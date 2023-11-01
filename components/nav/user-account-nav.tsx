@@ -1,0 +1,90 @@
+"use client"
+
+import Link from "next/link"
+
+import { Icons } from "@/components/icons"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { UserAvatar } from "@/components/user-avatar"
+import { User } from "@/types/dto"
+
+interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
+  user: Pick<User, "name" | "image" | "email">
+  logOut?: () => void
+}
+
+export function UserAccountNav({ user, logOut }: UserAccountNavProps) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <UserAvatar
+          user={{ name: user.name, image: user.image }}
+          className="h-8 w-8"
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <div className="flex items-center justify-start gap-2 p-2">
+          <div className="flex flex-col space-y-1 leading-none">
+            {user.name && <p className="font-medium">{user.name}</p>}
+            {user.email && (
+              <p className="w-[200px] truncate text-sm text-muted-foreground">
+                {user.email}
+              </p>
+            )}
+          </div>
+        </div>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem>
+          <Icons.user2 className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icons.creditCard className="mr-2 h-4 w-4" />
+          <span>Billing</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem>
+          <Icons.layoutDashboard className="mr-2 h-4 w-4" />
+          <Link href="/dashboard">Dashboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icons.fileSearch className="mr-2 h-4 w-4" />
+          <span>Audits</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icons.users className="mr-2 h-4 w-4" />
+          <span>Clients</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Icons.helpingHand className="mr-2 h-4 w-4" />
+          <span>Help</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Icons.lifeBuoy className="mr-2 h-4 w-4" />
+          <span>Support</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={(event) => {
+            event.preventDefault()
+            logOut?.()
+          }}
+        >
+          <Icons.logOut className="mr-2 h-4 w-4" />
+          <span>Sign out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
