@@ -9,6 +9,9 @@
 # vscode
 /.vscode/
 
+# pycharm
+.idea
+
 # testing
 /coverage
 
