@@ -22,14 +22,10 @@ export default function CompleteProfilePage({searchParams}: cpProps) {
         firstName: '',
         lastName: ''
     }
-    if (searchParams.fullName && searchParams.fullName.split(' ').length === 3) {
-        const [first, middle, last] = searchParams.fullName.split(' ');
-        name.firstName = first + ' ' + middle;
-        name.lastName = last;
-    } else if (searchParams.fullName && searchParams.fullName.split(' ').length === 2) {
-        const [first, last] = searchParams.fullName.split(' ');
-        name.firstName = first;
-        name.lastName = last;
+    if (searchParams.fullName) {
+        let nameParts = searchParams.fullName.split(" ");
+        name.firstName = nameParts.slice(0, -1).join(" ");
+        name.lastName = nameParts.slice(-1).join(" ");
     }
     return (
         <div className="container flex h-screen w-screen flex-col items-center justify-center">

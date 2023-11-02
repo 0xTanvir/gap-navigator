@@ -9,12 +9,13 @@ import {useForm} from "react-hook-form"
 import {cn} from "@/lib/utils"
 import {setUser} from "@/lib/firestore/user"
 import {User} from "@/types/dto"
-import {userAccountCompleteSchema, userRole} from "@/lib/validations/auth"
+import {userAccountCompleteSchema} from "@/lib/validations/auth"
 import {buttonVariants} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {toast} from "@/components/ui/use-toast"
 import {Icons} from "@/components/icons"
+import {userRole} from "@/config/site";
 
 
 interface UserAuthCompleteProps {

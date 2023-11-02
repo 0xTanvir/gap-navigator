@@ -1,10 +1,9 @@
 import * as z from "zod"
-
-export const userRole: string[] = ['client', 'consultant']
+import {userRole} from "@/config/site";
 
 export const userAuthLoginSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6).max(100),
+    email: z.string().email('Please enter a valid email'),
+    password: z.string().min(1, {message: 'Password is required'})
 })
 
 export const userAuthSignupSchema = z.object({

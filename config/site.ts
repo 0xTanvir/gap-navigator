@@ -11,3 +11,5 @@ export const siteConfig: SiteConfig = {
         instagram: "https://instagram.com/#",
     },
 }
+
+export const userRole: string[] = ['client', 'consultant']
