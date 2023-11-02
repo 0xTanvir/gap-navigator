@@ -15,7 +15,8 @@ export async function getUserById(id: string): Promise<User> {
         const data = snap.data()
         const user: User = {
             uid: snap.id,
-            fullName: data.fullName,
+            firstName: data.firstName,
+            lastName: data.lastName,
             email: data.email,
             role: data.role,
             image: data.image,

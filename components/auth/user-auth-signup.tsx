@@ -3,26 +3,27 @@
 import * as React from "react"
 import * as z from "zod"
 
-import { useSearchParams, useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { cn } from "@/lib/utils"
-import { setUser } from "@/lib/firestore/user"
-import { User } from "@/types/dto"
-import { userAuthSignupSchema } from "@/lib/validations/auth"
-import { buttonVariants } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
-import { Icons } from "@/components/icons"
-import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from "firebase/auth"
+import {useSearchParams, useRouter} from "next/navigation"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {cn} from "@/lib/utils"
+import {setUser} from "@/lib/firestore/user"
+import {User} from "@/types/dto"
+import {userAuthSignupSchema, userRole} from "@/lib/validations/auth"
+import {buttonVariants} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {toast} from "@/components/ui/use-toast"
+import {Icons} from "@/components/icons"
+import {getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword} from "firebase/auth"
 
 
-interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> { }
+interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
+}
 
 type FormData = z.infer<typeof userAuthSignupSchema>
 
-export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
+export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
     const provider = new GoogleAuthProvider()
     const auth = getAuth()
     const router = useRouter()
@@ -30,7 +31,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<FormData>({
         resolver: zodResolver(userAuthSignupSchema),
     })
@@ -63,7 +64,8 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
             const user: User = {
                 uid: result.user.uid,
                 email: data.email,
-                fullName: data.fullName,
+                firstName: data.firstName,
+                lastName: data.lastName,
                 role: data.role,
                 image: result.user.photoURL!,
             }
@@ -98,25 +100,45 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
 
     return (
         <div className={cn("grid gap-6", className)} {...props}>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
                 <div className="grid gap-2">
                     <div className="grid gap-1">
                         <Label className="sr-only" htmlFor="name">
-                            Full Name
+                            First Name
                         </Label>
                         <Input
-                            id="name"
-                            placeholder="Full Name"
+                            id="first_name"
+                            placeholder="First Name"
                             type="text"
                             autoCapitalize="none"
-                            autoComplete="name"
+                            autoComplete="first_name"
                             autoCorrect="off"
                             disabled={isLoading || isGoogleLoading}
-                            {...register("fullName")}
+                            {...register("firstName")}
                         />
-                        {errors?.fullName && (
+                        {errors?.firstName && (
                             <p className="px-1 text-xs text-red-600">
-                                {errors.fullName.message}
+                                {errors.firstName.message}
+                            </p>
+                        )}
+                    </div>
+                    <div className="grid gap-1">
+                        <Label className="sr-only" htmlFor="name">
+                            Last Name
+                        </Label>
+                        <Input
+                            id="last_name"
+                            placeholder="Last Name"
+                            type="text"
+                            autoCapitalize="none"
+                            autoComplete="last_name"
+                            autoCorrect="off"
+                            disabled={isLoading || isGoogleLoading}
+                            {...register("lastName")}
+                        />
+                        {errors?.lastName && (
+                            <p className="px-1 text-xs text-red-600">
+                                {errors.lastName.message}
                             </p>
                         )}
                     </div>
@@ -161,34 +183,51 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                         )}
                     </div>
                     <div className="grid gap-1">
-                        <Label className="sr-only" htmlFor="role">
+                        <Label htmlFor="role">
                             Account Type
                         </Label>
-                        <Input
-                            id="role"
-                            placeholder="Account Type"
-                            type="text"
-                            autoCapitalize="none"
-                            disabled={isLoading || isGoogleLoading}
-                            {...register("role")}
-                        />
+
+                        <fieldset className="mt-1">
+                            <legend className="sr-only">Notification method</legend>
+                            <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                                {userRole.map((userRole) => (
+                                    <div key={userRole} className="flex items-center">
+                                        <input
+                                            id={userRole}
+                                            type="radio"
+                                            value={userRole}
+                                            defaultChecked={userRole === 'client'}
+                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                            disabled={isLoading || isGoogleLoading}
+                                            {...register("role")}
+                                        />
+                                        <label htmlFor={userRole}
+                                               className="ml-3 block text-sm font-medium leading-6 text-gray-900 capitalize">
+                                            {userRole}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </fieldset>
+
                         {errors?.role && (
                             <p className="px-1 text-xs text-red-600">
                                 {errors.role.message}
                             </p>
                         )}
+
                     </div>
                     <button className={cn(buttonVariants())} disabled={isLoading}>
                         {isLoading && (
-                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                         )}
-                        Sign Up with Email
+                        Sign Up
                     </button>
                 </div>
             </form>
             <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t"/>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
@@ -198,7 +237,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
             </div>
             <button
                 type="button"
-                className={cn(buttonVariants({ variant: "outline" }))}
+                className={cn(buttonVariants({variant: "outline"}))}
                 onClick={() => {
                     setIsLoading(true)
                     setIsGoogleLoading(true)
@@ -207,9 +246,9 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                 disabled={isLoading || isGoogleLoading}
             >
                 {isGoogleLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                 ) : (
-                    <Icons.google className="mr-2 h-4 w-4" />
+                    <Icons.google className="mr-2 h-4 w-4"/>
                 )}{" "}
                 Google
             </button>

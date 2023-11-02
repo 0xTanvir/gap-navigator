@@ -1,23 +1,65 @@
 import * as z from "zod"
 
+export const userRole: string[] = ['client', 'consultant']
+
 export const userAuthLoginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6).max(100),
 })
 
 export const userAuthSignupSchema = z.object({
-    fullName: z.string().min(3),
-    email: z.string().email(),
-    password: z.string().min(6).max(100),
-    role: z.enum(["consultant", "client"], {
-        required_error: "You need at select between 'consultant' or 'client'",
+    firstName: z.string()
+        .refine(value => !/^\s/.test(value), {
+            message: 'The first character must not be a space',
+        })
+        .refine(value => value.trim().length > 0, {
+            message: 'First name is required',
+        })
+        .refine(value => value.trim().length >= 3, {
+            message: 'First Name must be at least 3 characters',
+        }),
+    lastName: z.string()
+        .refine(value => !/^\s/.test(value), {
+            message: 'The first character must not be a space',
+        })
+        .refine(value => value.trim().length > 0, {
+            message: 'First name is required',
+        })
+        .refine(value => value.trim().length >= 3, {
+            message: 'First Name must be at least 3 characters',
+        }),
+    email: z.string().email('Please enter a valid email'),
+    password: z.string().min(1, {message: 'Password is required'})
+        .min(6, {message: 'Password must be at least 6 character\'s'})
+        .max(100, {message: 'Password must be at least 100 character\'s'}),
+    role: z.string().refine((value) => userRole.includes(value), {
+        message: 'Please select a valid account type',
     }),
 })
 
 export const userAccountCompleteSchema = z.object({
-    fullName: z.string().min(3),
+    firstName: z.string()
+        .refine(value => !/^\s/.test(value), {
+            message: 'The first character must not be a space',
+        })
+        .refine(value => value.trim().length > 0, {
+            message: 'First name is required',
+        })
+        .refine(value => value.trim().length >= 3, {
+            message: 'First Name must be at least 3 characters',
+        }),
+    lastName: z.string()
+        .refine(value => !/^\s/.test(value), {
+            message: 'The first character must not be a space',
+        })
+        .refine(value => value.trim().length > 0, {
+            message: 'First name is required',
+        })
+        .refine(value => value.trim().length >= 3, {
+            message: 'First Name must be at least 3 characters',
+        }),
     email: z.string().email(),
-    role: z.enum(["consultant", "client"], {
-        required_error: "You need at select between 'consultant' or 'client'",
+    role: z.string().refine((value) => userRole.includes(value), {
+        message: 'Please select a valid account type',
     }),
 })
