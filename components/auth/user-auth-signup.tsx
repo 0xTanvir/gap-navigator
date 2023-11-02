@@ -7,6 +7,8 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { cn } from "@/lib/utils"
+import { setUser } from "@/lib/firestore/user"
+import { User } from "@/types/dto"
 import { userAuthSignupSchema } from "@/lib/validations/auth"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,7 +36,6 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
     })
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false)
-    const searchParams = useSearchParams()
 
     const handleSignInWithGoogle = async () => {
         await signInWithPopup(auth, provider).then((result) => {
@@ -54,16 +55,31 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
         })
     }
 
-
     async function onSubmit(data: FormData) {
         setIsLoading(true)
         setIsGoogleLoading(true)
-        console.log("data:", data)
-        await createUserWithEmailAndPassword(auth, data.email, data.password).then((result) => {
+        await createUserWithEmailAndPassword(auth, data.email, data.password).then(async (result) => {
+            // Add user to firestore
+            const user: User = {
+                uid: result.user.uid,
+                email: data.email,
+                fullName: data.fullName,
+                role: data.role,
+                image: result.user.photoURL!,
+            }
+            try {
+                await setUser(result.user.uid, user)
+            } catch (error: any) {
+                setIsLoading(false)
+                setIsGoogleLoading(false)
+                return toast({
+                    title: "Unable to Sign Up",
+                    description: error.message,
+                })
+            }
+
             setIsLoading(false)
             setIsGoogleLoading(false)
-            // TODO: Add user to firestore
-
             // TODO: force the caller to send callback url
             // get the callback url and redirect to the callback url
             router.push("/")
@@ -141,6 +157,24 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                         {errors?.password && (
                             <p className="px-1 text-xs text-red-600">
                                 {errors.password.message}
+                            </p>
+                        )}
+                    </div>
+                    <div className="grid gap-1">
+                        <Label className="sr-only" htmlFor="role">
+                            Account Type
+                        </Label>
+                        <Input
+                            id="role"
+                            placeholder="Account Type"
+                            type="text"
+                            autoCapitalize="none"
+                            disabled={isLoading || isGoogleLoading}
+                            {...register("role")}
+                        />
+                        {errors?.role && (
+                            <p className="px-1 text-xs text-red-600">
+                                {errors.role.message}
                             </p>
                         )}
                     </div>

@@ -14,26 +14,29 @@ import { UserAvatar } from "@/components/user-avatar"
 import { User } from "@/types/dto"
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
-  user: Pick<User, "name" | "image" | "email">
+  name?: string
+  image?: string
+  email?: string
   logOut?: () => void
 }
 
-export function UserAccountNav({ user, logOut }: UserAccountNavProps) {
+export function UserAccountNav({ name, image, email, logOut }: UserAccountNavProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <UserAvatar
-          user={{ name: user.name, image: user.image }}
+          name={name}
+          image={image}
           className="h-8 w-8"
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
-            {user.name && <p className="font-medium">{user.name}</p>}
-            {user.email && (
+            {name && <p className="font-medium">{name}</p>}
+            {email && (
               <p className="w-[200px] truncate text-sm text-muted-foreground">
-                {user.email}
+                {email}
               </p>
             )}
           </div>

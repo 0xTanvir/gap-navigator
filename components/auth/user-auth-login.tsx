@@ -58,7 +58,6 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
     async function onSubmit(data: FormData) {
         setIsLoading(true)
         setIsGoogleLoading(true)
-        console.log("data:", data)
         await signInWithEmailAndPassword(auth, data.email, data.password).then((result) => {
             setIsLoading(false)
             setIsGoogleLoading(false)
