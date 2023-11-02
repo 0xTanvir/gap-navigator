@@ -1,22 +1,23 @@
 import { useContext, createContext, FC, useState, ReactNode, useEffect } from 'react'
 import { signOut, onAuthStateChanged } from 'firebase/auth'
-import auth from 'firebase/auth'
+import { toast } from "@/components/ui/use-toast"
 import { firebaseAuth } from '@/firebase'
 import { useRouter, usePathname } from "next/navigation"
+import { getUserById } from "@/lib/firestore/user"
+import { User } from '@/types/dto'
 
 interface AuthContextValue {
-    // Change this user to session user
-    user: auth.User | null
-    // isAuthenticated: boolean
-    // isRegistered: boolean
+    user: User | null
+    isAuthenticated: boolean
     loading: boolean
     logOut: () => Promise<void>
 }
 
-export const AuthContext = createContext<AuthContextValue>({ user: null, loading: true, logOut: async () => { } })
+export const AuthContext = createContext<AuthContextValue>({ user: null, isAuthenticated: false, loading: true, logOut: async () => { } })
 
 export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<auth.User | null>(null)
+    const [user, setUser] = useState<User | null>(null)
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [loading, setLoading] = useState(true)
     const router = useRouter()
     const pathname = usePathname()
@@ -24,42 +25,48 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) =
     const logOut = async () => {
         await signOut(firebaseAuth)
         setUser(null)
+        setIsAuthenticated(false)
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(firebaseAuth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(firebaseAuth, async (currentUser) => {
             if (currentUser) {
+                // user is authenticated, set isAuthenticated to true
+                setIsAuthenticated(true)
+                // check if user available in application state
+                // at the beginning of the application, user will be null
+                // then fetch the user from firestore
+                if (!user) {
+                    try {
+                        const dbUser = await getUserById(currentUser.uid)
+                        setUser(dbUser)
+                    } catch (error) {
+                        // if authenticated user is not available in firestore
+                        // then redirect user to register page
+                        toast({
+                            title: "Authenticated, but not registered",
+                            description: "You are authenticated, but you are not registered, you need to register first to continue. You will be redirected to register page.",
+                        })
+                        // also redirect with param like, name, email and uid
+                        // that found on currentUser
+                        if (pathname !== "/complete-profile") {
+                            router.push(`/complete-profile?uid=${currentUser.uid}&email=${currentUser.email}&fullName=${currentUser.displayName}`)
+                        }
+                    }
+                }
+
+                // here means user is available in application state
                 setLoading(false)
-                // Instead of set user set isAuthenticated
-                setUser(currentUser)
-                // TODO: check if user role is available in local
-                // if role is not available, then fetch from firestore
-                // if role is available, then do nothing
-
-                // if firestore has no result, redirect user to complete profile
-                // with currentUser uid
-
-                // console.log("current path name:", pathname)
-                // if (pathname !== "/register-new") {
-                //     router.push("/register-new")
-
-                //     // You are authenticated, but you are not registered
-                //     // You need to register first to continue
-                //     // You will be redirected to register page
-                // }
-
-                // if firestore has result, then set this user
-                // console.log("I am getting call currentUser:", currentUser)
-
             } else {
                 setLoading(false)
+                setIsAuthenticated(false)
                 setUser(null)
             }
         })
         return unsubscribe
     }, [])
 
-    return <AuthContext.Provider value={{ user, loading, logOut }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ user, isAuthenticated, loading, logOut }}>{children}</AuthContext.Provider>
 };
 
 export const useAuth = () => useContext(AuthContext)

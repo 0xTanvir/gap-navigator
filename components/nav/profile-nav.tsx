@@ -13,11 +13,9 @@ export function ProfileNav() {
     return (
         <>
             {!loading && user && <UserAccountNav
-                user={{
-                    name: user.displayName!,
-                    image: user.photoURL!,
-                    email: user.email!,
-                }}
+                name={user.fullName}
+                image={user.image}
+                email={user.email}
                 logOut={logOut}
             />}
             {!loading && !user && <div className="flex gap-4">
