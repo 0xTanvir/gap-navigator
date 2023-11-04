@@ -105,7 +105,7 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                             placeholder="Last Name"
                             type="text"
                             autoCapitalize="none"
-                            autoComplete="name"
+                            autoComplete="lastName"
                             autoCorrect="off"
                             disabled={isLoading}
                             {...register("lastName")}
