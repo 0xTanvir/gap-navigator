@@ -14,6 +14,7 @@ import {Label} from "@/components/ui/label"
 import {toast} from "@/components/ui/use-toast"
 import {Icons} from "@/components/icons"
 import {getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword} from "firebase/auth"
+import Link from "next/link";
 
 
 interface UserAuthLoginProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -80,7 +81,7 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
     }
 
     return (
-        <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] ", className)} {...props}>
+        <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
             <div className="px-6 py-12 shadow sm:rounded-lg sm:px-12 border">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
 
@@ -91,6 +92,7 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                         <div className="mt-2">
                             <Input
                                 id="email"
+                                variant="flat"
                                 placeholder="name@example.com"
                                 type="email"
                                 autoCapitalize="none"
@@ -114,6 +116,7 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                         <div className="mt-2">
                             <Input
                                 id="password"
+                                variant="flat"
                                 placeholder="Password"
                                 type="password"
                                 autoCapitalize="none"
@@ -149,14 +152,13 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                         </button>
                     </div>
                 </form>
-
                 <div>
                     <div className="relative mt-6">
                         <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t border-gray-200"/>
+                            <span className="w-full border-t"/>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white px-4 text-black py-2 rounded text-muted-foreground">
+                            <span className="bg-background px-4 text-black py-2 rounded text-muted-foreground">
                                 Or continue with
                             </span>
                         </div>
@@ -182,6 +184,14 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                     </div>
                 </div>
             </div>
+            <p className="my-5 text-center text-sm text-muted-foreground">
+                <Link
+                    href="/signup"
+                    className="font-semibold leading-6 hover:text-brand underline underline-offset-4"
+                >
+                    Don&apos;t have an account? Sign Up
+                </Link>
+            </p>
         </div>
     )
 }

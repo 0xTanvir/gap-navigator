@@ -34,12 +34,14 @@ export default function RegisterPage() {
                     <Icons.chevronRight className="ml-2 h-4 w-4"/>
                 </Link>
             </div>
+
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <Icons.logo className="mx-auto h-6 w-6"/>
                 <h2 className="mt-4 text-center text-2xl font-bold leading-9 tracking-tight">
                     Sign in to your account
                 </h2>
             </div>
+
             <UserAuthSignup/>
 
         </div>

@@ -101,7 +101,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
     }
 
     return (
-        <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[680px]", className)} {...props}>
+        <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
             <div className=" px-6 py-12 shadow sm:rounded-lg sm:px-12 border">
                 <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" className="space-y-3">
 
@@ -113,6 +113,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                             <div className="mt-2">
                                 <Input
                                     id="first_name"
+                                    variant="flat"
                                     placeholder="First Name"
                                     type="text"
                                     autoCapitalize="none"
@@ -136,6 +137,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                             <div className="mt-2">
                                 <Input
                                     id="last_name"
+                                    variant="flat"
                                     placeholder="Last Name"
                                     type="text"
                                     autoCapitalize="none"
@@ -160,6 +162,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                         <div className="mt-2">
                             <Input
                                 id="email"
+                                variant="flat"
                                 placeholder="name@example.com"
                                 type="email"
                                 autoCapitalize="none"
@@ -183,6 +186,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                         <div className="mt-2">
                             <Input
                                 id="password"
+                                variant="flat"
                                 placeholder="Password"
                                 type="password"
                                 autoCapitalize="none"
@@ -200,7 +204,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium leading-6">
+                        <label htmlFor="role" className="block text-sm font-medium leading-6">
                             Account Type
                         </label>
                         <fieldset className="mt-2">
@@ -254,7 +258,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                             <div className="w-full border-t border-gray-200"/>
                         </div>
                         <div className="relative flex justify-center text-sm font-medium leading-6">
-                            <span className="bg-white px-6 py-2 rounded text-gray-900">Or continue with</span>
+                            <span className="bg-background px-6 py-2 rounded">Or continue with</span>
                         </div>
                     </div>
 

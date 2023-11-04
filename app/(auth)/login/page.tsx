@@ -48,15 +48,6 @@ export default function LoginPage() {
 
             <UserAuthLogin/>
 
-            <p className="mt-10 text-center text-sm text-muted-foreground">
-                <Link
-                    href="/signup"
-                    className="font-semibold leading-6 hover:text-brand underline underline-offset-4"
-                >
-                    Don&apos;t have an account? Sign Up
-                </Link>
-            </p>
-
         </div>
     )
 }

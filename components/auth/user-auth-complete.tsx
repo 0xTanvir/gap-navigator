@@ -16,6 +16,7 @@ import {Label} from "@/components/ui/label"
 import {toast} from "@/components/ui/use-toast"
 import {Icons} from "@/components/icons"
 import {userRole} from "@/config/site";
+import Link from "next/link";
 
 
 interface UserAuthCompleteProps {
@@ -66,15 +67,17 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
     }
 
     return (
-        <div className={cn("grid gap-6")}>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="grid gap-2">
-                    <div className="grid gap-1">
-                        <Label className="sr-only" htmlFor="firstName">
+        <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]")}>
+            <div className=" px-6 py-12 shadow sm:rounded-lg sm:px-12 border">
+                <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" className="space-y-3">
+
+                    <div>
+                        <Label className="block text-sm font-medium leading-6" htmlFor="firstName">
                             First Name
                         </Label>
                         <Input
                             id="firstName"
+                            variant='flat'
                             defaultValue={firstName}
                             placeholder="First Name"
                             type="text"
@@ -91,12 +94,13 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                         )}
                     </div>
 
-                    <div className="grid gap-1">
-                        <Label className="sr-only" htmlFor="lastName">
+                    <div>
+                        <Label className="block text-sm font-medium leading-6" htmlFor="lastName">
                             Last Name
                         </Label>
                         <Input
                             id="lastName"
+                            variant='flat'
                             defaultValue={lastName}
                             placeholder="Last Name"
                             type="text"
@@ -113,18 +117,19 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                         )}
                     </div>
 
-                    <div className="grid gap-1">
-                        <Label className="sr-only" htmlFor="email">
+                    <div>
+                        <Label className="block text-sm font-medium leading-6" htmlFor="email">
                             Email
                         </Label>
                         <Input
                             id="email"
+                            variant='flat'
                             defaultValue={email}
                             type="email"
                             autoCapitalize="none"
                             autoComplete="email"
                             autoCorrect="off"
-                            // disabled
+                            readOnly={true}
                             {...register("email")}
                         />
                         {errors?.email && (
@@ -133,30 +138,33 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                             </p>
                         )}
                     </div>
-                    <div className="grid gap-1">
-                        <Label htmlFor="role">
+
+                    <div>
+                        <Label htmlFor="role" className="block text-sm font-medium leading-6">
                             Account Type
                         </Label>
-                        <fieldset className="mt-1">
+                        <fieldset className="mt-2">
                             <legend className="sr-only">Notification method</legend>
                             <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                                {userRole.map((userRole) => (
-                                    <div key={userRole} className="flex items-center">
-                                        <input
-                                            id={userRole}
-                                            type="radio"
-                                            value={userRole}
-                                            defaultChecked={userRole === 'client'}
-                                            className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                            disabled={isLoading}
-                                            {...register("role")}
-                                        />
-                                        <label htmlFor={userRole}
-                                               className="ml-3 block text-sm font-medium leading-6 text-gray-900 capitalize">
-                                            {userRole}
-                                        </label>
-                                    </div>
-                                ))}
+                                {
+                                    userRole.map((userRole) => (
+                                        <div key={userRole} className="flex items-center">
+                                            <input
+                                                id={userRole}
+                                                type="radio"
+                                                value={userRole}
+                                                defaultChecked={userRole === 'client'}
+                                                className="h-4 w-4"
+                                                disabled={isLoading}
+                                                {...register("role")}
+                                            />
+                                            <label htmlFor={userRole}
+                                                   className="ml-2 text-sm font-medium capitalize text-muted-foreground">
+                                                {userRole}
+                                            </label>
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </fieldset>
                         {errors?.role && (
@@ -165,14 +173,38 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                             </p>
                         )}
                     </div>
-                    <button className={cn(buttonVariants())} disabled={isLoading}>
-                        {isLoading && (
-                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
-                        )}
-                        Complete Profile
-                    </button>
-                </div>
-            </form>
+
+                    <div>
+                        <button
+                            className={cn(buttonVariants(), "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm")}
+                            disabled={isLoading}
+                        >
+                            {isLoading && (
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                            )}
+                            Complete Profile
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+            <p className="my-5 px-4 text-center text-sm text-muted-foreground">
+                By clicking continue, you agree to our{" "}
+                <Link
+                    href="/terms"
+                    className="hover:text-brand underline underline-offset-4"
+                >
+                    Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                    href="/privacy"
+                    className="hover:text-brand underline underline-offset-4"
+                >
+                    Privacy Policy
+                </Link>
+                .
+            </p>
         </div>
     )
 }
