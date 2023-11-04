@@ -16,3 +16,7 @@ export enum AccountType {
     Client = 'client',
     Consultant = 'consultant',
 }
+export enum AuditsType{
+    Private = 'private',
+    Public = 'public',
+}
