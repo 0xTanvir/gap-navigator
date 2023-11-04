@@ -82,7 +82,7 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
 
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
-            <div className="px-6 py-12 shadow sm:rounded-lg sm:px-12 border">
+            <div className="px-6 py-12 shadow-xl mx-2 md:mx-0 sm:rounded-lg sm:px-12 border">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
 
                     <div>
