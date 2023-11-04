@@ -15,7 +15,7 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {toast} from "@/components/ui/use-toast"
 import {Icons} from "@/components/icons"
-import {userRole} from "@/config/site";
+import {AccountType} from "@/config/site";
 import Link from "next/link";
 
 
@@ -147,18 +147,18 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                             <legend className="sr-only">Notification method</legend>
                             <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
                                 {
-                                    userRole.map((userRole) => (
+                                    Object.keys(AccountType).map((userRole) => (
                                         <div key={userRole} className="flex items-center">
                                             <input
-                                                id={userRole}
+                                                id={userRole.toLowerCase()}
                                                 type="radio"
-                                                value={userRole}
-                                                defaultChecked={userRole === 'client'}
+                                                value={userRole.toLowerCase()}
+                                                defaultChecked={userRole.toLowerCase() === 'client'}
                                                 className="h-4 w-4"
                                                 disabled={isLoading}
                                                 {...register("role")}
                                             />
-                                            <label htmlFor={userRole}
+                                            <label htmlFor={userRole.toLowerCase()}
                                                    className="ml-2 text-sm font-medium capitalize text-muted-foreground">
                                                 {userRole}
                                             </label>

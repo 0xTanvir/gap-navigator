@@ -12,4 +12,7 @@ export const siteConfig: SiteConfig = {
     },
 }
 
-export const userRole: string[] = ['client', 'consultant']
+export enum AccountType {
+    Client = 'client',
+    Consultant = 'consultant',
+}

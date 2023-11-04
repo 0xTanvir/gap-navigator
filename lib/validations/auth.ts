@@ -1,5 +1,5 @@
 import * as z from "zod"
-import {userRole} from "@/config/site";
+import {AccountType} from "@/config/site";
 
 export const userAuthLoginSchema = z.object({
     email: z.string().email('Please enter a valid email'),
@@ -31,9 +31,10 @@ export const userAuthSignupSchema = z.object({
     password: z.string().min(1, {message: 'Password is required'})
         .min(6, {message: 'Password must be at least 6 character\'s'})
         .max(100, {message: 'Password must be at least 100 character\'s'}),
-    role: z.string().refine((value) => userRole.includes(value), {
-        message: 'Please select a valid account type',
-    }),
+    role: z.nativeEnum(AccountType).refine(value => {
+            return value === "client" || value === "consultant";
+        }, {message: 'Please select a valid account type'}
+    )
 })
 
 export const userAccountCompleteSchema = z.object({
@@ -58,7 +59,8 @@ export const userAccountCompleteSchema = z.object({
             message: 'First Name must be at least 3 characters',
         }),
     email: z.string().email(),
-    role: z.string().refine((value) => userRole.includes(value), {
-        message: 'Please select a valid account type',
-    }),
+    role: z.nativeEnum(AccountType).refine(value => {
+            return value === "client" || value === "consultant";
+        }, {message: 'Please select a valid account type'}
+    )
 })
