@@ -255,7 +255,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                 <div>
                     <div className="relative mt-6">
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="w-full border-t border-gray-200"/>
+                            <div className="w-full border-t"/>
                         </div>
                         <div className="relative flex justify-center text-sm font-medium leading-6">
                             <span className="bg-background px-6 py-2 rounded">Or continue with</span>
