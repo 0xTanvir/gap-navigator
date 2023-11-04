@@ -3,21 +3,21 @@
 import * as React from "react"
 import * as z from "zod"
 
-import {useSearchParams, useRouter} from "next/navigation"
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
-import {cn} from "@/lib/utils"
-import {setUser} from "@/lib/firestore/user"
-import {User} from "@/types/dto"
-import {userAuthSignupSchema} from "@/lib/validations/auth"
-import {buttonVariants} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {toast} from "@/components/ui/use-toast"
-import {Icons} from "@/components/icons"
-import {getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword} from "firebase/auth"
+import { useSearchParams, useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { cn } from "@/lib/utils"
+import { setUser } from "@/lib/firestore/user"
+import { User } from "@/types/dto"
+import { userAuthSignupSchema } from "@/lib/validations/auth"
+import { buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons"
+import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from "firebase/auth"
 import Link from "next/link";
-import {AccountType} from "@/config/site";
+import { AccountType } from "@/config/site";
 
 
 interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,7 +25,7 @@ interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
 
 type FormData = z.infer<typeof userAuthSignupSchema>
 
-export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
+export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
     const provider = new GoogleAuthProvider()
     const auth = getAuth()
     const router = useRouter()
@@ -33,7 +33,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(userAuthSignupSchema),
     })
@@ -224,7 +224,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                                                 {...register("role")}
                                             />
                                             <Label htmlFor={userRole.toLowerCase()}
-                                                   className="ml-2 text-sm font-medium capitalize text-muted-foreground">
+                                                className="ml-2 text-sm font-medium capitalize text-muted-foreground">
                                                 {userRole}
                                             </Label>
                                         </div>
@@ -245,7 +245,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                             className={cn(buttonVariants(), "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm")}
                             disabled={isLoading}>
                             {isLoading && (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                             )}
                             Sign Up
                         </button>
@@ -256,7 +256,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                 <div>
                     <div className="relative mt-6">
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="w-full border-t"/>
+                            <div className="w-full border-t" />
                         </div>
                         <div className="relative flex justify-center text-sm font-medium leading-6">
                             <span className="bg-background px-6 py-2 rounded">Or continue with</span>
@@ -266,7 +266,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                     <div className="mt-6 grid grid-cols-0 gap-4">
                         <button
                             type="button"
-                            className={cn(buttonVariants({variant: "outline"}))}
+                            className={cn(buttonVariants({ variant: "outline" }))}
                             onClick={() => {
                                 setIsLoading(true)
                                 setIsGoogleLoading(true)
@@ -275,9 +275,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                             disabled={isLoading || isGoogleLoading}
                         >
                             {isGoogleLoading ? (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                             ) : (
-                                <Icons.google className="mr-2 h-4 w-4"/>
+                                <Icons.google2 className="mr-2 h-4 w-4" />
                             )}{" "}
                             Google
                         </button>

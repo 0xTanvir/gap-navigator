@@ -8,6 +8,7 @@ import { UserAccountNav } from "./user-account-nav"
 import { Skeleton } from "@/components/ui/skeleton"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export function ProfileNav() {
     const { user, loading, logOut } = useAuth()
@@ -19,13 +20,16 @@ export function ProfileNav() {
 
     return (
         <>
-            {!loading && user && <UserAccountNav
-                name={user.firstName + ' ' + user.lastName}
-                image={user.image}
-                email={user.email}
-                logOut={logOut}
-            />}
+            {!loading && user && <div className="flex gap-4">
+                <ModeToggle />
+                <UserAccountNav
+                    name={user.firstName + ' ' + user.lastName}
+                    image={user.image}
+                    email={user.email}
+                    logOut={logOut}
+                /></div>}
             {!loading && !user && <div className="flex gap-4">
+                <ModeToggle />
                 <Link
                     href="/login"
                     className={cn(
@@ -34,15 +38,6 @@ export function ProfileNav() {
                     )}
                 >
                     Log In
-                </Link>
-                <Link
-                    href="/signup"
-                    className={cn(
-                        buttonVariants({ size: "sm" }),
-                        "px-4"
-                    )}
-                >
-                    Sign Up
                 </Link>
             </div>}
         </>

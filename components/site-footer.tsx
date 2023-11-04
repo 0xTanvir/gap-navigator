@@ -2,7 +2,6 @@ import * as React from "react"
 
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
-import { ModeToggle } from "@/components/mode-toggle"
 
 export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
     return (
@@ -13,7 +12,6 @@ export function SiteFooter({ className }: React.HTMLAttributes<HTMLElement>) {
                         &copy; 2023 {siteConfig.name}, Inc. All rights reserved.
                     </p>
                 </div>
-                <ModeToggle />
             </div>
         </footer>
     )
