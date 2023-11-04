@@ -1,3 +1,5 @@
+import React from "react"
+
 import { marketingConfig } from "@/config/marketing"
 import { MainNav } from "@/components/nav/main-nav"
 import { SiteFooter } from "@/components/site-footer"
@@ -12,10 +14,10 @@ export default async function MarketingLayout({
 }: MarketingLayoutProps) {
     return (
         <div className="flex min-h-screen flex-col">
-            <header className="container my-4 z-40 bg-background">
+            <header className="container z-40 py-6">
                 <div className="flex items-center justify-between">
                     <MainNav items={marketingConfig.mainNav} />
-                    <nav >
+                    <nav>
                         <ProfileNav />
                     </nav>
                 </div>

@@ -18,6 +18,14 @@ import {
     ChevronLeft,
     ChevronRight,
     Loader2,
+    Facebook,
+    Twitter,
+    Youtube,
+    Linkedin,
+    Milestone,
+    FilePlus2,
+    FileQuestion,
+    FileText,
 } from "lucide-react"
 
 export const Icons = {
@@ -39,6 +47,14 @@ export const Icons = {
     chevronLeft: ChevronLeft,
     chevronRight: ChevronRight,
     spinner: Loader2,
+    facebook: Facebook,
+    twitter: Twitter,
+    youtube: Youtube,
+    linkedin: Linkedin,
+    milestone: Milestone,
+    filePlus: FilePlus2,
+    fileQuestion: FileQuestion,
+    fileText: FileText,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

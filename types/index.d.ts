@@ -1,6 +1,6 @@
 export interface NavItem {
     title: string
-    href?: string
+    href: string
     disabled?: boolean
 }
 
@@ -42,3 +42,10 @@ export type SidebarNavItem = {
             items: NavLink[]
         }
     )
+
+export type SiteFooterConfig = {
+    solutions: MainNavItem[]
+    support: MainNavItem[]
+    company: MainNavItem[]
+    legal: MainNavItem[]
+}
