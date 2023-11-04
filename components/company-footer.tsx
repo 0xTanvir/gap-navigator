@@ -8,16 +8,6 @@ export async function CompanyFooter() {
             className="container space-y-6  py-8 dark:bg-transparent md:py-12 lg:py-24"
             aria-labelledby="footer-heading"
         >
-            <svg aria-hidden="true" width="100%" height="8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <pattern id="a" width="91" height="8" patternUnits="userSpaceOnUse">
-                    <g >
-                        <path d="M114 4c-5.067 4.667-10.133 4.667-15.2 0S88.667-.667 83.6 4 73.467 8.667 68.4 4 58.267-.667 53.2 4 43.067 8.667 38 4 27.867-.667 22.8 4 12.667 8.667 7.6 4-2.533-.667-7.6 4s-10.133 4.667-15.2 0S-32.933-.667-38 4s-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0-10.133-4.667-15.2 0-10.133 4.667-15.2 0" stroke="#E1E3E1">
-                        </path>
-                    </g>
-                </pattern>
-                <rect width="100%" height="100%" fill="url(#a)">
-                </rect>
-            </svg>
             <h2 id="footer-heading" className="sr-only">
                 Footer
             </h2>
@@ -31,7 +21,7 @@ export async function CompanyFooter() {
                             </span>
                         </Link>
                         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                            At {siteConfig.name}, Our platform is designed to make audits a breeze and 
+                            At {siteConfig.name}, Our platform is designed to make audits a breeze and
                             provide you with actionable insights.
                         </p>
                         <h3 className="font-bold">Follow Us On</h3>
