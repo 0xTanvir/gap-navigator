@@ -1,10 +1,10 @@
-import { useContext, createContext, FC, useState, ReactNode, useEffect } from 'react'
-import { signOut, onAuthStateChanged } from 'firebase/auth'
-import { toast } from "@/components/ui/use-toast"
-import { firebaseAuth } from '@/firebase'
-import { useRouter, usePathname } from "next/navigation"
-import { getUserById } from "@/lib/firestore/user"
-import { User } from '@/types/dto'
+import {useContext, createContext, FC, useState, ReactNode, useEffect} from 'react'
+import {signOut, onAuthStateChanged} from 'firebase/auth'
+import {toast} from "@/components/ui/use-toast"
+import {firebaseAuth} from '@/firebase'
+import {useRouter, usePathname} from "next/navigation"
+import {getUserById} from "@/lib/firestore/user"
+import {User} from '@/types/dto'
 
 interface AuthContextValue {
     user: User | null
@@ -13,9 +13,15 @@ interface AuthContextValue {
     logOut: () => Promise<void>
 }
 
-export const AuthContext = createContext<AuthContextValue>({ user: null, isAuthenticated: false, loading: true, logOut: async () => { } })
+export const AuthContext = createContext<AuthContextValue>({
+    user: null,
+    isAuthenticated: false,
+    loading: true,
+    logOut: async () => {
+    }
+})
 
-export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthContextProvider: FC<{ children: ReactNode }> = ({children}) => {
     const [user, setUser] = useState<User | null>(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -26,6 +32,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) =
         await signOut(firebaseAuth)
         setUser(null)
         setIsAuthenticated(false)
+        router.push('/')
     }
 
     useEffect(() => {
@@ -66,7 +73,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) =
         return unsubscribe
     }, [])
 
-    return <AuthContext.Provider value={{ user, isAuthenticated, loading, logOut }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{user, isAuthenticated, loading, logOut}}>{children}</AuthContext.Provider>
 };
 
 export const useAuth = () => useContext(AuthContext)

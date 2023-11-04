@@ -1,7 +1,8 @@
 import Link from "next/link"
 
-import { Icons } from "@/components/icons"
-import { UserAuthComplete } from "@/components/auth/user-auth-complete"
+import {Icons} from "@/components/icons"
+import {UserAuthComplete} from "@/components/auth/user-auth-complete"
+import React from "react";
 
 export const metadata = {
     title: "Create an account",
@@ -17,36 +18,34 @@ type cpProps = {
     searchParams: SearchParams;
 };
 
-export default function CompleteProfilePage({ searchParams }: cpProps) {
+export default function CompleteProfilePage({searchParams}: cpProps) {
+    let name = {
+        firstName: '',
+        lastName: ''
+    }
+    if (searchParams.fullName) {
+        let nameParts = searchParams.fullName.split(" ");
+        name.firstName = nameParts.slice(0, -1).join(" ");
+        name.lastName = nameParts.slice(-1).join(" ");
+    }
     return (
-        <div className="container flex h-screen w-screen flex-col items-center justify-center">
-            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                <div className="flex flex-col space-y-2 text-center">
-                    <Icons.logo className="mx-auto h-6 w-6" />
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        Complete your profile
-                    </h1>
-                </div>
-                {/* TODO: get the call call back url from the query params */}
-                <UserAuthComplete uid={searchParams.uid!} fullName={searchParams.fullName!} email={searchParams.email!} callbackUrl="/" />
-                <p className="px-8 text-center text-sm text-muted-foreground">
-                    By clicking continue, you agree to our{" "}
-                    <Link
-                        href="/terms"
-                        className="hover:text-brand underline underline-offset-4"
-                    >
-                        Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                        href="/privacy"
-                        className="hover:text-brand underline underline-offset-4"
-                    >
-                        Privacy Policy
-                    </Link>
-                    .
-                </p>
+        <div className="flex min-h-full lg:h-screen flex-1 flex-col justify-center my-5 lg:my-0">
+
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <Icons.logo className="mx-auto h-6 w-6"/>
+                <h1 className="text-2xl mt-4 text-center font-semibold tracking-tight">
+                    Complete your profile
+                </h1>
             </div>
+
+            <UserAuthComplete
+                uid={searchParams.uid!}
+                firstName={name.firstName!}
+                lastName={name.lastName}
+                email={searchParams.email!}
+                callbackUrl="/"
+            />
+
         </div>
     )
 }
