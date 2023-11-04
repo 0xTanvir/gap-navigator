@@ -86,9 +86,9 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
 
                     <div>
-                        <label htmlFor="email" className=" block text-sm font-medium leading-6">
+                        <Label htmlFor="email" className=" block text-sm font-medium leading-6">
                             Email
-                        </label>
+                        </Label>
                         <div className="mt-2">
                             <Input
                                 id="email"
@@ -110,9 +110,9 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium leading-6">
+                        <Label htmlFor="password" className="block text-sm font-medium leading-6">
                             Password
-                        </label>
+                        </Label>
                         <div className="mt-2">
                             <Input
                                 id="password"
@@ -135,7 +135,7 @@ export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
 
                     <div className="flex items-center justify-end">
                         <div className="text-sm leading-6">
-                            <a href="#" className="font-semibold">
+                            <a href={void 0} className="font-semibold">
                                 Forgot password?
                             </a>
                         </div>

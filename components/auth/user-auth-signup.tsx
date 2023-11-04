@@ -131,9 +131,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                         </div>
 
                         <div>
-                            <label htmlFor="last_name" className="block text-sm font-medium leading-6">
+                            <Label htmlFor="last_name" className="block text-sm font-medium leading-6">
                                 Last Name
-                            </label>
+                            </Label>
                             <div className="mt-2">
                                 <Input
                                     id="last_name"
@@ -156,9 +156,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="email" className=" block text-sm font-medium leading-6">
+                        <Label htmlFor="email" className=" block text-sm font-medium leading-6">
                             Email
-                        </label>
+                        </Label>
                         <div className="mt-2">
                             <Input
                                 id="email"
@@ -180,9 +180,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium leading-6">
+                        <Label htmlFor="password" className="block text-sm font-medium leading-6">
                             Password
-                        </label>
+                        </Label>
                         <div className="mt-2">
                             <Input
                                 id="password"
@@ -204,9 +204,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                     </div>
 
                     <div>
-                        <label htmlFor="role" className="block text-sm font-medium leading-6">
+                        <Label htmlFor="role" className="block text-sm font-medium leading-6">
                             Account Type
-                        </label>
+                        </Label>
                         <fieldset className="mt-2">
                             <legend className="sr-only">Notification method</legend>
                             <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
@@ -222,10 +222,10 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                                                 disabled={isLoading || isGoogleLoading}
                                                 {...register("role")}
                                             />
-                                            <label htmlFor={userRole.toLowerCase()}
+                                            <Label htmlFor={userRole.toLowerCase()}
                                                    className="ml-2 text-sm font-medium capitalize text-muted-foreground">
                                                 {userRole}
-                                            </label>
+                                            </Label>
                                         </div>
                                     ))
                                 }

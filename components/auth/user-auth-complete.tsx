@@ -158,10 +158,10 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                                                 disabled={isLoading}
                                                 {...register("role")}
                                             />
-                                            <label htmlFor={userRole.toLowerCase()}
+                                            <Label htmlFor={userRole.toLowerCase()}
                                                    className="ml-2 text-sm font-medium capitalize text-muted-foreground">
                                                 {userRole}
-                                            </label>
+                                            </Label>
                                         </div>
                                     ))
                                 }
