@@ -107,9 +107,9 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium leading-6">
+                            <Label htmlFor="first_name" className="block text-sm font-medium leading-6">
                                 First Name
-                            </label>
+                            </Label>
                             <div className="mt-2">
                                 <Input
                                     id="first_name"
@@ -131,7 +131,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium leading-6">
+                            <label htmlFor="last_name" className="block text-sm font-medium leading-6">
                                 Last Name
                             </label>
                             <div className="mt-2">
