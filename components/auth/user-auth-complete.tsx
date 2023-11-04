@@ -149,12 +149,13 @@ export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}:
                                 {
                                     Object.keys(AccountType).map((userRole) => (
                                         <div key={userRole} className="flex items-center">
-                                            <input
+                                            <Input
                                                 id={userRole.toLowerCase()}
                                                 type="radio"
                                                 value={userRole.toLowerCase()}
                                                 defaultChecked={userRole.toLowerCase() === 'client'}
                                                 className="h-4 w-4"
+                                                autoComplete="role"
                                                 disabled={isLoading}
                                                 {...register("role")}
                                             />

@@ -213,12 +213,13 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
                                 {
                                     Object.keys(AccountType).map((userRole) => (
                                         <div key={userRole} className="flex items-center">
-                                            <input
+                                            <Input
                                                 id={userRole.toLowerCase()}
                                                 type="radio"
                                                 value={userRole.toLowerCase()}
                                                 defaultChecked={userRole.toLowerCase() === 'client'}
                                                 className="h-4 w-4 "
+                                                autoComplete="role"
                                                 disabled={isLoading || isGoogleLoading}
                                                 {...register("role")}
                                             />
