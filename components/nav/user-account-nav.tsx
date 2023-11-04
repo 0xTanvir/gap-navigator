@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { UserAvatar } from "@/components/user-avatar"
-import { User } from "@/types/dto"
+import { useRouter } from "next/navigation"
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string
@@ -21,6 +21,7 @@ interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function UserAccountNav({ name, image, email, logOut }: UserAccountNavProps) {
+  const router = useRouter()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -82,6 +83,7 @@ export function UserAccountNav({ name, image, email, logOut }: UserAccountNavPro
           onSelect={(event) => {
             event.preventDefault()
             logOut?.()
+            router.push("/login")
           }}
         >
           <Icons.logOut className="mr-2 h-4 w-4" />
