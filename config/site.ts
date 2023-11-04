@@ -11,8 +11,3 @@ export const siteConfig: SiteConfig = {
         instagram: "https://instagram.com/#",
     },
 }
-
-export enum AccountType {
-    Client = 'client',
-    Consultant = 'consultant',
-}

@@ -13,7 +13,7 @@ export function ProfileNav() {
     return (
         <>
             {!loading && user && <UserAccountNav
-                name={user.firstName + ' ' + user.lastName}
+                name={user.fullName}
                 image={user.image}
                 email={user.email}
                 logOut={logOut}
