@@ -20,3 +20,9 @@ export enum AuditsType{
     Private = 'private',
     Public = 'public',
 }
+
+export type AuditsDataType = {
+    id: number
+    name: string
+    type: string
+}

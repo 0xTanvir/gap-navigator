@@ -1,33 +1,32 @@
 import React, {useState} from 'react';
 import {Icons} from "@/components/icons";
 import {AuditsModal} from "@/components/dashboard/audits-modal";
-import AuditsDeleteModal from "@/components/dashboard/audits-delete-modal";
+import {DataTable} from "@/components/data-table/data-table";
+import {Audit, columns} from "@/components/dashboard/table/columns";
+import {Button} from "@/components/ui/button";
 
-const audits = [
+const audits: Audit[] = [
     {id: 1, name: 'Audits 1', type: 'private'},
+    {id: 2, name: 'Audits 2', type: 'public'},
+    {id: 3, name: 'Audits 3', type: 'private'},
+    {id: 4, name: 'Audits 4', type: 'public'},
+    {id: 5, name: 'Audits 5', type: 'private'},
+    {id: 6, name: 'Audits 6', type: 'public'},
+    {id: 7, name: 'Audits 7', type: 'private'},
+    {id: 8, name: 'Audits 8', type: 'public'},
+    {id: 9, name: 'Audits 9', type: 'private'},
+    {id: 10, name: 'Audits 10', type: 'public'},
+    {id: 11, name: 'Audits 11', type: 'private'},
+    {id: 12, name: 'Audits 12', type: 'public'},
 ]
 const ClientDashboard = () => {
     const [open, setOpen] = useState<boolean>(false)
-    const [editOpenModal, setEditOpenModal] = useState<boolean>(false)
-    const [state, setState] = useState<{ delete: boolean; confirmDelete: boolean }>({
-        delete: false,
-        confirmDelete: false,
-    });
-
-    const handleCancelClick = () => {
-        setState({...state, delete: false, confirmDelete: false});
-    };
-
-    const handleSaveClick = () => {
-        setState({...state, delete: false, confirmDelete: true});
-    };
-
     return (
         <div className="container">
             <div className="px-4 sm:px-6 lg:px-8">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
-                        <h1 className="text-base font-semibold leading-6">Users</h1>
+                        <h1 className="text-base font-semibold leading-6">Audits</h1>
                         <p className="mt-2 text-sm">
                             A list of all the users in your account including their name, title, email and role.
                         </p>
@@ -35,16 +34,15 @@ const ClientDashboard = () => {
                     <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
 
                         <AuditsModal open={open} setOpen={setOpen} title={"Add Audits"}>
-                            <button
+                            <Button
                                 type="button"
-                                className="bg-primary flex justify-between items-center rounded-md border px-3 py-2 text-center text-sm font-semibold shadow-sm"
                                 onClick={() => {
                                     setOpen(true)
                                 }}
                             >
                                 <Icons.plus className="mr-1"/>
                                 Add Audits
-                            </button>
+                            </Button>
                         </AuditsModal>
                     </div>
                 </div>
@@ -53,61 +51,12 @@ const ClientDashboard = () => {
                 <div className="mt-8 flow-root">
                     <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead>
-                                <tr>
-                                    <th scope="col"
-                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold sm:pl-0">
-                                        Name
-                                    </th>
-                                    <th scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold">
-                                        Title
-                                    </th>
-                                    <th scope="col" className="px-3 text-right py-3.5 text-sm font-semibold">
-                                        Edit
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                {audits.map((audit) => (
-                                    <tr key={audit.id}>
-                                        <td className="whitespace-nowrap capitalize py-4 pl-4 pr-3 text-sm font-medium sm:pl-0">
-                                            {audit.name}
-                                        </td>
-                                        <td className="whitespace-nowrap capitalize px-3 py-4 text-sm">{audit.type}</td>
-                                        <td className="whitespace-nowrap px-3 text-right py-3.5 text-sm font-medium">
-                                            <div className="flex justify-end items-center">
-                                                <AuditsModal open={editOpenModal} setOpen={setEditOpenModal}
-                                                             title={"Edit Audits"} data={audit}>
-                                                    <Icons.edit
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            setEditOpenModal(true)
-                                                        }}
-                                                    />
-                                                </AuditsModal>
-
-                                                <AuditsDeleteModal
-                                                    open={state.delete}
-                                                    onClose={handleCancelClick}
-                                                    title={`Are you sure want to delete ${audit.name}?`}
-                                                    handleSaveClick={handleSaveClick}
-                                                >
-                                                    <Icons.delete
-                                                        className="cursor-pointer ml-3"
-                                                        onClick={() => setState({ ...state, delete: true, confirmDelete: false })}
-                                                    />
-                                                </AuditsDeleteModal>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                            <DataTable columns={columns} data={audits}/>
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
     );

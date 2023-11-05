@@ -1,21 +1,37 @@
 import React, {ReactNode} from 'react';
 import {
-    Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {AuditsType} from "@/config/site";
+import {Button} from "@/components/ui/button";
+
+interface AuditData {
+    name: string;
+    type: string
+}
 
 interface ModalProps {
     open: boolean;
     title: string
     setOpen: (value: boolean) => void;
-    data?: object;
+    auditData?: AuditData;
     children: ReactNode;
 }
 
-export function AuditsModal({open, setOpen, title, data, children}: ModalProps) {
+export function AuditsModal({open, setOpen, title, auditData, children}: ModalProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             {children}
@@ -24,7 +40,7 @@ export function AuditsModal({open, setOpen, title, data, children}: ModalProps) 
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
 
-                {JSON.stringify(data)}
+                {JSON.stringify(auditData)}
 
                 <form className="space-y-3">
                     <div>
@@ -40,6 +56,7 @@ export function AuditsModal({open, setOpen, title, data, children}: ModalProps) 
                                 autoCapitalize="none"
                                 autoComplete="audits_name"
                                 autoCorrect="off"
+                                defaultValue={auditData?.name}
                             />
                         </div>
                     </div>
@@ -49,14 +66,16 @@ export function AuditsModal({open, setOpen, title, data, children}: ModalProps) 
                             Audits Type
                         </Label>
                         <div className="mt-2">
-                            <Select>
+                            <Select defaultValue={auditData?.type}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Please select a audits"/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {
                                         Object.keys(AuditsType).map((type) => (
-                                            <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
+                                            <SelectItem key={type} value={type.toLowerCase()}>
+                                                {type}
+                                            </SelectItem>
                                         ))
                                     }
                                 </SelectContent>
@@ -64,20 +83,20 @@ export function AuditsModal({open, setOpen, title, data, children}: ModalProps) 
                         </div>
                     </div>
                     <div className="flex items-center justify-end pt-2">
-                        <button
+                        <Button
                             type="button"
-                            className="mt-3 mr-5 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                            variant="outline"
                             onClick={() => setOpen(false)}
+                            className="mr-3"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="button"
-                            className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
                             onClick={() => setOpen(false)}
                         >
-                            Submit
-                        </button>
+                            {auditData ? 'Update' : 'Save'}
+                        </Button>
                     </div>
                 </form>
 
