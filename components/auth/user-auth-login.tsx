@@ -92,7 +92,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                         <div className="mt-2">
                             <Input
                                 id="email"
-                                variant="flat"
+                                variant="ny"
                                 placeholder="name@example.com"
                                 type="email"
                                 autoCapitalize="none"
@@ -116,7 +116,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                         <div className="mt-2">
                             <Input
                                 id="password"
-                                variant="flat"
+                                variant="ny"
                                 placeholder="Password"
                                 type="password"
                                 autoCapitalize="none"

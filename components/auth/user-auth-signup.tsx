@@ -113,11 +113,11 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                             <div className="mt-2">
                                 <Input
                                     id="first_name"
-                                    variant="flat"
+                                    variant="ny"
                                     placeholder="First Name"
                                     type="text"
                                     autoCapitalize="none"
-                                    autoComplete="first_name"
+                                    autoComplete="given-name"
                                     autoCorrect="off"
                                     disabled={isLoading || isGoogleLoading}
                                     {...register("firstName")}
@@ -137,11 +137,11 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                             <div className="mt-2">
                                 <Input
                                     id="last_name"
-                                    variant="flat"
+                                    variant="ny"
                                     placeholder="Last Name"
                                     type="text"
                                     autoCapitalize="none"
-                                    autoComplete="last_name"
+                                    autoComplete="family-name"
                                     autoCorrect="off"
                                     disabled={isLoading || isGoogleLoading}
                                     {...register("lastName")}
@@ -162,7 +162,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                         <div className="mt-2">
                             <Input
                                 id="email"
-                                variant="flat"
+                                variant="ny"
                                 placeholder="name@example.com"
                                 type="email"
                                 autoCapitalize="none"
@@ -186,7 +186,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                         <div className="mt-2">
                             <Input
                                 id="password"
-                                variant="flat"
+                                variant="ny"
                                 placeholder="Password"
                                 type="password"
                                 autoCapitalize="none"
