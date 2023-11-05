@@ -18,7 +18,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Loader2,
-    Plus, Pencil, Trash2, MoreVertical
+    Plus, Pencil, Trash2, MoreVertical, MoveLeft
 } from "lucide-react"
 
 export const Icons = {
@@ -44,6 +44,7 @@ export const Icons = {
     edit: Pencil,
     delete: Trash2,
     moreVertical: MoreVertical,
+    moveLeft: MoveLeft,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

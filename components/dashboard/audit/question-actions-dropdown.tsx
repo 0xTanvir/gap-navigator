@@ -15,8 +15,7 @@ interface QuestionActionsDropdownProps {
 }
 
 const QuestionActionsDropdown = ({children, question}: QuestionActionsDropdownProps) => {
-    const pathname = usePathname()
-    console.log(pathname)
+    const pathname = usePathname();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
