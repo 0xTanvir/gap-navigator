@@ -1,8 +1,7 @@
 import React from 'react';
-import {Button} from "@/components/ui/button";
-import {Icons} from "@/components/icons";
 import AuditCard from "@/components/dashboard/audit/audit-card";
 import BackButton from "@/components/dashboard/back-button";
+import AddButton from "@/components/dashboard/add-button";
 
 export default function IndexPage() {
     return (
@@ -17,10 +16,7 @@ export default function IndexPage() {
                         </p>
                     </div>
                     <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                        <Button type="button">
-                            <Icons.plus className="mr-1"/>
-                            Add Question
-                        </Button>
+                        <AddButton/>
                     </div>
                 </div>
 
