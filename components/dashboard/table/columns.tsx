@@ -3,11 +3,18 @@
 import {ColumnDef} from "@tanstack/react-table"
 import DataTableRowActions from "@/components/dashboard/table/data-table-row-actions";
 import {AuditsDataType} from "@/config/site";
+import Link from "next/link";
 
 export const columns: ColumnDef<AuditsDataType>[] = [
     {
         accessorKey: "name",
         header: "Name",
+        cell:({row}) => {
+            const {id, name} = row.original
+            return(
+                <Link href={`dashboard/audit/${id}`}>{name}</Link>
+            )
+        }
     },
     {
         accessorKey: "type",

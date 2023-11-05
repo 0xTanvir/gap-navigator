@@ -3,8 +3,12 @@ import {AuditsModal} from "@/components/dashboard/audits-modal";
 import {Icons} from "@/components/icons";
 import AuditsDeleteModal from "@/components/dashboard/audits-delete-modal";
 
+interface AuditData {
+    name: string
+    type: string
+}
 interface DataTableRowActionsProps {
-    audit: object
+    audit: AuditData
     name:string
 }
 
