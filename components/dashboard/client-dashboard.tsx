@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Icons} from "@/components/icons";
 import {AuditsModal} from "@/components/dashboard/audits-modal";
+import AuditsDeleteModal from "@/components/dashboard/audits-delete-modal";
 
 const audits = [
     {id: 1, name: 'Audits 1', type: 'private'},
@@ -8,6 +9,18 @@ const audits = [
 const ClientDashboard = () => {
     const [open, setOpen] = useState<boolean>(false)
     const [editOpenModal, setEditOpenModal] = useState<boolean>(false)
+    const [state, setState] = useState<{ delete: boolean; confirmDelete: boolean }>({
+        delete: false,
+        confirmDelete: false,
+    });
+
+    const handleCancelClick = () => {
+        setState({...state, delete: false, confirmDelete: false});
+    };
+
+    const handleSaveClick = () => {
+        setState({...state, delete: false, confirmDelete: true});
+    };
 
     return (
         <div className="container">
@@ -75,7 +88,17 @@ const ClientDashboard = () => {
                                                     />
                                                 </AuditsModal>
 
-                                                <Icons.delete className="cursor-pointer ml-3" />
+                                                <AuditsDeleteModal
+                                                    open={state.delete}
+                                                    onClose={handleCancelClick}
+                                                    title={`Are you sure want to delete ${audit.name}?`}
+                                                    handleSaveClick={handleSaveClick}
+                                                >
+                                                    <Icons.delete
+                                                        className="cursor-pointer ml-3"
+                                                        onClick={() => setState({ ...state, delete: true, confirmDelete: false })}
+                                                    />
+                                                </AuditsDeleteModal>
                                             </div>
                                         </td>
                                     </tr>
