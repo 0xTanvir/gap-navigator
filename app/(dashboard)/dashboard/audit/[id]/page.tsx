@@ -6,7 +6,7 @@ import AddButton from "@/components/dashboard/add-button";
 export default function IndexPage() {
     return (
         <div className="container">
-            <div className="px-4 sm:px-6 lg:px-8">
+
                 <BackButton/>
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
@@ -27,7 +27,7 @@ export default function IndexPage() {
                         </div>
                     </div>
                 </div>
-            </div>
+
         </div>
     );
 };
