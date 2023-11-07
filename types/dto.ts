@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore'
+
 export interface User {
     uid: string
     firstName: string
@@ -15,3 +17,13 @@ export interface TeamCardProps {
     twitterLink: string,
     instagramLink: string,
 }
+
+export interface Audit {
+    uid: string
+    name: string
+    type: string
+    createdAt: Timestamp
+}
+
+// Define an array type of Audit
+export type Audits = Audit[]

@@ -60,7 +60,7 @@ export function UserAccountNav({ name, image, email, logOut }: UserAccountNavPro
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Icons.fileSearch className="mr-2 h-4 w-4" />
+          <Icons.audit className="mr-2 h-4 w-4" />
           <span>Audits</span>
         </DropdownMenuItem>
         <DropdownMenuItem>

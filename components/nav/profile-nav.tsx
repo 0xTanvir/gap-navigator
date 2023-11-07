@@ -21,7 +21,6 @@ export function ProfileNav() {
     return (
         <>
             {!loading && user && <div className="flex gap-4">
-                <ModeToggle />
                 <UserAccountNav
                     name={user.firstName + ' ' + user.lastName}
                     image={user.image}
@@ -29,7 +28,6 @@ export function ProfileNav() {
                     logOut={logOut}
                 /></div>}
             {!loading && !user && <div className="flex gap-4">
-                <ModeToggle />
                 <Link
                     href="/login"
                     className={cn(
