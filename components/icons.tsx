@@ -8,7 +8,6 @@ import {
     User,
     LayoutDashboard,
     CreditCard,
-    FileSearch,
     LifeBuoy,
     LogOut,
     HelpingHand,
@@ -26,6 +25,13 @@ import {
     FilePlus2,
     FileQuestion,
     FileText,
+    FileBarChart2,
+    ArrowRight,
+    Plus,
+    MoreVertical,
+    Trash,
+    FileEdit,
+    Lock,
 } from "lucide-react"
 
 export const Icons = {
@@ -37,7 +43,6 @@ export const Icons = {
     user: User,
     layoutDashboard: LayoutDashboard,
     creditCard: CreditCard,
-    fileSearch: FileSearch,
     lifeBuoy: LifeBuoy,
     logOut: LogOut,
     helpingHand: HelpingHand,
@@ -54,7 +59,14 @@ export const Icons = {
     milestone: Milestone,
     filePlus: FilePlus2,
     fileQuestion: FileQuestion,
-    fileText: FileText,
+    audit: FileText,
+    report: FileBarChart2,
+    arrowRight: ArrowRight,
+    add: Plus,
+    ellipsis: MoreVertical,
+    trash: Trash,
+    fileEdit: FileEdit,
+    lock: Lock,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

@@ -4,6 +4,7 @@ import { marketingConfig } from "@/config/marketing"
 import { MainNav } from "@/components/nav/main-nav"
 import { SiteFooter } from "@/components/site-footer"
 import { ProfileNav } from "@/components/nav/profile-nav"
+import { ModeToggle } from "@/components/mode-toggle"
 
 interface MarketingLayoutProps {
     children: React.ReactNode
@@ -17,7 +18,8 @@ export default async function MarketingLayout({
             <header className="container z-40 py-6">
                 <div className="flex items-center justify-between">
                     <MainNav items={marketingConfig.mainNav} />
-                    <nav>
+                    <nav className="flex gap-2">
+                        <ModeToggle />
                         <ProfileNav />
                     </nav>
                 </div>
