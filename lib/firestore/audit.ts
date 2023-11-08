@@ -1,7 +1,6 @@
 import { getDocs, setDoc, deleteDoc, Timestamp } from "firebase/firestore"
 import { Collections } from './client'
 import { Audit, Audits } from "@/types/dto"
-import { v4 as uuidv4 } from 'uuid'
 
 /// Audit ///
 export async function getAuditsByUserId(userId: string): Promise<Audits> {
@@ -31,7 +30,7 @@ export async function getAuditsByUserId(userId: string): Promise<Audits> {
     return audits
 }
 
-export async function addAudit(userId: string, audit: Audit): Promise<string> {
+export async function setAudit(userId: string, audit: Audit): Promise<string> {
     const newAuditRef = Collections.audit(userId, audit.uid)
     try {
         await setDoc(newAuditRef, audit)
