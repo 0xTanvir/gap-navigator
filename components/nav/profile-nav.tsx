@@ -8,13 +8,12 @@ import { UserAccountNav } from "./user-account-nav"
 import { Skeleton } from "@/components/ui/skeleton"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ModeToggle } from "@/components/mode-toggle"
 
 export function ProfileNav() {
     const { user, loading, logOut } = useAuth()
     if (loading) {
         return (
-            <PostItemSkeleton />
+            <AvatarSkeleton />
         )
     }
 
@@ -42,12 +41,12 @@ export function ProfileNav() {
     )
 }
 
-function PostItemSkeleton() {
+function AvatarSkeleton() {
     return (
         <div className="flex items-center space-x-4">
             <div className="space-y-2">
-                <Skeleton className="h-3 w-[100px]" />
                 <Skeleton className="h-3 w-[50px]" />
+                <Skeleton className="h-3 w-[25px]" />
             </div>
             <Skeleton className="h-6 w-6 rounded-full" />
         </div>
