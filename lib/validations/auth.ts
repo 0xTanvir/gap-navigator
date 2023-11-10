@@ -22,10 +22,10 @@ export const userAuthSignupSchema = z.object({
             message: 'The first character must not be a space',
         })
         .refine(value => value.trim().length > 0, {
-            message: 'First name is required',
+            message: 'Last name is required',
         })
         .refine(value => value.trim().length >= 3, {
-            message: 'First Name must be at least 3 characters',
+            message: 'Last Name must be at least 3 characters',
         }),
     email: z.string().email('Please enter a valid email'),
     password: z.string().min(1, {message: 'Password is required'})
@@ -53,10 +53,10 @@ export const userAccountCompleteSchema = z.object({
             message: 'The first character must not be a space',
         })
         .refine(value => value.trim().length > 0, {
-            message: 'First name is required',
+            message: 'Last name is required',
         })
         .refine(value => value.trim().length >= 3, {
-            message: 'First Name must be at least 3 characters',
+            message: 'Last Name must be at least 3 characters',
         }),
     email: z.string().email(),
     role: z.nativeEnum(AccountType).refine(value => {
