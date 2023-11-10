@@ -1,13 +1,12 @@
 "use client"
 import React from 'react';
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {contactSchema} from "@/lib/validations/contact";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactSchema } from "@/lib/validations/contact";
 import * as z from "zod";
 
 type FormData = z.infer<typeof contactSchema>
@@ -17,7 +16,7 @@ const ContactForm = () => {
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
         reset,
     } = useForm<FormData>({
         resolver: zodResolver(contactSchema)
@@ -34,9 +33,7 @@ const ContactForm = () => {
 
     return (
         <>
-            <form
-                onSubmit={handleSubmit(onSubmit)}
-            >
+            <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-48">
                 <div className="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
                     <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
                         <div>
@@ -51,9 +48,7 @@ const ContactForm = () => {
                                     variant="ny"
                                     placeholder="First Name"
                                     type="text"
-                                    autoCapitalize="none"
-                                    autoComplete="first_name"
-                                    autoCorrect="off"
+                                    autoComplete="given-name"
                                     disabled={isLoading}
                                     {...register('firstName')}
                                 />
@@ -76,9 +71,7 @@ const ContactForm = () => {
                                     type="text"
                                     id="last_name"
                                     placeholder="Last Name"
-                                    autoCapitalize="none"
-                                    autoCorrect="off"
-                                    autoComplete="last_name"
+                                    autoComplete="family-name"
                                     disabled={isLoading}
                                     {...register('lastName')}
                                 />
@@ -91,7 +84,7 @@ const ContactForm = () => {
                         </div>
                         <div className="sm:col-span-2">
                             <Label htmlFor="email"
-                                   className="block text-sm font-semibold leading-6">
+                                className="block text-sm font-semibold leading-6">
                                 Email
                             </Label>
                             <div className="mt-2.5">
@@ -100,9 +93,7 @@ const ContactForm = () => {
                                     variant="ny"
                                     placeholder="name@example.com"
                                     type="email"
-                                    autoCapitalize="none"
                                     autoComplete="email"
-                                    autoCorrect="off"
                                     disabled={isLoading}
                                     {...register("email")}
                                 />
@@ -115,7 +106,7 @@ const ContactForm = () => {
                         </div>
                         <div className="sm:col-span-2">
                             <Label htmlFor="phone"
-                                   className="block text-sm font-semibold leading-6">
+                                className="block text-sm font-semibold leading-6">
                                 Phone number
                             </Label>
                             <div className="mt-2.5">
@@ -137,7 +128,7 @@ const ContactForm = () => {
                         </div>
                         <div className="sm:col-span-2">
                             <Label htmlFor="message"
-                                   className="block text-sm font-semibold leading-6">
+                                className="block text-sm font-semibold leading-6">
                                 Message
                             </Label>
                             <div className="mt-2.5">
@@ -159,13 +150,14 @@ const ContactForm = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-8 flex justify-center w-full sm:justify-end">
-                        <button
+                    <div className="mt-8 flex justify-end">
+                        <Button
+                            type="submit"
+                            className="rounded-md"
                             disabled={isLoading}
-                            className={cn(buttonVariants({variant: "outline"}), "w-full sm:w-24")}
                         >
-                            Submit
-                        </button>
+                            Send message
+                        </Button>
                     </div>
                 </div>
             </form>

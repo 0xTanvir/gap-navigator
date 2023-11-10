@@ -1,5 +1,8 @@
 import * as z from 'zod'
-import validator from "validator";
+
+const phoneRegex = new RegExp(
+    /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
+)
 
 export const contactSchema = z.object({
     firstName: z.string()
@@ -23,7 +26,7 @@ export const contactSchema = z.object({
             message: 'Last name must be at least 3 characters',
         }),
     email: z.string().email('Please enter a valid email'),
-    phone: z.string().refine(validator.isMobilePhone, {message: 'Please enter a valid phone number'}),
+    phone: z.string().min(9).regex(phoneRegex, 'Please enter a valid phone number'),
     message: z.string()
         .refine(value => !/^\s/.test(value), {
             message: 'The first character must not be a space',

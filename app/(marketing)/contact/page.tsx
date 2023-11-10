@@ -1,15 +1,18 @@
-import {Icons} from "@/components/icons";
-import ContactForm from "@/components/contact/contact-form";
+import { Icons } from "@/components/icons"
+import ContactForm from "@/components/contact/contact-form"
+import { CompanyFooter } from "@/components/company-footer"
 
 export default async function ContactPage() {
     return (
-        <div className="container pb-8 pt-6 md:py-10">
-            <div className="relative isolate ">
-                <div className=" grid max-w-7xl grid-cols-1 lg:grid-cols-2">
-                    <div className="relative pb-24 lg:static ">
+        <>
+            <section className="relative isolate">
+                <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
+                    <div className="relative px-6 pb-20 pt-24 sm:pt-32 lg:static lg:px-8 lg:py-48">
                         <div className="mx-auto max-w-xl lg:mx-0 lg:max-w-lg">
-                            <h2 className="text-3xl font-bold tracking-tight ">Get in touch</h2>
-                            <p className="mt-6 text-lg leading-8 ">
+                            <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
+                                Get in touch
+                            </h2>
+                            <p className=" mt-2 max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
                                 Proin volutpat consequat porttitor cras nullam gravida at. Orci molestie a eu arcu. Sed
                                 ut tincidunt
                                 integer elementum id sem. Arcu sed malesuada et magna.
@@ -18,18 +21,18 @@ export default async function ContactPage() {
                                 <div className="flex gap-x-4">
                                     <dt className="flex-none">
                                         <span className="sr-only">Address</span>
-                                        <Icons.building/>
+                                        <Icons.building />
                                     </dt>
                                     <dd>
                                         545 Mavis Island
-                                        <br/>
+                                        <br />
                                         Chicago, IL 99191
                                     </dd>
                                 </div>
                                 <div className="flex gap-x-4">
                                     <dt className="flex-none">
                                         <span className="sr-only">Telephone</span>
-                                        <Icons.phone/>
+                                        <Icons.phone />
                                     </dt>
                                     <dd>
                                         <a className="hover:text-gray-900" href="tel:+1 (555) 234-5678">
@@ -40,7 +43,7 @@ export default async function ContactPage() {
                                 <div className="flex gap-x-4">
                                     <dt className="flex-none">
                                         <span className="sr-only">Email</span>
-                                        <Icons.mail/>
+                                        <Icons.mail />
                                     </dt>
                                     <dd>
                                         <a className="hover:text-gray-900" href="mailto:hello@example.com">
@@ -51,9 +54,10 @@ export default async function ContactPage() {
                             </dl>
                         </div>
                     </div>
-                    <ContactForm/>
+                    <ContactForm />
                 </div>
-            </div>
-        </div>
+            </section>
+            <CompanyFooter />
+        </>
     )
 }
