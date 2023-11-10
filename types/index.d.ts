@@ -49,3 +49,10 @@ export type SiteFooterConfig = {
     company: MainNavItem[]
     legal: MainNavItem[]
 }
+
+export type FAQ = {
+    question: string
+    answer: string
+}
+
+export type FAQs = FAQ[]
