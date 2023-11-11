@@ -40,3 +40,10 @@ export type AuditAction =
     | { type: AuditActionType.ADD_MULTIPLE_AUDITS; payload: Audit[] }
     | { type: AuditActionType.UPDATE_AUDIT; payload: Audit }
     | { type: AuditActionType.DELETE_AUDIT; payload: string }
+
+export interface Notification{
+    id:number,
+    title:string,
+    body:string,
+    timestamp:string
+}
