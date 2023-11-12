@@ -40,7 +40,7 @@ export function AuditItem({ userId, audit }: AuditItemProps) {
                     <Icons.users className="w-4 h-4 mr-1" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Private Audit</p>
+                    <p>Public Audit</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -53,6 +53,18 @@ export function AuditItem({ userId, audit }: AuditItemProps) {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Exclusive Audit</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {audit.type === "private" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Icons.lock className="w-4 h-4 mr-1" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Private Audit</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

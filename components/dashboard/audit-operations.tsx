@@ -135,7 +135,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                     {audit.type === "public" && (<>
                         <DropdownMenuItem className="flex cursor-pointer items-center">
                             <Icons.copy className="mr-2 h-4 w-4" />
-                            Share URL
+                            Share Audit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                     </>)}
