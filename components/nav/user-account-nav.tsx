@@ -46,7 +46,7 @@ export function UserAccountNav({ name, image, email, logOut }: UserAccountNavPro
 
         <DropdownMenuItem>
           <Icons.user2 className="mr-2 h-4 w-4" />
-          <span>Profile</span>
+          <Link href="/settings">Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Icons.creditCard className="mr-2 h-4 w-4" />
