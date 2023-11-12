@@ -23,7 +23,7 @@ export function AuditItem({ userId, audit }: AuditItemProps) {
       <div className="grid gap-1">
         <div className="flex gap-2">
           <Link
-            href={`/editor/${audit.uid}`}
+            href={`/audit/${audit.uid}`}
             className="font-semibold hover:underline"
           >
             {audit.name}
