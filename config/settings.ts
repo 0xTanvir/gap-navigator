@@ -20,5 +20,13 @@ export const settingsConfig: SettingsConfig = {
             title: "Account",
             href: "/settings/account",
         },
+        {
+            title: "Appearance",
+            href: "/settings/appearance",
+        },
+        {
+            title: "Notifications",
+            href: "/notification",
+        },
     ],
 }

@@ -16,5 +16,4 @@ export const profileFormSchema = z.object({
             message: 'Last Name must be at least 3 characters',
         }),
     email: z.string({required_error: 'Email is required'}).email('Please enter a valid email'),
-    bio: z.string().max(160).min(4),
 })

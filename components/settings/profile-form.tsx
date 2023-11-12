@@ -1,41 +1,60 @@
 "use client"
 
-import React from "react";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import React, {useEffect, useState} from "react";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
 import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {profileFormSchema} from "@/lib/validations/profile";
-
+import {useAuth} from "@/components/auth/auth-provider";
+import {updateDoc} from "firebase/firestore"
+import {Collections} from "@/lib/firestore/client";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-    bio: "I own a computer.",
-}
-
 export function ProfileForm() {
+    const [loader, setLoader] = useState<boolean>(false)
+    const {user, loading} = useAuth()
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileFormSchema),
-        defaultValues,
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+        },
         mode: "onChange",
     })
 
-    function onSubmit(data: ProfileFormValues) {
-        toast({
-            title: "You submitted the following values:",
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                  <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        })
+    async function onSubmit(data: ProfileFormValues) {
+        setLoader(true)
+        try {
+            const userDocRef = Collections.user(user?.uid as string);
+            await updateDoc(userDocRef, {
+                firstName: data.firstName,
+                lastName: data.lastName,
+            })
+            toast({
+                title: "Profile Updated successfully",
+            })
+            setLoader(false)
+        } catch (error) {
+            console.error("Error updating user profile:", error);
+            setLoader(false)
+        }
     }
+
+    useEffect(() => {
+        if (!loading && user) {
+            form.reset({
+                firstName: user?.firstName || '',
+                lastName: user?.lastName || '',
+                email: user?.email || '',
+            });
+        }
+    }, [loading, user, form]);
 
     return (
         <Form {...form}>
@@ -43,6 +62,7 @@ export function ProfileForm() {
                 <FormField
                     control={form.control}
                     name="firstName"
+                    disabled={loader || loading}
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>First Name</FormLabel>
@@ -56,6 +76,7 @@ export function ProfileForm() {
                 <FormField
                     control={form.control}
                     name="lastName"
+                    disabled={loader || loading}
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Last Name</FormLabel>
@@ -69,33 +90,16 @@ export function ProfileForm() {
                 <FormField
                     control={form.control}
                     name="email"
+                    disabled={true}
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Email</FormLabel>
-                            <Input variant="ny" placeholder="please enter email" {...field} />
+                            <Input variant="ny" placeholder="Please enter email" {...field} />
                             <FormMessage/>
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Bio</FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    variant="ny"
-                                    placeholder="Tell us a little bit about yourself"
-                                    className="resize-none"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit">Update profile</Button>
+                <Button disabled={loader || loading} type="submit">Update Profile</Button>
             </form>
         </Form>
     )
