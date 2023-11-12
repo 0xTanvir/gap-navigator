@@ -251,6 +251,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                                 </FormControl>
                                                 <SelectContent>
                                                     <SelectItem value="private">Private</SelectItem>
+                                                    <SelectItem value="exclusive">Exclusive</SelectItem>
                                                     <SelectItem value="public">Public</SelectItem>
                                                 </SelectContent>
                                             </Select>
