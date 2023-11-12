@@ -132,6 +132,30 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                     <span className="sr-only">Open</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                    {audit.type === "public" && (<>
+                        <DropdownMenuItem className="flex cursor-pointer items-center">
+                            <Icons.copy className="mr-2 h-4 w-4" />
+                            Share URL
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>)}
+                    {audit.type === "exclusive" && (<>
+                        <DropdownMenuItem className="flex cursor-pointer items-center">
+                            <Icons.userPlus className="mr-2 h-4 w-4" />
+                            Invite
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>)}
+                    <DropdownMenuItem className="flex cursor-pointer items-center" >
+                        <Icons.preview className="mr-2 h-4 w-4" />
+                        Preview
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="flex cursor-pointer items-center" >
+                        <Icons.evaluate className="mr-2 h-4 w-4" />
+                        Evaluate
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center"
                         onSelect={() => setShowUpdateDialog(true)}

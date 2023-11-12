@@ -33,14 +33,26 @@ export function AuditItem({ userId, audit }: AuditItemProps) {
         <div>
           <p className="flex text-sm text-muted-foreground">
             {/* TODO: Use it from enums */}
-            {audit.type === "private" && (
+            {audit.type === "public" && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Icons.lock className="w-4 h-4 mr-1" />
+                    <Icons.users className="w-4 h-4 mr-1" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Private Audit</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {audit.type === "exclusive" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Icons.userPlus className="w-4 h-4 mr-1" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Exclusive Audit</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
