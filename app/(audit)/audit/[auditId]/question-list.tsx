@@ -12,7 +12,7 @@ interface AuditEditorProps {
     auditId: string;
 }
 
-export default function AuditEditor({ userId, auditId }: AuditEditorProps) {
+export default function QuestionList({ userId, auditId }: AuditEditorProps) {
 
     return (
         <AuditEditorShell>
