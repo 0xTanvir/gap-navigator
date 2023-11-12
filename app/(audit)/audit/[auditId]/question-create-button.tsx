@@ -6,8 +6,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { usePathname, useRouter } from "next/navigation";
 
 export function QuestionCreateButton() {
+    const router = useRouter()
+    const pathName = usePathname()
+
+    function handleAddQuestion() {
+        // TODO create question as `Untitled Question`
+        // and push router to that question
+        router.push(`${pathName}/someId`)
+    }
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -17,7 +26,9 @@ export function QuestionCreateButton() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem className="flex cursor-pointer items-center" >
+                <DropdownMenuItem className="flex cursor-pointer items-center"
+                    onClick={handleAddQuestion}
+                >
                     <Icons.filePlus className="mr-2 h-4 w-4" />
                     Add Question
                 </DropdownMenuItem>
