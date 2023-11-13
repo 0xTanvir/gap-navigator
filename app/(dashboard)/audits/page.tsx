@@ -2,11 +2,12 @@
 
 import { notFound } from "next/navigation"
 import { useAuth } from "@/components/auth/auth-provider"
-import ClientDashboard from "@/components/dashboard/client-dashboard"
-import ConsultantDashboard from "@/components/dashboard/consultant-dashboard"
+import ClientAudits from "@/components/dashboard/client-audits"
+import ConsultantAudits from "@/components/dashboard/consultant-audits"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import { AuditsProvider } from "@/components/dashboard/AuditsContext"
 
-export default function DashboardsPage() {
+export default function AuditsPage() {
     const { user, isAuthenticated, loading } = useAuth()
     if (loading) {
         return (
@@ -15,11 +16,13 @@ export default function DashboardsPage() {
     }
     if (isAuthenticated && user && user.role === "client") {
         return (
-            <ClientDashboard />
+            <ClientAudits />
         )
     } else if (isAuthenticated && user && user.role === "consultant") {
         return (
-            <ConsultantDashboard />
+            <AuditsProvider>
+                <ConsultantAudits userId={user.uid} />
+            </AuditsProvider>
         )
     } else {
         return notFound()

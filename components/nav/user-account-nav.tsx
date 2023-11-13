@@ -61,7 +61,7 @@ export function UserAccountNav({ name, image, email, logOut }: UserAccountNavPro
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Icons.audit className="mr-2 h-4 w-4" />
-          <Link href="/dashboard">Audits</Link>
+          <Link href="/audits">Audits</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Icons.users className="mr-2 h-4 w-4" />
