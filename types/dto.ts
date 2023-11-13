@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase/firestore'
+import {Timestamp} from 'firebase/firestore'
 
 export interface User {
     uid: string
@@ -6,7 +6,8 @@ export interface User {
     lastName: string
     email: string
     role: string
-    image: string
+    image: string,
+    audits: string[],
 }
 
 export interface TeamCardProps {

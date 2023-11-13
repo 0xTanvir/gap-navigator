@@ -70,6 +70,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
                 lastName: data.lastName,
                 role: data.role,
                 image: result.user.photoURL!,
+                audits: []
             }
             try {
                 await setUser(result.user.uid, user)

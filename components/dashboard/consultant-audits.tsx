@@ -13,18 +13,20 @@ import useAudits from './AuditsContext'
 
 interface ConsultantAuditsProps {
     userId: string;
+    userAuditsId: string[]
 }
 
-export default function ConsultantAudits({ userId }: ConsultantAuditsProps) {
+export default function ConsultantAudits({userId, userAuditsId}: ConsultantAuditsProps) {
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const { audits, dispatch } = useAudits()
+    const {audits, dispatch} = useAudits()
 
     useEffect(() => {
         async function fetchAudits() {
             try {
-                const dbAudits = await getAuditsByUserId(userId)
-                dispatch({ type: AuditActionType.ADD_MULTIPLE_AUDITS, payload: dbAudits })
+                const dbAudits = await getAuditsByUserId(userAuditsId)
+                dispatch({type: AuditActionType.ADD_MULTIPLE_AUDITS, payload: dbAudits})
             } catch (error) {
+                console.log(error)
                 toast({
                     title: "Something went wrong.",
                     description: "Failed to fetch audits. Please try again.",
@@ -36,44 +38,44 @@ export default function ConsultantAudits({ userId }: ConsultantAuditsProps) {
         }
 
         fetchAudits()
-    }, [userId]) // Run this effect when the userId changes
+    }, [userAuditsId]) // Run this effect when the userId changes
 
     if (isLoading) {
         return (<>
-            <DashboardHeader heading="Audits" text="Create and manage audits.">
-                <AuditCreateButton userId={userId} />
-            </DashboardHeader>
-            <div className="divide-border-200 divide-y rounded-md border">
-                <AuditItem.Skeleton />
-                <AuditItem.Skeleton />
-                <AuditItem.Skeleton />
-                <AuditItem.Skeleton />
-                <AuditItem.Skeleton />
-            </div>
-        </>
+                <DashboardHeader heading="Audits" text="Create and manage audits.">
+                    <AuditCreateButton userId={userId}/>
+                </DashboardHeader>
+                <div className="divide-border-200 divide-y rounded-md border">
+                    <AuditItem.Skeleton/>
+                    <AuditItem.Skeleton/>
+                    <AuditItem.Skeleton/>
+                    <AuditItem.Skeleton/>
+                    <AuditItem.Skeleton/>
+                </div>
+            </>
         )
     }
 
     return (
         <>
             <DashboardHeader heading="Audits" text="Create and manage audits.">
-                <AuditCreateButton userId={userId} />
+                <AuditCreateButton userId={userId}/>
             </DashboardHeader>
             <div>
                 {audits?.length ? (
                     <div className="divide-y divide-border rounded-md border">
                         {audits.map((audit) => (
-                            <AuditItem key={audit.uid} userId={userId} audit={audit} />
+                            <AuditItem key={audit.uid} userId={userId} audit={audit}/>
                         ))}
                     </div>
                 ) : (
                     <EmptyPlaceholder>
-                        <EmptyPlaceholder.Icon name="audit" />
+                        <EmptyPlaceholder.Icon name="audit"/>
                         <EmptyPlaceholder.Title>No audits created</EmptyPlaceholder.Title>
                         <EmptyPlaceholder.Description>
                             You don&apos;t have any audits yet. Start creating audit.
                         </EmptyPlaceholder.Description>
-                        <AuditCreateButton userId={userId} variant="outline" />
+                        <AuditCreateButton userId={userId} variant="outline"/>
                     </EmptyPlaceholder>
                 )}
             </div>

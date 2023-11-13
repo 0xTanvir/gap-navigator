@@ -21,7 +21,7 @@ export default function AuditsPage() {
     } else if (isAuthenticated && user && user.role === "consultant") {
         return (
             <AuditsProvider>
-                <ConsultantAudits userId={user.uid} />
+                <ConsultantAudits userId={user?.uid} userAuditsId={user.audits} />
             </AuditsProvider>
         )
     } else {

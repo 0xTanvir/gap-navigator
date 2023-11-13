@@ -1,40 +1,54 @@
-import { getDocs, setDoc, deleteDoc, Timestamp } from "firebase/firestore"
-import { Collections } from './client'
-import { Audit, Audits } from "@/types/dto"
+import {
+    getDocs,
+    setDoc,
+    deleteDoc,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
+    where,
+    query
+} from "firebase/firestore"
+import {Collections} from './client'
+import {Audit, Audits} from "@/types/dto"
 
 /// Audit ///
-export async function getAuditsByUserId(userId: string): Promise<Audits> {
-    if (!userId) {
-        throw new Error(`Invalid user id: ${userId}`)
-    }
+export async function getAuditsByUserId(userAuditsId: string[]): Promise<Audits> {
+    if (userAuditsId.length > 0) {
+        const userAuditsCollectionRef = Collections.audits();
+        const q = query(
+            userAuditsCollectionRef,
+            where('uid', 'in', userAuditsId)
+        );
 
-    const userAuditsCollectionRef = Collections.audits(userId)
-    const auditsSnap = await getDocs(userAuditsCollectionRef)
+        const querySnapshot = await getDocs(q);
 
-    // If no audits are found, return an empty array instead of rejecting.
-    if (auditsSnap.empty) {
+        // If no audits are found, return an empty array instead of rejecting.
+        if (querySnapshot.empty) {
+            return [];
+        }
+        const audits: Audit[] = querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                uid: doc.id,
+                name: data.name,
+                type: data.type,
+                createdAt: data.createdAt,
+            } as Audit;
+        });
+        return audits
+    } else {
         return []
     }
-
-    const audits: Audit[] = auditsSnap.docs.map(doc => {
-        const data = doc.data();
-        // Ensure the audit object has the right structure, including type assertion if necessary.
-        return {
-            uid: doc.id,
-            name: data.name,
-            type: data.type,
-            createdAt: data.createdAt,
-        } as Audit // Cast as we are sure about the structure to handle the validation properly.
-    })
-
-    return audits
 }
 
-export async function setAudit(userId: string, audit: Audit): Promise<string> {
-    const newAuditRef = Collections.audit(userId, audit.uid)
+export async function setAudit(userId: string, audit: Audit): Promise<void> {
+    const newAuditRef = Collections.audit(audit.uid)
+    const createAuditsUser = Collections.userAudits(userId)
     try {
         await setDoc(newAuditRef, audit)
-        return newAuditRef.id
+        await updateDoc(createAuditsUser, {
+            audits: arrayUnion(newAuditRef.id),
+        });
     } catch (error) {
         // If error is an instance of Error, rethrow it
         if (error instanceof Error) {
@@ -46,9 +60,13 @@ export async function setAudit(userId: string, audit: Audit): Promise<string> {
 }
 
 export async function deleteAudit(userId: string, auditId: string) {
-    const auditRef = Collections.audit(userId, auditId)
+    const auditRef = Collections.audit(auditId)
+    const userRef = Collections.userAudits(userId)
     try {
         await deleteDoc(auditRef)
+        await updateDoc(userRef, {
+            audits: arrayRemove(auditId),
+        });
     } catch (error) {
         // Check if the error is an instance of Error and throw it directly if so
         if (error instanceof Error) {
