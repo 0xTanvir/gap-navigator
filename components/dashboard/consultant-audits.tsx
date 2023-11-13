@@ -5,7 +5,7 @@ import { AuditItem } from "@/components/dashboard/audit-item"
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { AuditCreateButton } from "@/components/dashboard/audit-create-button"
-import { getAuditsByUserId } from "@/lib/firestore/audit"
+import {getAuditsByIds} from "@/lib/firestore/audit"
 import { AuditActionType } from '@/types/dto'
 import { toast } from "@/components/ui/use-toast"
 import useAudits from './AuditsContext'
@@ -23,7 +23,7 @@ export default function ConsultantAudits({userId, userAuditsId}: ConsultantAudit
     useEffect(() => {
         async function fetchAudits() {
             try {
-                const dbAudits = await getAuditsByUserId(userAuditsId)
+                const dbAudits = await getAuditsByIds(userAuditsId)
                 dispatch({type: AuditActionType.ADD_MULTIPLE_AUDITS, payload: dbAudits})
             } catch (error) {
                 console.log(error)

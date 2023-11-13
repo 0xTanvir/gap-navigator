@@ -12,7 +12,7 @@ import {Collections} from './client'
 import {Audit, Audits} from "@/types/dto"
 
 /// Audit ///
-export async function getAuditsByUserId(userAuditsId: string[]): Promise<Audits> {
+export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
     if (userAuditsId.length > 0) {
         const userAuditsCollectionRef = Collections.audits();
         const q = query(
