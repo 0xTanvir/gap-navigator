@@ -20,6 +20,7 @@ interface AuditEditorProps {
 export default function QuestionList({userId, auditId}: AuditEditorProps) {
     const [audit, setAudit] = useState<Audit | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [loading, setLoading] = useState<boolean>(true)
     const {questions, dispatch} = useQuestions()
 
     useEffect(() => {
@@ -50,11 +51,28 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                     variant: "destructive",
                 })
             } finally {
-                setIsLoading(false)
+                setLoading(false)
             }
         }
+
         allQuestion()
     }, [])
+
+    if (loading) {
+        return (<AuditEditorShell>
+                <AuditEditorHeader heading="Questions" text="Create and manage questions.">
+                    <QuestionCreateButton auditId={auditId as string}/>
+                </AuditEditorHeader>
+                <div className="divide-border-200 divide-y rounded-md border">
+                    <QuestionItem.Skeleton/>
+                    <QuestionItem.Skeleton/>
+                    <QuestionItem.Skeleton/>
+                    <QuestionItem.Skeleton/>
+                    <QuestionItem.Skeleton/>
+                </div>
+            </AuditEditorShell>
+        )
+    }
 
     return (
         <AuditEditorShell>

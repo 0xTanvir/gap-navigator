@@ -1,9 +1,8 @@
 import React from 'react';
 import {formatDate} from "@/lib/utils";
 import {Answer} from "@/types/dto";
-import {DropdownMenu, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {Icons} from "@/components/icons";
 import AnswerOperations from "@/app/(audit)/audit/[auditId]/[questionId]/answer-operations";
+import {Skeleton} from "@/components/ui/skeleton";
 
 interface AnswerItemProps {
     answer: Answer
@@ -39,6 +38,17 @@ const AnswerItem = ({answer, auditId, questionId, singleQuestionFetch}: AnswerIt
         </div>
     );
 };
+
+AnswerItem.Skeleton = function AnswerItemSkeleton() {
+    return (
+        <div className="p-4">
+            <div className="space-y-3">
+                <Skeleton className="h-5 w-2/5"/>
+                <Skeleton className="h-4 w-4/5"/>
+            </div>
+        </div>
+    )
+}
 
 
 export default AnswerItem;

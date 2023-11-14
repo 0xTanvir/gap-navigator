@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Link from "next/link"
 import {cn} from "@/lib/utils"
-import {Button, buttonVariants} from "@/components/ui/button"
+import {buttonVariants} from "@/components/ui/button"
 import {Icons} from "@/components/icons"
 import {AuditEditorShell} from '../audit-editor-shell'
 import {AuditEditorHeader} from '../audit-editor-header'
@@ -19,6 +19,7 @@ import {toast} from "@/components/ui/use-toast";
 import AnswerCreateButton from "@/app/(audit)/audit/[auditId]/[questionId]/answer-create-button";
 import AnswerItem from "@/app/(audit)/audit/[auditId]/[questionId]/answer-item";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
+import {QuestionCreateButton} from "@/app/(audit)/audit/[auditId]/question-create-button";
 
 interface AuditEditorProps {
     userId: string;
@@ -50,7 +51,6 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
             answers: question?.answers,
             createdAt: question?.createdAt,
         }
-        console.log(formData)
         const questionRef = Collections.question(auditId, questionId)
         try {
             await updateDoc(questionRef, formData)
@@ -77,7 +77,23 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
         singleQuestionFetch()
     }, [auditId, questionId])
 
-    console.log(question)
+    if (loading) {
+        return (<AuditEditorShell>
+                <AuditEditorHeader heading="Answers" text="Create and manage answers.">
+                    <QuestionCreateButton auditId={auditId as string}/>
+                </AuditEditorHeader>
+                <div className="divide-border-200 divide-y rounded-md border">
+                    <AnswerItem.Skeleton/>
+                    <AnswerItem.Skeleton/>
+                    <AnswerItem.Skeleton/>
+                    <AnswerItem.Skeleton/>
+                    <AnswerItem.Skeleton/>
+                </div>
+            </AuditEditorShell>
+        )
+    }
+
+
     return (
         <AuditEditorShell>
             <Link
