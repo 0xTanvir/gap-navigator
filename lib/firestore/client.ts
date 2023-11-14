@@ -5,6 +5,7 @@ import {db} from '@/firebase'
 enum CollectionName {
     Users = "users",
     Audits = "audits",
+    QUESTIONS = "questions",
 }
 
 // Utility functions using the enum for collection names
@@ -23,5 +24,11 @@ export const Collections = {
     },
     userAudits(userId: string): DocumentReference {
         return doc(db, CollectionName.Users, userId);
+    },
+    questions(auditId: string): CollectionReference {
+        return collection(db, CollectionName.Audits, auditId, CollectionName.QUESTIONS);
+    },
+    question(auditId: string, questionId: string): DocumentReference {
+        return doc(db, CollectionName.Audits, auditId, 'questions', questionId);
     },
 }

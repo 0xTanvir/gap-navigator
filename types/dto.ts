@@ -45,7 +45,7 @@ export type AuditAction =
 export interface Question {
     uid: string
     name: string
-    answer: Answer[]
+    answers: Answer[]
     createdAt: Timestamp
 }
 
@@ -53,6 +53,7 @@ export interface Answer {
     uid: string,
     name: string,
     recommendationDocument: string
+    createdAt: Timestamp
 }
 
 export type Answers = Answer[]

@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useReducer, Dispatch} from 'react';
+import React, {createContext, useContext, useReducer, Dispatch, useState} from 'react';
 import {questionsReducer} from "@/app/(audit)/audit/questionReducer";
 import {Question, QuestionAction} from "@/types/dto";
 
@@ -10,10 +10,10 @@ interface QuestionContextType {
 const QuestionContext = createContext<QuestionContextType | undefined>(undefined)
 interface QuestionProviderProps {
     children: React.ReactNode,
-    initialQuestion: Question[]
+    initialQuestion?: Question[]
 }
 
-const QuestionProvider: React.FC<QuestionProviderProps> = ({children, initialQuestion = []}) => {
+export const QuestionProvider: React.FC<QuestionProviderProps> = ({children, initialQuestion = []}) => {
     const [questions, dispatch] = useReducer(questionsReducer, initialQuestion)
     return (
         <QuestionContext.Provider value={{questions, dispatch}}>
