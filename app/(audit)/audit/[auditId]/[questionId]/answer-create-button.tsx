@@ -103,7 +103,7 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Answer Name" {...field} />
+                                                <Input variant="ny" placeholder="Answer Name" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

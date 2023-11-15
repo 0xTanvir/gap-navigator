@@ -181,6 +181,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
                                                 <Input
+                                                    variant="ny"
                                                     placeholder="Answer Name" {...field}
                                                 />
                                             </FormControl>
