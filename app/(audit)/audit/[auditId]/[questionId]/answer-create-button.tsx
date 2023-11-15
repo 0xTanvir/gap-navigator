@@ -82,7 +82,7 @@ const AnswerCreateButton = ({
                 variant={variant}
                 onClick={() => setShowAddDialog(true)}
             >
-                <Icons.add className="mr-2 h-4 w-4"/>
+                <Icons.filePlus className="mr-2 h-4 w-4"/>
                 New Answer
             </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
@@ -119,7 +119,8 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Textarea variant="ny" placeholder="Recommendation Document" {...field} />
+                                                <Textarea variant="ny"
+                                                          placeholder="Recommendation Document" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

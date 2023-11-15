@@ -1,5 +1,5 @@
 import {Icons} from "@/components/icons";
-import {ButtonProps, buttonVariants} from "@/components/ui/button";
+import {Button, ButtonProps, buttonVariants} from "@/components/ui/button";
 import {v4 as uuidv4} from 'uuid'
 import {Timestamp} from "firebase/firestore";
 import {Question, QuestionActionType} from "@/types/dto";
@@ -30,8 +30,11 @@ interface QuestionCreateButtonProps extends ButtonProps {
 
 type FormData = z.infer<typeof questionSchema>
 
+interface QuestionCreateButtonProps extends ButtonProps {
 
-export function QuestionCreateButton({auditId, noQuestion, className, ...props}: QuestionCreateButtonProps) {
+}
+
+export function QuestionCreateButton({auditId, noQuestion, variant, className, ...props}: QuestionCreateButtonProps) {
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
     const {dispatch} = useQuestions()
@@ -75,13 +78,13 @@ export function QuestionCreateButton({auditId, noQuestion, className, ...props}:
 
     return (
         <>
-            <button
-                className={cn(buttonVariants({variant: 'outline'}))}
+            <Button
+                variant={variant}
                 onClick={() => setShowAddDialog(true)}
             >
                 <Icons.filePlus className="mr-2 h-4 w-4"/>
                 Add Question
-            </button>
+            </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <Form {...form}>
@@ -89,7 +92,7 @@ export function QuestionCreateButton({auditId, noQuestion, className, ...props}:
                             <DialogHeader>
                                 <DialogTitle>Add Answer</DialogTitle>
                                 <DialogDescription>
-                                    Type answer name and recommendation document.
+                                    Type Question name.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">

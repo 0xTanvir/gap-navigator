@@ -38,14 +38,7 @@ export default function AnswerList({auditId, questionId}: AuditEditorProps) {
     if (loading) {
         return (
             <AuditEditorShell>
-                <AuditEditorHeader heading="Answers" text="Create and manage answers.">
-                    <AnswerCreateButton
-                        loading={loading}
-                        auditId={auditId}
-                        questionId={questionId}
-                        singleQuestionFetch={singleQuestionFetch}
-                    />
-                </AuditEditorHeader>
+                <AnswerItem.Skeleton/>
                 <div className="divide-border-200 divide-y rounded-md border mt-8 mx-2">
                     <AnswerItem.Skeleton/>
                     <AnswerItem.Skeleton/>
@@ -71,7 +64,7 @@ export default function AnswerList({auditId, questionId}: AuditEditorProps) {
                 Back to questions
             </Link>
 
-            <AuditEditorHeader heading="Answers" text="Create and manage answers.">
+            <AuditEditorHeader heading={question?.name as string} text="Create and manage answers.">
                 <AnswerCreateButton
                     auditId={auditId}
                     questionId={questionId}
