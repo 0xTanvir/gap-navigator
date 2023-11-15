@@ -1,5 +1,13 @@
 import { Timestamp } from 'firebase/firestore'
 
+export interface EmailMsg {
+    to: string,
+    from: string,
+    subject: string,
+    text: string,
+    html: string,
+}
+
 export interface User {
     uid: string
     firstName: string
