@@ -9,7 +9,7 @@ import {
     query, getDoc
 } from "firebase/firestore"
 import {Collections} from './client'
-import {Answer, Audit, Audits, Question} from "@/types/dto"
+import {Answer, Audit, Audits, Question, QuestionActionType} from "@/types/dto"
 import {toast} from "@/components/ui/use-toast";
 
 /// Audit ///
@@ -145,6 +145,18 @@ export async function singleQuestion(auditId: string, questionId: string) {
     return question;
 }
 
+export async function updateSingleQuestionInFirebase(auditId: string, questionId: string, formData: Question) {
+    const questionRef = Collections.question(auditId, questionId);
+
+    try {
+        await updateDoc(questionRef, formData as any);
+        return true; // Success
+    } catch (error) {
+        console.error('Error updating document:', error);
+        return false; // Failure
+    }
+}
+
 export async function deleteQuestionAnswer(auditId: string, questionId: string, answerId: string) {
     const questionRef = Collections.question(auditId, questionId);
     try {
@@ -165,6 +177,17 @@ export async function deleteQuestionAnswer(auditId: string, questionId: string, 
         }
     } catch (error) {
         console.error('Error deleting answer:', error);
+    }
+}
+
+export async function createQuestionAnswer(auditId: string, questionId: string, newAnswer: Answer) {
+    const answerRef = Collections.question(auditId, questionId);
+    try {
+        await updateDoc(answerRef, {
+            answers: arrayUnion(newAnswer),
+        });
+    } catch (error) {
+        console.error('Error adding answer:', error);
     }
 }
 

@@ -26,16 +26,16 @@ import {
 } from "@/components/ui/dialog";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {cn} from "@/lib/utils";
 import {buttonVariants} from "@/components/ui/button";
-import {deleteAudit, deleteQuestionAnswer, updateQuestionAnswer} from "@/lib/firestore/audit";
+import {deleteQuestionAnswer, updateQuestionAnswer} from "@/lib/firestore/audit";
 import {toast} from "@/components/ui/use-toast";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {answerSchema} from "@/lib/validations/question";
 import * as z from "zod";
 import {Answer} from "@/types/dto";
+import {Textarea} from "@/components/ui/textarea";
 
 type FormData = z.infer<typeof answerSchema>
 
@@ -80,7 +80,6 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
 
     async function onUpdateSubmit(data: FormData) {
         setIsUpdateLoading(true)
-        console.log(data)
         const updateAnswer = {
             uid: answer.uid,
             name: data.name,
@@ -196,8 +195,10 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="Recommendation Document" {...field}
+                                                <Textarea
+                                                    variant="ny"
+                                                    placeholder="Recommendation Document"
+                                                    {...field}
                                                 />
                                             </FormControl>
                                             <FormMessage/>

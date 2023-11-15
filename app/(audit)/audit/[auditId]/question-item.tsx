@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import Link from "next/link";
-import {formatDate} from "@/lib/utils";
+import {cn, formatDate} from "@/lib/utils";
 import {Question, QuestionActionType} from "@/types/dto";
 import {Icons} from "@/components/icons";
 import {Collections} from "@/lib/firestore/client";
@@ -17,6 +17,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import {Skeleton} from "@/components/ui/skeleton";
+import {buttonVariants} from "@/components/ui/button";
 
 interface QuestionItemProps {
     auditId: string
@@ -72,10 +73,8 @@ const QuestionItem = ({auditId, question}: QuestionItemProps) => {
             <button
                 disabled={loading}
                 onClick={() => setShowDeleteAlert(true)}
-                className="border flex justify-center items-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm"
-            >
-                <Icons.trash className="mr-2 h-4 w-4"/>
-                Delete
+                className={cn(buttonVariants({variant: "ghost", size: 'icon'}))}>
+                <Icons.trash className="h-4 w-4"/>
             </button>
 
             <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>

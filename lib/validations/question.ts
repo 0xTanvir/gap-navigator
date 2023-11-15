@@ -11,11 +11,9 @@ export const questionSchema = z.object({
 })
 export const answerSchema = z.object({
     name: z
-        .string({
-            required_error: "Please type an answer name.",
-        }).min(1),
+        .string()
+        .min(1, {message: "Please type an answer name."}),
     recommendationDocument: z
-        .string({
-            required_error: "Please type an recommendation document.",
-        }).min(1)
+        .string()
+        .min(1, {message: "Please type an recommendation document."})
 })

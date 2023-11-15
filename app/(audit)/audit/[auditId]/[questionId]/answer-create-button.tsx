@@ -17,13 +17,15 @@ import * as z from "zod";
 import {v4 as uuidv4} from 'uuid'
 import {answerSchema} from "@/lib/validations/question";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {arrayUnion, Timestamp, updateDoc} from "firebase/firestore";
+import {Timestamp} from "firebase/firestore";
 import {toast} from "@/components/ui/use-toast";
-import {Collections} from "@/lib/firestore/client";
+import {Textarea} from "@/components/ui/textarea";
+import {createQuestionAnswer} from "@/lib/firestore/audit";
 
 interface AnswerCreateButtonProps extends ButtonProps {
     auditId: string
     questionId: string
+    loading?: boolean
     singleQuestionFetch: Function
 }
 
@@ -33,6 +35,7 @@ const AnswerCreateButton = ({
                                 auditId,
                                 questionId,
                                 singleQuestionFetch,
+                                loading,
                                 className,
                                 variant,
                                 ...props
@@ -56,11 +59,8 @@ const AnswerCreateButton = ({
             recommendationDocument: data.recommendationDocument,
             createdAt: Timestamp.now()
         }
-        const answerRef = Collections.question(auditId, questionId)
         try {
-            await updateDoc(answerRef, {
-                answers: arrayUnion(newAnswer),
-            });
+            await createQuestionAnswer(auditId, questionId, newAnswer)
             form.reset()
             setIsLoading(false)
             setShowAddDialog(false)
@@ -72,13 +72,13 @@ const AnswerCreateButton = ({
         } catch (error) {
             setIsLoading(false)
             console.error('Error adding answer:', error);
-            // Handle the error as needed
         }
     }
 
     return (
         <>
             <Button
+                disabled={loading}
                 variant={variant}
                 onClick={() => setShowAddDialog(true)}
             >
@@ -119,7 +119,7 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Recommendation Document" {...field} />
+                                                <Textarea variant="ny" placeholder="Recommendation Document" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

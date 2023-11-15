@@ -11,6 +11,7 @@ import {Audit, QuestionActionType} from "@/types/dto";
 import {toast} from "@/components/ui/use-toast";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import QuestionItem from "@/app/(audit)/audit/[auditId]/question-item";
+import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
 
 interface AuditEditorProps {
     userId: string;
@@ -60,10 +61,8 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
 
     if (loading) {
         return (<AuditEditorShell>
-                <AuditEditorHeader heading="Questions" text="Create and manage questions.">
-                    <QuestionCreateButton auditId={auditId as string}/>
-                </AuditEditorHeader>
-                <div className="divide-border-200 divide-y rounded-md border">
+                <AuditEditorHeader.Skeleton/>
+                <div className="divide-border-200 mt-8 divide-y rounded-md border">
                     <QuestionItem.Skeleton/>
                     <QuestionItem.Skeleton/>
                     <QuestionItem.Skeleton/>
@@ -93,14 +92,23 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
 
             {
                 questions.length ? (
-                    <div className="divide-y divide-border rounded-md border mt-3">
+                    <div className="divide-y divide-border rounded-md border mt-8">
                         {
                             questions.map(question => (
                                 <QuestionItem key={question.uid} question={question} auditId={auditId}/>
                             ))
                         }
                     </div>
-                ) : null
+                ) : (
+                    <EmptyPlaceholder className="mt-3">
+                        <EmptyPlaceholder.Icon name="audit"/>
+                        <EmptyPlaceholder.Title>No question created</EmptyPlaceholder.Title>
+                        <EmptyPlaceholder.Description>
+                            You don&apos;t have any question yet. Start creating question.
+                        </EmptyPlaceholder.Description>
+                        <QuestionCreateButton noQuestion={true} auditId={auditId as string}/>
+                    </EmptyPlaceholder>
+                )
             }
 
             <hr className="mt-12"/>

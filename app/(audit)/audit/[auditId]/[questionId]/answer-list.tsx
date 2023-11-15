@@ -6,20 +6,19 @@ import {Icons} from "@/components/icons"
 import {AuditEditorShell} from '../audit-editor-shell'
 import {AuditEditorHeader} from '../audit-editor-header'
 import {Question, QuestionActionType} from "@/types/dto";
-import {singleQuestion} from "@/lib/firestore/audit";
+import {singleQuestion, updateSingleQuestionInFirebase} from "@/lib/firestore/audit";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {questionSchema} from "@/lib/validations/question";
 import * as z from "zod";
-import {Collections} from "@/lib/firestore/client";
-import {updateDoc} from "firebase/firestore";
+import {Timestamp} from "firebase/firestore";
 import {toast} from "@/components/ui/use-toast";
 import AnswerCreateButton from "@/app/(audit)/audit/[auditId]/[questionId]/answer-create-button";
 import AnswerItem from "@/app/(audit)/audit/[auditId]/[questionId]/answer-item";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
-import {QuestionCreateButton} from "@/app/(audit)/audit/[auditId]/question-create-button";
+import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
 
 interface AuditEditorProps {
     userId: string;
@@ -45,25 +44,31 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
 
     async function onSubmit(data: FormData) {
         setIsLoading(true)
-        let formData = {
-            uid: question?.uid,
+        let formData: Question = {
+            uid: question?.uid || '',
             name: data.question_name,
-            answers: question?.answers,
-            createdAt: question?.createdAt,
+            answers: question?.answers || [],
+            createdAt: question?.createdAt || Timestamp.now(),
         }
-        const questionRef = Collections.question(auditId, questionId)
         try {
-            await updateDoc(questionRef, formData)
-            dispatch({type: QuestionActionType.UPDATE_QUESTION, payload: formData as Question})
-            toast({
-                title: 'Question updated successfully!',
-                variant: 'default',
-                description: `Your Question was updated.`,
-            })
-            setIsLoading(false)
+            const isSuccess: boolean = await updateSingleQuestionInFirebase(auditId, questionId, formData)
+            if (isSuccess) {
+                // Update your state or dispatch action
+                dispatch({type: QuestionActionType.UPDATE_QUESTION, payload: formData as Question});
+
+                toast({
+                    title: 'Question updated successfully!',
+                    variant: 'default',
+                    description: `Your Question was updated.`,
+                });
+            } else {
+                // Handle failure
+                console.error('Failed to update question in Firebase');
+            }
+            setIsLoading(false);
         } catch (error) {
             console.error('Error updating document:', error);
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -78,11 +83,20 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
     }, [auditId, questionId])
 
     if (loading) {
-        return (<AuditEditorShell>
+        return (
+            <AuditEditorShell>
                 <AuditEditorHeader heading="Answers" text="Create and manage answers.">
-                    <QuestionCreateButton auditId={auditId as string}/>
+                    <AnswerCreateButton
+                        loading={loading}
+                        auditId={auditId}
+                        questionId={questionId}
+                        singleQuestionFetch={singleQuestionFetch}
+                    />
                 </AuditEditorHeader>
-                <div className="divide-border-200 divide-y rounded-md border">
+                <>
+                    <AnswerItem.Skeleton/>
+                </>
+                <div className="divide-border-200 divide-y rounded-md border mt-8 mx-2">
                     <AnswerItem.Skeleton/>
                     <AnswerItem.Skeleton/>
                     <AnswerItem.Skeleton/>
@@ -115,14 +129,14 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
                 />
             </AuditEditorHeader>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} className="px-2 mt-4">
                 <div className="w-full flex items-end justify-between">
                     <div className="w-11/12">
-                        <Label htmlFor="question_name" className="block text-sm font-medium leading-6">
+                        <Label htmlFor="question_name" className="block text-xl font-medium leading-6">
                             Question Name
                         </Label>
                         <Input
-                            className="mt-2 text-2xl h-12"
+                            className="mt-2 text-2xl h-12 border-none"
                             id="question_name"
                             variant="ny"
                             placeholder="question_name"
@@ -141,7 +155,8 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
                         )}
                     </div>
                     <button
-                        className="flex justify-center items-center w-w-1/12 h-12 border rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm"
+                        className={cn(buttonVariants({variant: "outline", size: 'icon'}))}
+                        // className="flex justify-center items-center w-w-1/12 h-12 border rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm"
                         disabled={loading || isLoading}
                     >
                         <Icons.save/>
@@ -152,7 +167,7 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
 
             {
                 question?.answers?.length ? (
-                    <div className="divide-y divide-border rounded-md border mt-3">
+                    <div className="divide-y divide-border rounded-md border mt-8 mx-2">
                         {
                             question?.answers?.map(answer => (
                                     <AnswerItem
@@ -166,7 +181,20 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
                             )
                         }
                     </div>
-                ) : null
+                ) : (
+                    <EmptyPlaceholder className="mt-3">
+                        <EmptyPlaceholder.Icon name="audit"/>
+                        <EmptyPlaceholder.Title>No answer created</EmptyPlaceholder.Title>
+                        <EmptyPlaceholder.Description>
+                            You don&apos;t have any answer yet. Start creating answer.
+                        </EmptyPlaceholder.Description>
+                        <AnswerCreateButton
+                            auditId={auditId}
+                            questionId={questionId}
+                            singleQuestionFetch={singleQuestionFetch}
+                        />
+                    </EmptyPlaceholder>
+                )
             }
 
 
