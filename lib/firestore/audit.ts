@@ -157,6 +157,15 @@ export async function updateSingleQuestionInFirebase(auditId: string, questionId
     }
 }
 
+export async function deleteSingleQuestionInFirebase(auditId: string, questionId: string) {
+    const questionRef = Collections.question(auditId, questionId)
+    try {
+        await deleteDoc(questionRef)
+    } catch (error) {
+        console.error('Error deleting answer:', error);
+    }
+}
+
 export async function deleteQuestionAnswer(auditId: string, questionId: string, answerId: string) {
     const questionRef = Collections.question(auditId, questionId);
     try {

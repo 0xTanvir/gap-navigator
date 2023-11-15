@@ -5,19 +5,12 @@ import {buttonVariants} from "@/components/ui/button"
 import {Icons} from "@/components/icons"
 import {AuditEditorShell} from '../audit-editor-shell'
 import {AuditEditorHeader} from '../audit-editor-header'
-import {Question, QuestionActionType} from "@/types/dto";
-import {singleQuestion, updateSingleQuestionInFirebase} from "@/lib/firestore/audit";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
+import {Question} from "@/types/dto";
+import {singleQuestion} from "@/lib/firestore/audit";
 import {questionSchema} from "@/lib/validations/question";
 import * as z from "zod";
-import {Timestamp} from "firebase/firestore";
-import {toast} from "@/components/ui/use-toast";
 import AnswerCreateButton from "@/app/(audit)/audit/[auditId]/[questionId]/answer-create-button";
 import AnswerItem from "@/app/(audit)/audit/[auditId]/[questionId]/answer-item";
-import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
 
 interface AuditEditorProps {
@@ -28,49 +21,9 @@ interface AuditEditorProps {
 
 type FormData = z.infer<typeof questionSchema>
 
-export default function AnswerList({userId, auditId, questionId}: AuditEditorProps) {
+export default function AnswerList({auditId, questionId}: AuditEditorProps) {
     const [question, setQuestion] = useState<Question | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const {dispatch} = useQuestions()
-
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-    } = useForm<FormData>({
-        resolver: zodResolver(questionSchema)
-    })
-
-    async function onSubmit(data: FormData) {
-        setIsLoading(true)
-        let formData: Question = {
-            uid: question?.uid || '',
-            name: data.question_name,
-            answers: question?.answers || [],
-            createdAt: question?.createdAt || Timestamp.now(),
-        }
-        try {
-            const isSuccess: boolean = await updateSingleQuestionInFirebase(auditId, questionId, formData)
-            if (isSuccess) {
-                // Update your state or dispatch action
-                dispatch({type: QuestionActionType.UPDATE_QUESTION, payload: formData as Question});
-
-                toast({
-                    title: 'Question updated successfully!',
-                    variant: 'default',
-                    description: `Your Question was updated.`,
-                });
-            } else {
-                // Handle failure
-                console.error('Failed to update question in Firebase');
-            }
-            setIsLoading(false);
-        } catch (error) {
-            console.error('Error updating document:', error);
-            setIsLoading(false);
-        }
-    }
 
     async function singleQuestionFetch() {
         const dbQuestion = await singleQuestion(auditId, questionId)
@@ -93,9 +46,6 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
                         singleQuestionFetch={singleQuestionFetch}
                     />
                 </AuditEditorHeader>
-                <>
-                    <AnswerItem.Skeleton/>
-                </>
                 <div className="divide-border-200 divide-y rounded-md border mt-8 mx-2">
                     <AnswerItem.Skeleton/>
                     <AnswerItem.Skeleton/>
@@ -128,42 +78,6 @@ export default function AnswerList({userId, auditId, questionId}: AuditEditorPro
                     singleQuestionFetch={singleQuestionFetch}
                 />
             </AuditEditorHeader>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="px-2 mt-4">
-                <div className="w-full flex items-end justify-between">
-                    <div className="w-11/12">
-                        <Label htmlFor="question_name" className="block text-xl font-medium leading-6">
-                            Question Name
-                        </Label>
-                        <Input
-                            className="mt-2 text-2xl h-12 border-none"
-                            id="question_name"
-                            variant="ny"
-                            placeholder="question_name"
-                            type="text"
-                            autoCapitalize="none"
-                            autoComplete="question_name"
-                            autoCorrect="off"
-                            disabled={loading || isLoading}
-                            defaultValue={question?.name || ''}
-                            {...register('question_name')}
-                        />
-                        {errors?.question_name && (
-                            <p className="px-1 mt-1.5 text-xs">
-                                {errors.question_name.message}
-                            </p>
-                        )}
-                    </div>
-                    <button
-                        className={cn(buttonVariants({variant: "outline", size: 'icon'}))}
-                        // className="flex justify-center items-center w-w-1/12 h-12 border rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm"
-                        disabled={loading || isLoading}
-                    >
-                        <Icons.save/>
-                    </button>
-                </div>
-            </form>
-
 
             {
                 question?.answers?.length ? (
