@@ -14,6 +14,7 @@ export type SiteConfig = {
     name: string
     stitchedName: string
     description: string
+    emailFrom: string
     links: {
         twitter: string
         github: string
