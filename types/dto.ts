@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase/firestore'
+import {Timestamp} from 'firebase/firestore'
 
 export interface EmailMsg {
     to: string,
@@ -14,7 +14,8 @@ export interface User {
     lastName: string
     email: string
     role: string
-    image: string
+    image: string,
+    audits: string[],
 }
 
 export interface TeamCardProps {
@@ -48,3 +49,34 @@ export type AuditAction =
     | { type: AuditActionType.ADD_MULTIPLE_AUDITS; payload: Audit[] }
     | { type: AuditActionType.UPDATE_AUDIT; payload: Audit }
     | { type: AuditActionType.DELETE_AUDIT; payload: string }
+
+export interface Question {
+    uid: string
+    name: string
+    answers: Answer[]
+    createdAt: Timestamp
+}
+
+export interface Answer {
+    uid: string,
+    name: string,
+    recommendationDocument: string
+    createdAt: Timestamp
+}
+
+export type Answers = Answer[]
+
+export type Questions = Question[]
+
+export enum QuestionActionType {
+    ADD_QUESTION = "ADD_QUESTION",
+    ADD_MULTIPLE_QUESTIONS = "ADD_MULTIPLE_QUESTIONS",
+    UPDATE_QUESTION = "UPDATE_QUESTION",
+    DELETE_QUESTION = "DELETE_QUESTION",
+}
+
+export type QuestionAction =
+    | { type: QuestionActionType.ADD_QUESTION; payload: Question }
+    | { type: QuestionActionType.ADD_MULTIPLE_QUESTIONS; payload: Question[] }
+    | { type: QuestionActionType.UPDATE_QUESTION; payload: Question }
+    | { type: QuestionActionType.DELETE_QUESTION; payload: string }

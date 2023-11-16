@@ -3,19 +3,19 @@
 import * as z from "zod"
 import * as React from "react"
 
-import { Timestamp } from "firebase/firestore"
-import { setAudit } from "@/lib/firestore/audit"
-import { v4 as uuidv4 } from 'uuid'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { cn } from "@/lib/utils"
-import { Icons } from "@/components/icons"
-import { Audit, AuditActionType } from "@/types/dto"
-import { auditSchema } from "@/lib/validations/audit"
-import { ButtonProps, buttonVariants } from "@/components/ui/button"
-import { toast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {Timestamp} from "firebase/firestore"
+import {setAudit} from "@/lib/firestore/audit"
+import {v4 as uuidv4} from 'uuid'
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {cn} from "@/lib/utils"
+import {Icons} from "@/components/icons"
+import {Audit, AuditActionType} from "@/types/dto"
+import {auditSchema} from "@/lib/validations/audit"
+import {ButtonProps, buttonVariants} from "@/components/ui/button"
+import {toast} from "@/components/ui/use-toast"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
 import {
     Dialog,
     DialogContent,
@@ -50,12 +50,12 @@ interface AuditCreateButtonProps extends ButtonProps {
 }
 
 export function AuditCreateButton({
-    userId,
-    className,
-    variant,
-    ...props
-}: AuditCreateButtonProps) {
-    const { dispatch } = useAudits()
+                                      userId,
+                                      className,
+                                      variant,
+                                      ...props
+                                  }: AuditCreateButtonProps) {
+    const {dispatch} = useAudits()
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
 
@@ -78,7 +78,7 @@ export function AuditCreateButton({
             }
 
             const auditId = await setAudit(userId, audit)
-            dispatch({ type: AuditActionType.ADD_AUDIT, payload: audit })
+            dispatch({type: AuditActionType.ADD_AUDIT, payload: audit})
             form.reset()
 
             return toast({
@@ -103,11 +103,14 @@ export function AuditCreateButton({
             <Button
                 variant={variant}
                 onClick={() => setShowAddDialog(true)}
-            ><Icons.add className="mr-2 h-4 w-4" />New audit</Button>
+            >
+                <Icons.filePlus className="mr-2 h-4 w-4"/>
+                New audit
+            </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} >
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
                             <DialogHeader>
                                 <DialogTitle>Add audit</DialogTitle>
                                 <DialogDescription>
@@ -118,26 +121,26 @@ export function AuditCreateButton({
                                 <FormField
                                     control={form.control}
                                     name="auditName"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Audit Name" {...field} />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
                                     name="auditType"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Type</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select an audit type" />
+                                                        <SelectValue placeholder="Select an audit type"/>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -150,7 +153,7 @@ export function AuditCreateButton({
                                                 Only public type can be sharable with client.
                                                 Private type is only for consultant.
                                             </FormDescription>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
@@ -160,7 +163,7 @@ export function AuditCreateButton({
                                     type="submit"
                                     // onClick={onClick}
                                     className={cn(
-                                        buttonVariants({ variant: "default" }),
+                                        buttonVariants({variant: "default"}),
                                         {
                                             "cursor-not-allowed opacity-60": isLoading,
                                         },
@@ -170,9 +173,9 @@ export function AuditCreateButton({
                                     {...props}
                                 >
                                     {isLoading ? (
-                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                                     ) : (
-                                        <Icons.add className="mr-2 h-4 w-4" />
+                                        <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
                                     Add audit
                                 </button>

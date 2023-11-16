@@ -22,6 +22,7 @@ export async function getUserById(id: string): Promise<User> {
             email: data.email,
             role: data.role,
             image: data.image,
+            audits: data.audits
         }
         return user
     } else {

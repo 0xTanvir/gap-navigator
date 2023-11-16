@@ -51,6 +51,7 @@ export function UserAuthComplete({ uid, callbackUrl, firstName, lastName, email 
             email: data.email,
             role: data.role,
             image: "",
+            audits: []
         }
         try {
             await setUser(uid, user)

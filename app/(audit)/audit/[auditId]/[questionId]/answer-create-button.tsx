@@ -1,13 +1,6 @@
+import React from 'react';
 import {Icons} from "@/components/icons";
 import {Button, ButtonProps, buttonVariants} from "@/components/ui/button";
-import {v4 as uuidv4} from 'uuid'
-import {Timestamp} from "firebase/firestore";
-import {Question, QuestionActionType} from "@/types/dto";
-import {setQuestion} from "@/lib/firestore/audit";
-import {toast} from "@/components/ui/use-toast";
-import useQuestions from "@/app/(audit)/audit/QuestionContext";
-import {cn} from "@/lib/utils";
-import React from "react";
 import {
     Dialog,
     DialogContent,
@@ -17,73 +10,80 @@ import {
     DialogTitle
 } from "@/components/ui/dialog";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {questionSchema} from "@/lib/validations/question";
 import {Input} from "@/components/ui/input";
+import {cn} from "@/lib/utils";
+import {useForm} from "react-hook-form";
 import * as z from "zod";
+import {v4 as uuidv4} from 'uuid'
+import {answerSchema} from "@/lib/validations/question";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Timestamp} from "firebase/firestore";
+import {toast} from "@/components/ui/use-toast";
+import {Textarea} from "@/components/ui/textarea";
+import {createQuestionAnswer} from "@/lib/firestore/audit";
 
-interface QuestionCreateButtonProps extends ButtonProps {
+interface AnswerCreateButtonProps extends ButtonProps {
     auditId: string
-    noQuestion?: boolean
+    questionId: string
+    loading?: boolean
+    singleQuestionFetch: Function
 }
 
-type FormData = z.infer<typeof questionSchema>
+type FormData = z.infer<typeof answerSchema>
 
-interface QuestionCreateButtonProps extends ButtonProps {
-
-}
-
-export function QuestionCreateButton({auditId, noQuestion, variant, className, ...props}: QuestionCreateButtonProps) {
+const AnswerCreateButton = ({
+                                auditId,
+                                questionId,
+                                singleQuestionFetch,
+                                loading,
+                                className,
+                                variant,
+                                ...props
+                            }: AnswerCreateButtonProps) => {
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
-    const {dispatch} = useQuestions()
 
     const form = useForm<FormData>({
-        resolver: zodResolver(questionSchema),
+        resolver: zodResolver(answerSchema),
         defaultValues: {
-            question_name: ''
+            name: '',
+            recommendationDocument: ''
         },
     })
 
     async function onSubmit(data: FormData) {
         setIsLoading(true)
-        const newQuestion: Question = {
+        const newAnswer = {
             uid: uuidv4(),
-            name: data.question_name,
-            answers: [],
-            createdAt: Timestamp.now(),
+            name: data.name,
+            recommendationDocument: data.recommendationDocument,
+            createdAt: Timestamp.now()
         }
         try {
-            await setQuestion(auditId, newQuestion)
-            dispatch({type: QuestionActionType.ADD_QUESTION, payload: newQuestion})
-            toast({
-                title: "Question created successfully.",
-                description: `Your question was created with id ${newQuestion.uid}.`,
-            })
+            await createQuestionAnswer(auditId, questionId, newAnswer)
             form.reset()
             setIsLoading(false)
             setShowAddDialog(false)
-        } catch (error) {
-            console.log(error)
-            setIsLoading(false)
+            singleQuestionFetch()
             return toast({
-                title: "Something went wrong.",
-                description: "Your question was not created. Please try again.",
-                variant: "destructive",
+                title: "Answer created successfully.",
+                description: `Your answer was created with id ${newAnswer.uid}.`,
             })
+        } catch (error) {
+            setIsLoading(false)
+            console.error('Error adding answer:', error);
         }
-
     }
 
     return (
         <>
             <Button
+                disabled={loading}
                 variant={variant}
                 onClick={() => setShowAddDialog(true)}
             >
                 <Icons.filePlus className="mr-2 h-4 w-4"/>
-                Add Question
+                New Answer
             </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
                 <DialogContent className="sm:max-w-[425px]">
@@ -92,23 +92,41 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
                             <DialogHeader>
                                 <DialogTitle>Add Answer</DialogTitle>
                                 <DialogDescription>
-                                    Type Question name.
+                                    Type answer name and recommendation document.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <FormField
                                     control={form.control}
-                                    name="question_name"
+                                    name="name"
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
-                                                <Input variant="ny" placeholder="Question Name" {...field} />
+                                                <Input variant="ny" placeholder="Answer Name" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
+
+                            </div>
+                            <div className="grid gap-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="recommendationDocument"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Recommendation Document</FormLabel>
+                                            <FormControl>
+                                                <Textarea variant="ny"
+                                                          placeholder="Recommendation Document" {...field} />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
                             </div>
                             <DialogFooter>
                                 <button
@@ -128,13 +146,16 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
                                     ) : (
                                         <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
-                                    Add Question
+                                    Add Answer
                                 </button>
                             </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>
             </Dialog>
+
         </>
-    )
-}
+    );
+};
+
+export default AnswerCreateButton;
