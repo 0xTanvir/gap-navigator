@@ -3,18 +3,18 @@
 import * as React from "react"
 import * as z from "zod"
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { deleteAudit } from "@/lib/firestore/audit"
-import { toast } from "@/components/ui/use-toast"
-import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Icons } from "@/components/icons"
-import { setAudit } from "@/lib/firestore/audit"
+import {cn} from "@/lib/utils"
+import {buttonVariants} from "@/components/ui/button"
+import {deleteAudit} from "@/lib/firestore/audit"
+import {toast} from "@/components/ui/use-toast"
+import {Input} from "@/components/ui/input"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {Icons} from "@/components/icons"
+import {setAudit} from "@/lib/firestore/audit"
 import useAudits from "./AuditsContext"
-import { auditSchema } from "@/lib/validations/audit"
-import { Audit, AuditActionType } from "@/types/dto"
+import {auditSchema} from "@/lib/validations/audit"
+import {Audit, AuditActionType} from "@/types/dto"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -56,6 +56,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import {useRouter} from "next/navigation";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -77,13 +78,14 @@ interface AuditOperationsProps {
     audit: Audit
 }
 
-export function AuditOperations({ userId, audit }: AuditOperationsProps) {
-    const { dispatch } = useAudits()
+export function AuditOperations({userId, audit}: AuditOperationsProps) {
+    const {dispatch} = useAudits()
     const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false)
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
 
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false)
     const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false)
+    const router = useRouter();
 
     const form = useForm<FormData>({
         resolver: zodResolver(auditSchema),
@@ -104,7 +106,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
             }
 
             const auditId = await setAudit(userId, updatedAudit)
-            dispatch({ type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit })
+            dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit})
             form.reset()
 
             return toast({
@@ -127,48 +129,52 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
     return (
         <>
             <DropdownMenu>
-                <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
-                    <Icons.ellipsis className="h-4 w-4" />
+                <DropdownMenuTrigger
+                    className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
+                    <Icons.ellipsis className="h-4 w-4"/>
                     <span className="sr-only">Open</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     {audit.type === "public" && (<>
                         <DropdownMenuItem className="flex cursor-pointer items-center">
-                            <Icons.copy className="mr-2 h-4 w-4" />
+                            <Icons.copy className="mr-2 h-4 w-4"/>
                             Share Audit
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator/>
                     </>)}
                     {audit.type === "exclusive" && (<>
                         <DropdownMenuItem className="flex cursor-pointer items-center">
-                            <Icons.userPlus className="mr-2 h-4 w-4" />
+                            <Icons.userPlus className="mr-2 h-4 w-4"/>
                             Invite
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator/>
                     </>)}
-                    <DropdownMenuItem className="flex cursor-pointer items-center" >
-                        <Icons.preview className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/preview/${audit.uid}`)}
+                    >
+                        <Icons.preview className="mr-2 h-4 w-4"/>
                         Preview
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="flex cursor-pointer items-center" >
-                        <Icons.evaluate className="mr-2 h-4 w-4" />
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem className="flex cursor-pointer items-center">
+                        <Icons.evaluate className="mr-2 h-4 w-4"/>
                         Evaluate
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator/>
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center"
                         onSelect={() => setShowUpdateDialog(true)}
                     >
-                        <Icons.fileEdit className="mr-2 h-4 w-4" />
+                        <Icons.fileEdit className="mr-2 h-4 w-4"/>
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator/>
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center text-destructive focus:text-destructive"
                         onSelect={() => setShowDeleteAlert(true)}
                     >
-                        <Icons.trash className="mr-2 h-4 w-4" />
+                        <Icons.trash className="mr-2 h-4 w-4"/>
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -196,15 +202,15 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                     setIsDeleteLoading(false)
                                     setShowDeleteAlert(false)
 
-                                    dispatch({ type: AuditActionType.DELETE_AUDIT, payload: audit.uid })
+                                    dispatch({type: AuditActionType.DELETE_AUDIT, payload: audit.uid})
                                 }
                             }}
                             className="bg-red-600 focus:ring-red-600"
                         >
                             {isDeleteLoading ? (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                             ) : (
-                                <Icons.trash className="mr-2 h-4 w-4" />
+                                <Icons.trash className="mr-2 h-4 w-4"/>
                             )}
                             <span>Delete</span>
                         </AlertDialogAction>
@@ -214,7 +220,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
             <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onUpdateSubmit)} >
+                        <form onSubmit={form.handleSubmit(onUpdateSubmit)}>
                             <DialogHeader>
                                 <DialogTitle>Update audit</DialogTitle>
                                 <DialogDescription>
@@ -225,7 +231,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                 <FormField
                                     control={form.control}
                                     name="auditName"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
@@ -233,20 +239,20 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                                     placeholder="Audit Name" {...field}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
                                     name="auditType"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Type</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={audit.type}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select an audit type" />
+                                                        <SelectValue placeholder="Select an audit type"/>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -259,7 +265,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                                 Only public type can be sharable with client.
                                                 Private type is only for consultant.
                                             </FormDescription>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
@@ -269,7 +275,7 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                     type="submit"
                                     // onClick={onClick}
                                     className={cn(
-                                        buttonVariants({ variant: "default" }),
+                                        buttonVariants({variant: "default"}),
                                         {
                                             "cursor-not-allowed opacity-60": isUpdateLoading,
                                         }
@@ -277,9 +283,9 @@ export function AuditOperations({ userId, audit }: AuditOperationsProps) {
                                     disabled={isUpdateLoading}
                                 >
                                     {isUpdateLoading ? (
-                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                                     ) : (
-                                        <Icons.add className="mr-2 h-4 w-4" />
+                                        <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
                                     Save changes
                                 </button>
