@@ -1,4 +1,5 @@
-import {Timestamp} from 'firebase/firestore'
+import { Timestamp } from 'firebase/firestore'
+import { SidebarNavItem } from '.'
 
 export interface EmailMsg {
     to: string,
@@ -80,3 +81,15 @@ export type QuestionAction =
     | { type: QuestionActionType.ADD_MULTIPLE_QUESTIONS; payload: Question[] }
     | { type: QuestionActionType.UPDATE_QUESTION; payload: Question }
     | { type: QuestionActionType.DELETE_QUESTION; payload: string }
+
+export interface Preview extends Audit {
+    questions: Question[]
+    sideBarNav: SidebarNavItem[]
+}
+
+export enum PreviewActionType {
+    ADD_PREVIEW = "ADD_PREVIEW",
+}
+
+export type PreviewAction =
+    | { type: PreviewActionType.ADD_PREVIEW; payload: Preview }

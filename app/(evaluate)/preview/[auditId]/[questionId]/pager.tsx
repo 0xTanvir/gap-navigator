@@ -3,13 +3,16 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
+import usePreview from "@/app/(evaluate)/preview-context"
+import { Preview } from "@/types/dto"
 
-interface DocsPagerProps {}
+interface PreviewPagerProps {
+  currentQuestion: string
+}
 
- // TODO: here pass the questions id length for pager
-export function DocsPager() {
-  // TODO: here pass the questions to generate pager
-  const pager = getPagerForQuestions()
+export function PreviewPager({ currentQuestion }: PreviewPagerProps) {
+  const { preview } = usePreview()
+  const pager = getPagerForQuestions(currentQuestion, preview)
 
   if (!pager) {
     return null
@@ -19,8 +22,9 @@ export function DocsPager() {
     <div className="pt-12 flex flex-row items-center justify-between">
       {pager?.prev && (
         <Link
-          href={pager.prev.href}
-          className={cn(buttonVariants({ variant: "ghost" }))}
+          scroll={!pager.prev.disabled}
+          href={pager.prev.disabled ? "#" : pager.prev.href}
+          className={cn(buttonVariants({ variant: "ghost" }), pager.prev.disabled ? "opacity-50 cursor-not-allowed" : "")}
         >
           <Icons.chevronLeft className="mr-2 h-4 w-4" />
           Previous
@@ -28,8 +32,9 @@ export function DocsPager() {
       )}
       {pager?.next && (
         <Link
-          href={pager.next.href}
-          className={cn(buttonVariants({ variant: "ghost" }), "ml-auto")}
+          scroll={!pager.next.disabled}
+          href={pager.next.disabled ? "#" : pager.next.href}
+          className={cn(buttonVariants({ variant: "ghost" }), pager.next.disabled ? "opacity-50 cursor-not-allowed ml-auto" : "ml-auto")}
         >
           Next
           <Icons.chevronRight className="ml-2 h-4 w-4" />
@@ -39,16 +44,25 @@ export function DocsPager() {
   )
 }
 
-export function getPagerForQuestions() {
-  // TODO: here pass the questions to generate pager
+export function getPagerForQuestions(currentQuestion: string, preview: Preview) {
+  const currentQuestionIndex = preview.questions.findIndex(
+    (question) => question.uid === currentQuestion
+  )
+  const prevQuestion = preview.questions[currentQuestionIndex - 1]
+  const nextQuestion = preview.questions[currentQuestionIndex + 1]
+
   const prev = {
-    title: "How do I use Next.js with TypeScript?",
-    href: "/preview/2e6d211f-a0fe-4667-936a-1d5f34455a3e/1",
+    title: prevQuestion?.name ?? "Previous Question",
+    href: `/preview/${preview.uid}/${prevQuestion?.uid}`,
+    disabled: !prevQuestion,
   }
+
   const next = {
-    title: "How do I use Golang?",
-    href: "/preview/2e6d211f-a0fe-4667-936a-1d5f34455a3e/2",
+    title: nextQuestion?.name ?? "Next Question",
+    href: `/preview/${preview.uid}/${nextQuestion?.uid}`,
+    disabled: !nextQuestion,
   }
+
   return {
     prev,
     next,

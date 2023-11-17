@@ -1,28 +1,20 @@
 "use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder"
-import {DocsPageHeader} from "../page-header"
-import {Button} from "@/components/ui/button"
-import {useAllQuestion} from "@/app/(evaluate)/questionsContext";
-import {useSingleAudit} from "@/app/(evaluate)/auditContext";
 
-export default function PreviewsPage({params}: { params: { auditId: string } }) {
-    const {allQuestion} = useAllQuestion()
-    const {singleAudit} = useSingleAudit()
-    const {auditId} = params
-    console.log(allQuestion)
-    console.log(params.auditId)
+import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder"
+import { DocsPageHeader } from "../page-header"
+import { Button } from "@/components/ui/button"
+import usePreview from "../../preview-context"
 
-    let id: string | undefined;
-    if (allQuestion && allQuestion.length > 0) {
-        id = allQuestion[0].uid;
-    }
+export default function PreviewsPage({ params }: { params: { auditId: string } }) {
+    const { preview } = usePreview()
 
     return (
         <div className="py-6 lg:py-10">
             <DocsPageHeader
-                heading={singleAudit?.name as string}
+                heading={preview.name}
                 text={"Complete this audit to generate your report."}
             />
             <EmptyPlaceholder>
@@ -34,11 +26,11 @@ export default function PreviewsPage({params}: { params: { auditId: string } }) 
                     className="rounded-md transition-colors"
                 />
                 <EmptyPlaceholder.Title>
-                    Total {allQuestion?.length}
-                    {allQuestion?.length === 2 ? ' Questions' : ' Question'}
+                    Total {preview.questions.length}
+                    {preview.questions.length === 2 ? ' Questions' : ' Question'}
                 </EmptyPlaceholder.Title>
                 <Button size="xl" className="mt-8 text-sm font-semibold rounded-full" asChild>
-                    {id && (<Link className="flex-none" href={`/preview/${auditId}/${id}`}>
+                    {params.auditId && (<Link className="flex-none" href={`/preview/${params.auditId}/${preview.questions[0]?.uid}`}>
                         Lets Get Started
                     </Link>)}
                 </Button>

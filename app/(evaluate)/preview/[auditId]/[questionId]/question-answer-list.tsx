@@ -1,62 +1,24 @@
-import React, {useEffect} from 'react';
-import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {Textarea} from "@/components/ui/textarea";
-import {DocsPager} from "@/app/(evaluate)/preview/[auditId]/[questionId]/pager";
-import {useForm} from "react-hook-form";
+import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { PreviewPager } from "@/app/(evaluate)/preview/[auditId]/[questionId]/pager";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {toast} from "@/components/ui/use-toast";
-import {useSingleAudit} from "@/app/(evaluate)/auditContext";
-import {useAllQuestion} from "@/app/(evaluate)/questionsContext";
-import {SidebarNavItem} from "@/types";
-import {previewQuestionListSchema} from "@/lib/validations/question";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/components/ui/use-toast";
+import { previewQuestionListSchema } from "@/lib/validations/question";
+import usePreview from '@/app/(evaluate)/preview-context';
 
 interface QuestionAnswerListProps {
-    auditId: string
     questionId: string
 }
 
 type FormData = z.infer<typeof previewQuestionListSchema>
 
-const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
-    const {singleAudit, fetchSingleAudit} = useSingleAudit()
-    const {allQuestion, fetchAllQuestion} = useAllQuestion()
-
-
-    const transformedAudits = {
-        title: singleAudit?.name,
-        description: "Complete this audit to generate your report.",
-        questions: allQuestion?.map(question => ({
-            id: question.uid,
-            title: question.name,
-            answers: question.answers.map(answer => ({
-                id: answer.uid,
-                text: answer.name,
-            })),
-        })),
-        sidebarNav: [
-            {
-                title: "Getting Started",
-                items: [
-                    {
-                        title: singleAudit?.name,
-                        href: `/preview/${singleAudit?.uid}`,
-                    },
-                ],
-            },
-            {
-                title: "Questions",
-                items: allQuestion?.map(question => ({
-                    title: question.name,
-                    href: `/preview/${singleAudit?.uid}/${question?.uid}`,
-                })),
-            },
-        ] as SidebarNavItem[]
-    };
-
-    const question = transformedAudits?.questions?.find((question) => question.id === questionId)
+const QuestionAnswerList = ({ questionId }: QuestionAnswerListProps) => {
+    const { preview } = usePreview()
+    const question = preview?.questions?.find((question) => question.uid === questionId)
 
     const form = useForm<FormData>({
         resolver: zodResolver(previewQuestionListSchema),
@@ -74,59 +36,54 @@ const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
         })
     }
 
-    useEffect(() => {
-        fetchSingleAudit(auditId)
-        fetchAllQuestion(auditId)
-    }, [auditId])
-
     return (
         <>
             <DocsPageHeader
-                heading={question?.title ?? "Question not found"}
+                heading={question?.name ?? "Question not found"}
                 text="Please choose from the following answers:"
             />
             {question?.answers?.length ? (
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField control={form.control}
-                                   name="answer"
-                                   render={({field}) => (
-                                       <FormItem className="space-y-1">
-                                           {/* TODO: when evaluate happens, then this should be populated
+                            name="answer"
+                            render={({ field }) => (
+                                <FormItem className="space-y-1">
+                                    {/* TODO: when evaluate happens, then this should be populated
                                         a defaultValue={already - answered - value} if answer already seated */}
-                                           <RadioGroup
-                                               onValueChange={field.onChange}
-                                               defaultValue={field.value}
-                                               className="grid gap-4 md:grid-cols-2 md:gap-6">
-                                               {question.answers.map((answer) => (
-                                                   <FormItem>
-                                                       <FormLabel
-                                                           className="[&:has([data-state=checked])>div]:border-primary">
-                                                           <FormControl>
-                                                               <RadioGroupItem value={answer.id} className="sr-only"/>
-                                                           </FormControl>
-                                                           <div
-                                                               className="items-center text-center rounded-md border-4 border-muted hover:border-accent cursor-pointer">
-                                                               <div
-                                                                   className="flex flex-col p-6 justify-between space-y-4 hover:bg-primary hover:text-primary-foreground">
-                                                                   <div className="space-y-2">
-                                                                       <h2 className="text-xl font-medium tracking-tight">
-                                                                           {answer.text}
-                                                                       </h2>
-                                                                   </div>
-                                                               </div>
-                                                           </div>
-                                                       </FormLabel>
-                                                   </FormItem>
-                                               ))}
-                                           </RadioGroup>
-                                       </FormItem>
-                                   )}
+                                    <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className="grid gap-4 md:grid-cols-2 md:gap-6">
+                                        {question.answers.map((answer) => (
+                                            <FormItem>
+                                                <FormLabel
+                                                    className="[&:has([data-state=checked])>div]:border-primary">
+                                                    <FormControl>
+                                                        <RadioGroupItem value={answer.uid} className="sr-only" />
+                                                    </FormControl>
+                                                    <div
+                                                        className="items-center text-center rounded-md border-4 border-muted hover:border-accent cursor-pointer">
+                                                        <div
+                                                            className="flex flex-col p-6 justify-between space-y-4 hover:bg-primary hover:text-primary-foreground">
+                                                            <div className="space-y-2">
+                                                                <h2 className="text-xl font-medium tracking-tight">
+                                                                    {answer.name}
+                                                                </h2>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </FormLabel>
+                                            </FormItem>
+                                        ))}
+                                    </RadioGroup>
+                                </FormItem>
+                            )}
                         />
                         <FormField
                             control={form.control}
                             name="additionalNote"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Additional Note</FormLabel>
                                     <FormControl>
@@ -137,14 +94,14 @@ const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="recommendedNote"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Recommended Note</FormLabel>
                                     <FormControl>
@@ -155,14 +112,14 @@ const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
                             control={form.control}
                             name="internalNote"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Internal Note</FormLabel>
                                     <FormControl>
@@ -173,7 +130,7 @@ const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage/>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -182,8 +139,7 @@ const QuestionAnswerList = ({auditId, questionId}: QuestionAnswerListProps) => {
             ) : (
                 <p>Answers not found.</p>
             )}
-            <DocsPager/>
-
+            <PreviewPager currentQuestion={questionId} />
         </>
     );
 };
