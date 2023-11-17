@@ -29,7 +29,7 @@ export default function PreviewsPage({params}: { params: { auditId: string } }) 
                 />
                 <EmptyPlaceholder.Title>
                     Total {preview.questions.length}
-                    {preview.questions.length === 2 ? ' Questions' : ' Question'}
+                    {preview.questions.length >= 2 ? ' Questions' : ' Question'}
                 </EmptyPlaceholder.Title>
                 <Button size="xl" className="mt-8 text-sm font-semibold rounded-full" asChild>
                     {preview.questions.length > 0 ? (
