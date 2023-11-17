@@ -1,26 +1,28 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { DocsSidebarNav } from "../sidebar-nav"
-import { MainNav } from "@/components/nav/main-nav";
-import { dashboardConfig } from "@/config/dashboard";
-import { ProfileNav } from "@/components/nav/profile-nav";
-import { ModeToggle } from "@/components/mode-toggle";
-import { SiteFooter } from "@/components/site-footer";
-import { useParams } from "next/navigation";
-import { SidebarNavItem } from "@/types";
+import {useEffect, useState} from "react";
+import {DocsSidebarNav, DocsSidebarNavItems, DocsSidebarNavSkeleton, previewChildrenSkeleton} from "../sidebar-nav"
+import {MainNav} from "@/components/nav/main-nav";
+import {dashboardConfig} from "@/config/dashboard";
+import {ProfileNav} from "@/components/nav/profile-nav";
+import {ModeToggle} from "@/components/mode-toggle";
+import {SiteFooter} from "@/components/site-footer";
+import {redirect, useParams} from "next/navigation";
+import {SidebarNavItem} from "@/types";
 import usePreview from "../preview-context";
-import { getAudit, allQuestions } from "@/lib/firestore/audit";
-import { toast } from "@/components/ui/use-toast";
-import { Audit, PreviewActionType, Questions } from "@/types/dto";
+import {getAudit, allQuestions} from "@/lib/firestore/audit";
+import {toast} from "@/components/ui/use-toast";
+import {Audit, PreviewActionType, Questions} from "@/types/dto";
+import {useAuth} from "@/components/auth/auth-provider";
 
 interface DocsLayoutProps {
     children: React.ReactNode
 }
 
-export default function DocsLayout({ children }: DocsLayoutProps) {
-    const { auditId } = useParams()
-    const { preview, dispatch } = usePreview()
+export default function DocsLayout({children}: DocsLayoutProps) {
+    const {loading, user, isAuthenticated} = useAuth()
+    const {auditId} = useParams()
+    const {preview, dispatch} = usePreview()
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
     useEffect(() => {
@@ -36,7 +38,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
                     sideBarNav,
                 }
 
-                dispatch({ type: PreviewActionType.ADD_PREVIEW, payload: currentPreview })
+                dispatch({type: PreviewActionType.ADD_PREVIEW, payload: currentPreview})
             } catch (error) {
                 toast({
                     variant: "destructive",
@@ -54,35 +56,80 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
         }
     }, [auditId])
 
-    if (isLoading) return (
-        <div>Loading... set right skelton</div>
-    )
 
-    return (
-        <div className="flex min-h-screen flex-col">
-            <header className="sticky top-0 z-40 w-full border-b bg-background">
-                <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-                    <MainNav items={dashboardConfig.mainNav}>
-                        <DocsSidebarNav items={preview.sideBarNav} />
-                    </MainNav>
-                    <nav className="flex gap-2">
-                        <ProfileNav />
-                        <ModeToggle />
-                    </nav>
+    let content: any;
+    let childrenContent: any;
+    if (isLoading) {
+        content = <>
+            <DocsSidebarNavSkeleton>
+                <DocsSidebarNavItems.Skeleton/>
+            </DocsSidebarNavSkeleton>
+
+            <DocsSidebarNavSkeleton>
+                <DocsSidebarNavItems.Skeleton/>
+                <DocsSidebarNavItems.Skeleton/>
+                <DocsSidebarNavItems.Skeleton/>
+                <DocsSidebarNavItems.Skeleton/>
+            </DocsSidebarNavSkeleton>
+        </>
+        childrenContent = previewChildrenSkeleton()
+    } else {
+        content = <DocsSidebarNav items={preview.sideBarNav}/>
+        childrenContent = children
+    }
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen flex-col">
+                <header className="sticky top-0 z-40 w-full border-b bg-background">
+                    <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+                        <MainNav items={dashboardConfig.mainNav}>
+                        </MainNav>
+                        <nav className="flex gap-2">
+                            <ProfileNav/>
+                            <ModeToggle/>
+                        </nav>
+                    </div>
+                </header>
+                <div className="container flex-1">
+                    <div
+                        className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
+
+                    </div>
                 </div>
-            </header>
-            <div className="container flex-1">
-                <div className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
-                    <aside
-                        className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r py-6 pr-2 md:sticky md:block lg:py-10">
-                        <DocsSidebarNav items={preview.sideBarNav} />
-                    </aside>
-                    {children}
-                </div>
+                <SiteFooter className="border-t"/>
             </div>
-            <SiteFooter className="border-t" />
-        </div>
-    )
+        )
+    } else if (isAuthenticated && user && user.role === "consultant") {
+        return (
+            <div className="flex min-h-screen flex-col">
+                <header className="sticky top-0 z-40 w-full border-b bg-background">
+                    <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+                        <MainNav items={dashboardConfig.mainNav}>
+                            <DocsSidebarNav items={preview.sideBarNav}/>
+                        </MainNav>
+                        <nav className="flex gap-2">
+                            <ProfileNav/>
+                            <ModeToggle/>
+                        </nav>
+                    </div>
+                </header>
+                <div className="container flex-1">
+                    <div
+                        className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
+                        <aside
+                            className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r py-6 pr-2 md:sticky md:block lg:py-10">
+                            {content}
+                        </aside>
+                        {childrenContent}
+                    </div>
+                </div>
+                <SiteFooter className="border-t"/>
+            </div>
+        )
+    } else {
+        redirect('/')
+    }
 }
 
 

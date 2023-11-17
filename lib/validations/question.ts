@@ -22,7 +22,7 @@ export const previewQuestionListSchema = z.object({
     answer: z.string({
         required_error: "You need to select a answer.",
     }),
-    additionalNote: z.string().max(160).min(4),
+    additionalNote: z.string().max(160).min(4, {message: 'skdjskldfj'}),
     recommendedNote: z.string().max(160).min(4),
     internalNote: z.string().max(160).min(4),
 })
