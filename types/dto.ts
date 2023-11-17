@@ -1,5 +1,5 @@
-import { Timestamp } from 'firebase/firestore'
-import { SidebarNavItem } from '.'
+import {Timestamp} from 'firebase/firestore'
+import {SidebarNavItem} from '.'
 
 export interface EmailMsg {
     to: string,
@@ -93,3 +93,32 @@ export enum PreviewActionType {
 
 export type PreviewAction =
     | { type: PreviewActionType.ADD_PREVIEW; payload: Preview }
+
+export interface Evaluation extends Audit {
+    questions: Question[]
+    sideBarNav: SidebarNavItem[]
+    // evaluate: Evaluate
+}
+
+export enum EvaluationActionType {
+    ADD_EVALUATION = "ADD_EVALUATION"
+}
+
+export type EvaluationAction =
+    | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
+
+export interface Evaluate {
+    participantFirstName: string
+    participantLastName: string
+    participantEmail: string
+    choices: Choice []
+    exclusiveList: string []
+}
+
+export interface Choice {
+    questionId: string
+    answerId: string
+    additionalNote: string
+    recommendedNote: string
+    internalNote: string
+}

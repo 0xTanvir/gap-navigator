@@ -1,7 +1,7 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import {DocsSidebarNav, DocsSidebarNavItems, DocsSidebarNavSkeleton, previewChildrenSkeleton} from "../sidebar-nav"
+import {DocsSidebarNav, DocsSidebarNavItems, DocsSidebarNavSkeleton, childrenSkeleton} from "../sidebar-nav"
 import {MainNav} from "@/components/nav/main-nav";
 import {dashboardConfig} from "@/config/dashboard";
 import {ProfileNav} from "@/components/nav/profile-nav";
@@ -72,7 +72,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
                 <DocsSidebarNavItems.Skeleton/>
             </DocsSidebarNavSkeleton>
         </>
-        childrenContent = previewChildrenSkeleton()
+        childrenContent = childrenSkeleton()
     } else {
         content = <DocsSidebarNav items={preview.sideBarNav}/>
         childrenContent = children
@@ -92,10 +92,10 @@ export default function DocsLayout({children}: DocsLayoutProps) {
                     </div>
                 </header>
                 <div className="container flex-1">
-                    <div
-                        className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
+                    <div className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
 
                     </div>
+
                 </div>
                 <SiteFooter className="border-t"/>
             </div>

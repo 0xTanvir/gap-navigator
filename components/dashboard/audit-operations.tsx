@@ -157,7 +157,8 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                         Preview
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
-                    <DropdownMenuItem className="flex cursor-pointer items-center">
+                    <DropdownMenuItem className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/evaluate/${audit.uid}`)}>
                         <Icons.evaluate className="mr-2 h-4 w-4"/>
                         Evaluate
                     </DropdownMenuItem>
