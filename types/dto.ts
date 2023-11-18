@@ -32,6 +32,7 @@ export interface Audit {
     uid: string
     name: string
     type: string
+    authorId: string
     createdAt: Timestamp
 }
 

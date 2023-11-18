@@ -102,6 +102,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                 name: data.auditName,
                 type: data.auditType,
                 uid: audit.uid,
+                authorId:audit.authorId,
                 createdAt: audit.createdAt,
             }
 

@@ -41,6 +41,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import useAudits from "./AuditsContext"
+import {useAuth} from "@/components/auth/auth-provider";
 
 
 type FormData = z.infer<typeof auditSchema>
@@ -74,6 +75,7 @@ export function AuditCreateButton({
                 name: data.auditName,
                 type: data.auditType,
                 uid: uuidv4(),
+                authorId: userId,
                 createdAt: Timestamp.now(),
             }
 

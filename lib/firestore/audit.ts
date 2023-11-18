@@ -33,6 +33,7 @@ export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
                 uid: doc.id,
                 name: data.name,
                 type: data.type,
+                authorId:data.authorId,
                 createdAt: data.createdAt,
             } as Audit;
         });
