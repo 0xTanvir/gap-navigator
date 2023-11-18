@@ -119,7 +119,7 @@ export interface Evaluate {
 export interface Choice {
     questionId: string
     answerId: string
-    additionalNote: string
-    recommendedNote: string
-    internalNote: string
+    additionalNote?: string
+    recommendedNote?: string
+    internalNote?: string
 }
