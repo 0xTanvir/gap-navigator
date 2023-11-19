@@ -9,7 +9,7 @@ import {
     query, getDoc
 } from "firebase/firestore"
 import {Collections} from './client'
-import {Answer, Audit, Audits, Evaluate, Question} from "@/types/dto"
+import {Answer, Audit, Audits, Choice, Evaluate, Question} from "@/types/dto"
 import {toast} from "@/components/ui/use-toast";
 
 /// Audit ///
@@ -256,6 +256,41 @@ export async function setEvaluation(auditId: string, evaluation: Evaluate) {
         }
         // If it's not an Error instance, throw a new Error object
         throw new Error('Failed to add the question.')
+    }
+}
+
+export async function updateSingleEvaluation(auditId: string, evaluationId: string, updatedEvaluation: Choice) {
+    const evaluationsRef = Collections.evaluation(auditId, evaluationId)
+    try {
+        // Get the existing evaluation document
+        const evaluationDoc = await getDoc(evaluationsRef);
+        console.log(evaluationDoc)
+
+        if (evaluationDoc.exists()) {
+            // If the document exists, update the choices array
+            const existingEvaluation = evaluationDoc.data() as Evaluate;
+            console.log(existingEvaluation)
+
+            // Ensure that 'choices' is defined before pushing the new choice
+            if (!existingEvaluation.hasOwnProperty('choices') || existingEvaluation.choices === undefined) {
+                existingEvaluation.choices = [];
+            }
+            // Assuming that 'choices' is an array property in 'Evaluate'
+            existingEvaluation.choices.push(updatedEvaluation);
+            console.log(existingEvaluation)
+
+            // Update the document with the modified evaluation
+            await updateDoc(evaluationsRef, existingEvaluation as any);
+        } else {
+            throw new Error('Evaluation document not found');
+        }
+    } catch (error) {
+        // If error is an instance of Error, rethrow it
+        if (error instanceof Error) {
+            throw error;
+        }
+        // If it's not an Error instance, throw a new Error object
+        throw new Error('Failed to update the evaluation with a new choice.');
     }
 }
 

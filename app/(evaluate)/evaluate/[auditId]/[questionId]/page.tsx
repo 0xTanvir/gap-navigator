@@ -13,8 +13,8 @@ import {EvaluatePager, getPagerForQuestions} from "@/app/(evaluate)/evaluate/[au
 import {useAuth} from "@/components/auth/auth-provider";
 import {Icons} from "@/components/icons";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
 import {Choice} from "@/types/dto";
+import {updateSingleEvaluation} from "@/lib/firestore/audit";
 
 type FormData = z.infer<typeof evaluationQuestionListSchema>
 
@@ -32,7 +32,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
         // TODO: pass default values here from the saved answer
     })
 
-    console.log(evaluation.evaluate?.uid)
+    // console.log(evaluation)
 
     async function onSubmit(data: FormData) {
         const newEvaluate: Choice = {
@@ -45,7 +45,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
         // Move to the next page if an answer is selected
         const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
         if (hasAnswerSelected) {
-
+            await updateSingleEvaluation(auditId, evaluation.evaluate?.uid as string, newEvaluate)
             if (pager.next && !pager.next.disabled) {
                 await router.push(pager.next.href);
             }
