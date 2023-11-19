@@ -32,10 +32,12 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
         // TODO: pass default values here from the saved answer
     })
 
+    console.log(evaluation.evaluate?.uid)
+
     async function onSubmit(data: FormData) {
-        const newEvaluate:Choice = {
+        const newEvaluate: Choice = {
             questionId: questionId,
-            answerId:data.answerId,
+            answerId: data.answerId,
             additionalNote: data.additionalNote || undefined,
             recommendedNote: data.recommendedNote || undefined,
             internalNote: data.internalNote || undefined,
@@ -43,6 +45,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
         // Move to the next page if an answer is selected
         const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
         if (hasAnswerSelected) {
+
             if (pager.next && !pager.next.disabled) {
                 await router.push(pager.next.href);
             }

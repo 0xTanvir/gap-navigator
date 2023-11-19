@@ -9,7 +9,7 @@ import {
     query, getDoc
 } from "firebase/firestore"
 import {Collections} from './client'
-import {Answer, Audit, Audits, Question, QuestionActionType} from "@/types/dto"
+import {Answer, Audit, Audits, Evaluate, Question} from "@/types/dto"
 import {toast} from "@/components/ui/use-toast";
 
 /// Audit ///
@@ -33,7 +33,7 @@ export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
                 uid: doc.id,
                 name: data.name,
                 type: data.type,
-                authorId:data.authorId,
+                authorId: data.authorId,
                 createdAt: data.createdAt,
             } as Audit;
         });
@@ -242,5 +242,39 @@ export async function updateQuestionAnswer(auditId: string, questionId: string, 
             description: `Your answer was updated ${answerId}`,
             variant: 'destructive'
         })
+    }
+}
+
+export async function setEvaluation(auditId: string, evaluation: Evaluate) {
+    const evaluationsRef = Collections.evaluation(auditId, evaluation.uid)
+    try {
+        const evaluationRef = await setDoc(evaluationsRef, evaluation)
+    } catch (error) {
+        // If error is an instance of Error, rethrow it
+        if (error instanceof Error) {
+            throw error;
+        }
+        // If it's not an Error instance, throw a new Error object
+        throw new Error('Failed to add the question.')
+    }
+}
+
+export async function unAuthenticatedUserData(auditId: string, evaluation: Evaluate) {
+    const evaluationsRef = Collections.evaluations(auditId)
+    const q = query(
+        evaluationsRef,
+        where('uid', '==', evaluation.uid)
+    )
+    // @ts-ignore
+    const querySnapshot = await getDocs(q);
+    let uid;
+    if (!querySnapshot.empty) {
+        // Assuming there's only one document with the specified UID
+        const doc = querySnapshot.docs[0];
+        uid = doc.id;
+        return uid;
+    } else {
+        console.log('Document with the specified UID does not exist.');
+        return null;
     }
 }

@@ -98,22 +98,25 @@ export type PreviewAction =
 export interface Evaluation extends Audit {
     questions: Question[]
     sideBarNav: SidebarNavItem[]
-    // evaluate: Evaluate
+    evaluate?: Evaluate
 }
 
 export enum EvaluationActionType {
-    ADD_EVALUATION = "ADD_EVALUATION"
+    ADD_EVALUATION = "ADD_EVALUATION",
+    ADD_EVALUATE = "ADD_EVALUATE"
 }
 
 export type EvaluationAction =
     | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
+    | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
 
 export interface Evaluate {
+    uid:string
     participantFirstName: string
     participantLastName: string
     participantEmail: string
-    choices: Choice []
-    exclusiveList: string []
+    choices?: Choice []
+    exclusiveList?: string []
 }
 
 export interface Choice {

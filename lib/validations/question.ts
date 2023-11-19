@@ -34,3 +34,15 @@ export const evaluationQuestionListSchema = z.object({
     recommendedNote: z.string().max(160).optional(),
     internalNote: z.string().max(160).optional(),
 })
+
+export const evaluateParticipant = z.object({
+    participantFirstName: z.string({required_error: 'First name is required!'})
+        .min(3, {
+            message: 'First Name must be at least 3 characters',
+        }),
+    participantLastName: z.string({required_error: 'Last name is required!'})
+        .min(3, {
+            message: 'Last Name must be at least 3 characters',
+        }),
+    participantEmail: z.string({required_error: 'Email is required!'}).email('Please enter a valid email'),
+})
