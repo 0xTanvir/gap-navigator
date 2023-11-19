@@ -9,6 +9,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "@/components/ui/use-toast";
 import {previewQuestionListSchema} from "@/lib/validations/question";
 import usePreview from '@/app/(evaluate)/preview-context';
+import {Icons} from "@/components/icons";
 
 interface QuestionAnswerListProps {
     questionId: string
@@ -55,27 +56,30 @@ const QuestionAnswerList = ({questionId}: QuestionAnswerListProps) => {
                                                onValueChange={field.onChange}
                                                defaultValue={field.value}
                                                className="grid gap-4 md:grid-cols-2 md:gap-6">
-                                               {question.answers.map((answer) => (
-                                                   <FormItem>
-                                                       <FormLabel
-                                                           className="[&:has([data-state=checked])>div]:border-primary">
-                                                           <FormControl>
-                                                               <RadioGroupItem value={answer.uid} className="sr-only"/>
+                                               {question.answers.map((answer, index) => (
+                                                       <FormItem
+                                                           key={answer.uid}
+                                                           className={`cursor-pointer rounded-lg border p-3 shadow-sm focus:outline-none grid grid-cols-12 space-x-3 space-y-0 w-full ${form.getValues('answer') === answer.uid ? 'border-indigo-600 ring-2 ring-indigo-600' : 'border-gray-300'}`}
+                                                       >
+                                                           <FormControl style={{display: 'none'}}>
+                                                               <RadioGroupItem value={answer.uid}/>
                                                            </FormControl>
-                                                           <div
-                                                               className="items-center text-center rounded-md border-4 border-muted hover:border-accent cursor-pointer">
+                                                           <FormLabel
+                                                               className="font-normal block text-sm cursor-pointer col-span-11">
+                                                               {index + 1 + ". "}{answer.name}
+                                                           </FormLabel>
+
+                                                           {/* Custom check icon */}
+                                                           {form.getValues('answer') === answer.uid && (
                                                                <div
-                                                                   className="flex flex-col p-6 justify-between space-y-4 hover:bg-primary hover:text-primary-foreground">
-                                                                   <div className="space-y-2">
-                                                                       <h2 className="text-xl font-medium tracking-tight">
-                                                                           {answer.name}
-                                                                       </h2>
-                                                                   </div>
+                                                                   className="text-green-500 col-span-1 flex justify-end">
+                                                                   {/* Replace the content below with your custom check icon */}
+                                                                   <Icons.checkCircle2 size={20}/>
                                                                </div>
-                                                           </div>
-                                                       </FormLabel>
-                                                   </FormItem>
-                                               ))}
+                                                           )}
+
+                                                       </FormItem>
+                                                   ))}
                                            </RadioGroup>
                                        </FormItem>
                                    )}
