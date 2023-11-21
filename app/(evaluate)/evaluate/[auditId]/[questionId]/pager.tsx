@@ -8,10 +8,10 @@ import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 
 interface EvaluatePagerProps {
     currentQuestion: string
-    handleNextClick:() => void;
+    // handleNextClick:() => void;
 }
 
-export function EvaluatePager({currentQuestion, handleNextClick}: EvaluatePagerProps) {
+export function EvaluatePager({currentQuestion}: EvaluatePagerProps) {
     const {evaluation} = useEvaluation()
     const pager = getPagerForQuestions(currentQuestion, evaluation)
 
@@ -33,7 +33,7 @@ export function EvaluatePager({currentQuestion, handleNextClick}: EvaluatePagerP
             )}
             {pager?.next && (
                 <button
-                    onClick={handleNextClick}
+                    // onClick={handleNextClick}
                     className={cn(buttonVariants({variant: "ghost"}), pager.next.disabled ? "opacity-50 cursor-not-allowed ml-auto" : "ml-auto")}
                 >
                     Next

@@ -35,12 +35,21 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
     // console.log(evaluation)
 
     async function onSubmit(data: FormData) {
-        const newEvaluate: Choice = {
-            questionId: questionId,
-            answerId: data.answerId,
-            additionalNote: data.additionalNote || undefined,
-            recommendedNote: data.recommendedNote || undefined,
-            internalNote: data.internalNote || undefined,
+        let newEvaluate: Choice
+        if (user) {
+            newEvaluate = {
+                questionId: questionId,
+                answerId: data.answerId,
+                additionalNote: data.additionalNote || '',
+                recommendedNote: data.recommendedNote || '',
+                internalNote: data.internalNote || '',
+            }
+        } else {
+            newEvaluate = {
+                questionId: questionId,
+                answerId: data.answerId,
+                additionalNote: data.additionalNote || '',
+            }
         }
         // Move to the next page if an answer is selected
         const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
@@ -54,7 +63,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
 
     const handleNextClick = () => {
         // Trigger form submission logic
-        form.handleSubmit(onSubmit)();
+        // form.handleSubmit(onSubmit)();
     };
 
     return (
@@ -171,7 +180,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
                         }
 
                         <EvaluatePager
-                            handleNextClick={handleNextClick}
+                            // handleNextClick={handleNextClick}
                             currentQuestion={questionId}
                         />
                     </form>
@@ -182,9 +191,3 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
         </div>
     )
 }
-
-// export function getSavedFormData(questionId: string): FormData | undefined {
-//     // Retrieve saved form data for the current question from localStorage
-//     const savedFormDataArray = JSON.parse(localStorage.getItem('formDataArray') || '[]') as Choice[];
-//     return savedFormDataArray.find(data => data?.questionId === questionId);
-// }

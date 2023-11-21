@@ -6,7 +6,7 @@ import {
     arrayUnion,
     arrayRemove,
     where,
-    query, getDoc
+    query, getDoc, FieldValue
 } from "firebase/firestore"
 import {Collections} from './client'
 import {Answer, Audit, Audits, Choice, Evaluate, Question} from "@/types/dto"
@@ -248,7 +248,7 @@ export async function updateQuestionAnswer(auditId: string, questionId: string, 
 export async function setEvaluation(auditId: string, evaluation: Evaluate) {
     const evaluationsRef = Collections.evaluation(auditId, evaluation.uid)
     try {
-        const evaluationRef = await setDoc(evaluationsRef, evaluation)
+        await setDoc(evaluationsRef, evaluation)
     } catch (error) {
         // If error is an instance of Error, rethrow it
         if (error instanceof Error) {
@@ -259,28 +259,17 @@ export async function setEvaluation(auditId: string, evaluation: Evaluate) {
     }
 }
 
-export async function updateSingleEvaluation(auditId: string, evaluationId: string, updatedEvaluation: Choice) {
-    const evaluationsRef = Collections.evaluation(auditId, evaluationId)
+export async function updateSingleEvaluation(auditId: string, evaluationId: string, newChoice: Choice) {
+    const evaluationRef = Collections.evaluation(auditId, evaluationId);
+
     try {
         // Get the existing evaluation document
-        const evaluationDoc = await getDoc(evaluationsRef);
-        console.log(evaluationDoc)
+        const evaluationDoc = await getDoc(evaluationRef);
 
         if (evaluationDoc.exists()) {
-            // If the document exists, update the choices array
-            const existingEvaluation = evaluationDoc.data() as Evaluate;
-            console.log(existingEvaluation)
-
-            // Ensure that 'choices' is defined before pushing the new choice
-            if (!existingEvaluation.hasOwnProperty('choices') || existingEvaluation.choices === undefined) {
-                existingEvaluation.choices = [];
-            }
-            // Assuming that 'choices' is an array property in 'Evaluate'
-            existingEvaluation.choices.push(updatedEvaluation);
-            console.log(existingEvaluation)
-
-            // Update the document with the modified evaluation
-            await updateDoc(evaluationsRef, existingEvaluation as any);
+            await updateDoc(evaluationRef, {
+                choices: arrayUnion(newChoice)
+            });
         } else {
             throw new Error('Evaluation document not found');
         }
@@ -300,7 +289,6 @@ export async function unAuthenticatedUserData(auditId: string, evaluation: Evalu
         evaluationsRef,
         where('uid', '==', evaluation.uid)
     )
-    // @ts-ignore
     const querySnapshot = await getDocs(q);
     let uid;
     if (!querySnapshot.empty) {
