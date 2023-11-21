@@ -9,6 +9,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 import React from "react";
 import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
 import PreviewsPage from "@/app/(evaluate)/preview/[auditId]/page";
+import {useAuth} from "@/components/auth/auth-provider";
 
 export interface DocsSidebarNavProps {
     items: SidebarNavItem[]
@@ -42,13 +43,14 @@ export function DocsSidebarNavItems({
                                         items,
                                         pathname,
                                     }: DocsSidebarNavItemsProps) {
+    const {user} = useAuth()
     return items?.length ? (
         <div className="grid grid-flow-row auto-rows-max text-sm">
             {items.map((item, index) =>
                     !item.disabled && item.href ? (
                         <Link
                             key={index}
-                            href={item.href}
+                            href={user ? item.href : "#"}
                             className={cn(
                                 "flex w-full items-center rounded-md p-2 hover:underline",
                                 {

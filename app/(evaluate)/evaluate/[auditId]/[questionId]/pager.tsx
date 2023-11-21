@@ -8,10 +8,11 @@ import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 
 interface EvaluatePagerProps {
     currentQuestion: string
+    isLoading: boolean
     // handleNextClick:() => void;
 }
 
-export function EvaluatePager({currentQuestion}: EvaluatePagerProps) {
+export function EvaluatePager({currentQuestion, isLoading}: EvaluatePagerProps) {
     const {evaluation} = useEvaluation()
     const pager = getPagerForQuestions(currentQuestion, evaluation)
 
@@ -34,23 +35,13 @@ export function EvaluatePager({currentQuestion}: EvaluatePagerProps) {
             {pager?.next && (
                 <button
                     // onClick={handleNextClick}
-                    className={cn(buttonVariants({variant: "ghost"}), pager.next.disabled ? "opacity-50 cursor-not-allowed ml-auto" : "ml-auto")}
+                    className={cn(buttonVariants({variant: "ghost"}), "ml-auto")}
                 >
+                    {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
                     Next
                     <Icons.chevronRight className="ml-2 h-4 w-4"/>
                 </button>
             )}
-
-            {/*{pager?.next && (*/}
-            {/*  <Link*/}
-            {/*    scroll={!pager.next.disabled}*/}
-            {/*    href={pager.next.disabled ? "#" : pager.next.href}*/}
-            {/*    className={cn(buttonVariants({ variant: "ghost" }), pager.next.disabled ? "opacity-50 cursor-not-allowed ml-auto" : "ml-auto")}*/}
-            {/*  >*/}
-            {/*    Next*/}
-            {/*    <Icons.chevronRight className="ml-2 h-4 w-4" />*/}
-            {/*  </Link>*/}
-            {/*)}*/}
         </div>
     )
 }

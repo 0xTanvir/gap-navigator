@@ -15,10 +15,12 @@ import {Icons} from "@/components/icons";
 import {useRouter} from "next/navigation";
 import {Choice} from "@/types/dto";
 import {updateSingleEvaluation} from "@/lib/firestore/audit";
+import {useState} from "react";
 
 type FormData = z.infer<typeof evaluationQuestionListSchema>
 
 export default function EvaluateQuestionPage({params}: { params: { auditId: string, questionId: string } }) {
+        const [isLoading, setIsLoading] = useState<boolean>(false)
     const {evaluation} = useEvaluation()
     const {user} = useAuth()
     const router = useRouter()
@@ -51,13 +53,25 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
                 additionalNote: data.additionalNote || '',
             }
         }
+        setIsLoading(true)
         // Move to the next page if an answer is selected
         const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
         if (hasAnswerSelected) {
             await updateSingleEvaluation(auditId, evaluation.evaluate?.uid as string, newEvaluate)
             if (pager.next && !pager.next.disabled) {
+                toast({
+                    title: "Answer submitted successfully.",
+                    description: `Your question and answer submitted with id ${questionId} and ${data.answerId}.`,
+                })
                 await router.push(pager.next.href);
+            }else {
+                toast({
+                    title: 'Evaluation Completed!',
+                    variant: "default"
+                })
+                // await router.push(`/evaluate/${auditId}/thankyou`)
             }
+            setIsLoading(false)
         }
     }
 
@@ -181,6 +195,7 @@ export default function EvaluateQuestionPage({params}: { params: { auditId: stri
 
                         <EvaluatePager
                             // handleNextClick={handleNextClick}
+                            isLoading={isLoading}
                             currentQuestion={questionId}
                         />
                     </form>
