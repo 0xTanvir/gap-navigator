@@ -23,7 +23,7 @@ export default function ConsultantAudits({userId, userAuditsId}: ConsultantAudit
     useEffect(() => {
         async function fetchAudits() {
             try {
-                const dbAudits = await getAuditsByIds(userId)
+                const dbAudits = await getAuditsByIds(userAuditsId)
                 dispatch({type: AuditActionType.ADD_MULTIPLE_AUDITS, payload: dbAudits})
             } catch (error) {
                 console.log(error)
@@ -38,8 +38,7 @@ export default function ConsultantAudits({userId, userAuditsId}: ConsultantAudit
         }
 
         fetchAudits()
-    }, [userId]) // Run this effect when the userId changes
-
+    }, [userAuditsId]) // Run this effect when the userId changes
 
     if (isLoading) {
         return (<>

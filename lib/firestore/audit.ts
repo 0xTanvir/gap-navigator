@@ -13,12 +13,12 @@ import {Answer, Audit, Audits, Choice, Evaluate, Question} from "@/types/dto"
 import {toast} from "@/components/ui/use-toast";
 
 /// Audit ///
-export async function getAuditsByIds(userId: string): Promise<Audits> {
-    if (userId) {
+export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
+    if (userAuditsId.length > 0) {
         const userAuditsCollectionRef = Collections.audits();
         const q = query(
             userAuditsCollectionRef,
-            where('authorId', '==', userId)
+            where('uid', 'in', userAuditsId)
         );
 
         const querySnapshot = await getDocs(q);
@@ -27,14 +27,17 @@ export async function getAuditsByIds(userId: string): Promise<Audits> {
         if (querySnapshot.empty) {
             return [];
         }
-
-        return querySnapshot.docs.map((doc) => ({
-            uid: doc.id,
-            name: doc.data()?.name || '',
-            type: doc.data()?.type || '',
-            authorId: doc.data()?.authorId || '',
-            createdAt: doc.data()?.createdAt || '',
-        } as Audit));
+        const audits: Audit[] = querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                uid: doc.id,
+                name: data.name,
+                type: data.type,
+                authorId: data.authorId,
+                createdAt: data.createdAt,
+            } as Audit;
+        });
+        return audits
     } else {
         return []
     }
