@@ -80,3 +80,9 @@ export type QuestionAction =
     | { type: QuestionActionType.ADD_MULTIPLE_QUESTIONS; payload: Question[] }
     | { type: QuestionActionType.UPDATE_QUESTION; payload: Question }
     | { type: QuestionActionType.DELETE_QUESTION; payload: string }
+
+
+export interface GroupedAudits {
+    name: string;
+    total: number;
+}

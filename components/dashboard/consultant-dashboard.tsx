@@ -5,7 +5,7 @@ import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-e
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { getAuditsByIds } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
-import { Audit } from "@/types/dto";
+import { Audit, GroupedAudits } from "@/types/dto";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AuditsCounts {
@@ -14,10 +14,7 @@ interface AuditsCounts {
     exclusiveAuditsCount: number | undefined;
 }
 
-export interface GroupedAudits {
-    name: string;
-    total: number;
-}
+
 
 const ConsultantDashboard = () => {
     const [auditsCounts, setAuditsCounts] = useState<AuditsCounts>({

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { GroupedAudits } from "@/components/dashboard/consultant-dashboard";
+import { GroupedAudits } from "@/types/dto";
 
 interface DashboardOverviewChartProps{
   auditsGroupByMonth: GroupedAudits[]
@@ -13,19 +13,19 @@ const DashboardOverviewChart = ({auditsGroupByMonth}:DashboardOverviewChartProps
             <BarChart data={auditsGroupByMonth}>
                 <XAxis
                     dataKey="name"
-                    stroke="#888888"
+                    stroke="#2662EB"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                 />
                 <YAxis
-                    stroke="#888888"
+                    stroke="#2662EB"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(value) => `${value}`}
                 />
-                <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]}/>
+                <Bar dataKey="total" fill="#2662EB" radius={[4, 4, 0, 0]}/>
             </BarChart>
         </ResponsiveContainer>
     );
