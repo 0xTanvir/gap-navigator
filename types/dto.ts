@@ -32,6 +32,7 @@ export interface Audit {
     uid: string
     name: string
     type: string
+    exclusiveList?: string[];
     authorId: string
     createdAt: Timestamp
 }
@@ -111,12 +112,12 @@ export type EvaluationAction =
     | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
 
 export interface Evaluate {
-    uid:string
-    participantFirstName: string
-    participantLastName: string
-    participantEmail: string
-    choices?: Choice []
-    exclusiveList?: string []
+  uid: string;
+  participantFirstName: string;
+  participantLastName: string;
+  participantEmail: string;
+  choices?: Choice[];
+  runningStatus?: string // not-started, id, completed
 }
 
 export interface Choice {
