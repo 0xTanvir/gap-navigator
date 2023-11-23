@@ -9,10 +9,10 @@ import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 interface EvaluatePagerProps {
     currentQuestion: string
     isLoading: boolean
-    // handleNextClick:() => void;
+    handleNextClick:() => void;
 }
 
-export function EvaluatePager({currentQuestion, isLoading}: EvaluatePagerProps) {
+export function EvaluatePager({currentQuestion, isLoading, handleNextClick}: EvaluatePagerProps) {
     const {evaluation} = useEvaluation()
     const pager = getPagerForQuestions(currentQuestion, evaluation)
 
@@ -25,7 +25,7 @@ export function EvaluatePager({currentQuestion, isLoading}: EvaluatePagerProps) 
             {pager?.prev && (
                 <Link
                     scroll={!pager.prev.disabled}
-                    href={pager.prev.disabled ? "#" : pager.prev.href}
+                    href={pager.prev.disabled || isLoading ? "#" : pager.prev.href}
                     className={cn(buttonVariants({variant: "ghost"}), pager.prev.disabled ? "opacity-50 cursor-not-allowed" : "")}
                 >
                     <Icons.chevronLeft className="mr-2 h-4 w-4"/>
@@ -34,7 +34,7 @@ export function EvaluatePager({currentQuestion, isLoading}: EvaluatePagerProps) 
             )}
             {pager?.next && (
                 <button
-                    // onClick={handleNextClick}
+                    onClick={handleNextClick}
                     className={cn(buttonVariants({variant: "ghost"}), "ml-auto")}
                 >
                     {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}

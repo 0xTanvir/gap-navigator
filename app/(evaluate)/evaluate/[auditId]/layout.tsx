@@ -20,6 +20,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { SiteFooter } from "@/components/site-footer";
 import { SidebarNavItem } from "@/types";
 import { getQuestionsById } from "@/lib/firestore/question";
+import { getAllEvaluations } from "@/lib/firestore/evaluation";
 
 interface DocsLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
     const fetchEvaluation = async (auditId: string) => {
       try {
         const audit = await getAudit(auditId);
+        const evaluations = await getAllEvaluations(auditId);
         const questions = await getQuestionsById(auditId);
         const sideBarNav = getSidebarNav(audit, questions);
         let evaluate = {} as Evaluate;
@@ -117,6 +119,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
           questions,
           sideBarNav,
           evaluate,
+          evaluations
         };
         dispatch({
           type: EvaluationActionType.ADD_EVALUATION,

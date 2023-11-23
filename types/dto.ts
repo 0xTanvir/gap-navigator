@@ -1,5 +1,5 @@
-import {Timestamp} from 'firebase/firestore'
-import {SidebarNavItem} from '.'
+import { Timestamp } from 'firebase/firestore'
+import { SidebarNavItem } from '.'
 
 export interface EmailMsg {
     to: string,
@@ -99,25 +99,28 @@ export type PreviewAction =
 export interface Evaluation extends Audit {
     questions: Question[]
     sideBarNav: SidebarNavItem[]
-    evaluate?: Evaluate
+    evaluate: Evaluate
+    evaluations: Evaluate[]
 }
 
 export enum EvaluationActionType {
     ADD_EVALUATION = "ADD_EVALUATION",
-    ADD_EVALUATE = "ADD_EVALUATE"
+    ADD_EVALUATE = "ADD_EVALUATE",
+    ADD_QUESTION_ANSWER = "ADD_QUESTION_ANSWER"
 }
 
 export type EvaluationAction =
     | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
     | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
+    | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
 
 export interface Evaluate {
-  uid: string;
-  participantFirstName: string;
-  participantLastName: string;
-  participantEmail: string;
-  choices?: Choice[];
-  runningStatus?: string // not-started, id, completed
+    uid: string;
+    participantFirstName: string;
+    participantLastName: string;
+    participantEmail: string;
+    choices?: Choice[];
+    // runningStatus?: string // not-started, id, completed
 }
 
 export interface Choice {
