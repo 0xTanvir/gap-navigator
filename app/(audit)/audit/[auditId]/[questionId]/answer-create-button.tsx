@@ -20,7 +20,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Timestamp} from "firebase/firestore";
 import {toast} from "@/components/ui/use-toast";
 import {Textarea} from "@/components/ui/textarea";
-import {createQuestionAnswer} from "@/lib/firestore/audit";
+import { setQuestionAnswer } from "@/lib/firestore/answer";
 
 interface AnswerCreateButtonProps extends ButtonProps {
     auditId: string
@@ -60,7 +60,7 @@ const AnswerCreateButton = ({
             createdAt: Timestamp.now()
         }
         try {
-            await createQuestionAnswer(auditId, questionId, newAnswer)
+            await setQuestionAnswer(auditId, questionId, newAnswer)
             form.reset()
             setIsLoading(false)
             setShowAddDialog(false)
@@ -68,9 +68,14 @@ const AnswerCreateButton = ({
             return toast({
                 title: "Answer created successfully.",
                 description: `Your answer was created with id ${newAnswer.uid}.`,
+                variant: "success"
             })
         } catch (error) {
             setIsLoading(false)
+            toast({
+                title: "Error created answer.",
+                variant: "destructive"
+            })
             console.error('Error adding answer:', error);
         }
     }

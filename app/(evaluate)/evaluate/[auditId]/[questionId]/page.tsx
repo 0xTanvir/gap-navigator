@@ -24,7 +24,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { Choice } from "@/types/dto";
-import { updateSingleEvaluation } from "@/lib/firestore/audit";
+import { updateEvaluationById } from "@/lib/firestore/evaluation";
 import { useState } from "react";
 
 type FormData = z.infer<typeof evaluationQuestionListSchema>;
@@ -73,7 +73,7 @@ export default function EvaluateQuestionPage({
     // Move to the next page if an answer is selected
     const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
     if (hasAnswerSelected) {
-      await updateSingleEvaluation(
+      await updateEvaluationById(
         auditId,
         evaluation.evaluate?.uid as string,
         newEvaluate

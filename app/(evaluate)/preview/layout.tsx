@@ -10,10 +10,11 @@ import {SiteFooter} from "@/components/site-footer";
 import {redirect, useParams} from "next/navigation";
 import {SidebarNavItem} from "@/types";
 import usePreview from "../preview-context";
-import {getAudit, allQuestions} from "@/lib/firestore/audit";
+import {getAudit} from "@/lib/firestore/audit";
 import {toast} from "@/components/ui/use-toast";
 import {Audit, PreviewActionType, Questions} from "@/types/dto";
 import {useAuth} from "@/components/auth/auth-provider";
+import { getQuestionsById } from "@/lib/firestore/question";
 
 interface DocsLayoutProps {
     children: React.ReactNode
@@ -29,7 +30,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
         const fetchPreview = async (auditId: string) => {
             try {
                 const audit = await getAudit(auditId)
-                const questions = await allQuestions(auditId)
+                const questions = await getQuestionsById(auditId)
                 const sideBarNav = getSidebarNav(audit, questions)
 
                 const currentPreview = {

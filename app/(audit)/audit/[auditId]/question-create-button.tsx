@@ -3,7 +3,6 @@ import {Button, ButtonProps, buttonVariants} from "@/components/ui/button";
 import {v4 as uuidv4} from 'uuid'
 import {Timestamp} from "firebase/firestore";
 import {Question, QuestionActionType} from "@/types/dto";
-import {setQuestion} from "@/lib/firestore/audit";
 import {toast} from "@/components/ui/use-toast";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import {cn} from "@/lib/utils";
@@ -22,6 +21,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {questionSchema} from "@/lib/validations/question";
 import {Input} from "@/components/ui/input";
 import * as z from "zod";
+import { setQuestion } from "@/lib/firestore/question";
 
 interface QuestionCreateButtonProps extends ButtonProps {
     auditId: string
@@ -60,6 +60,7 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
             toast({
                 title: "Question created successfully.",
                 description: `Your question was created with id ${newQuestion.uid}.`,
+                variant: "success"
             })
             form.reset()
             setIsLoading(false)

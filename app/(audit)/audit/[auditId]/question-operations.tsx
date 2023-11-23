@@ -36,7 +36,7 @@ import {useForm} from "react-hook-form";
 import * as z from 'zod'
 import {zodResolver} from "@hookform/resolvers/zod";
 import {questionSchema} from "@/lib/validations/question";
-import {deleteSingleQuestionInFirebase, updateSingleQuestionInFirebase} from "@/lib/firestore/audit";
+import { deleteQuestionById, updateQuestionById } from "@/lib/firestore/question";
 
 interface QuestionOperationsProps {
     auditId: string
@@ -67,13 +67,13 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
             createdAt: question?.createdAt || Timestamp.now(),
         }
         try {
-            const isSuccess: boolean = await updateSingleQuestionInFirebase(auditId, questionId, formData)
+            const isSuccess: boolean = await updateQuestionById(auditId, questionId, formData)
             if (isSuccess) {
                 // Update your state or dispatch action
                 dispatch({type: QuestionActionType.UPDATE_QUESTION, payload: formData as Question});
                 toast({
                     title: 'Question updated successfully!',
-                    variant: 'default',
+                    variant: 'success',
                     description: `Your Question was updated.`,
                 });
                 form.reset()
@@ -94,11 +94,11 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
         event.preventDefault()
         setIsDeleteLoading(true)
         try {
-            await deleteSingleQuestionInFirebase(auditId, questionId)
+            await deleteQuestionById(auditId, questionId)
             dispatch({type: QuestionActionType.DELETE_QUESTION, payload: questionId})
             toast({
                 title: 'Question deleted successfully!',
-                variant: 'default'
+                variant: 'success'
             })
             setIsDeleteLoading(false)
             setShowDeleteAlert(false)

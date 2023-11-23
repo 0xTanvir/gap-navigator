@@ -88,6 +88,7 @@ export function AuditCreateButton({
       return toast({
         title: "Audit created successfully.",
         description: `Your audit was created with id ${auditId}.`,
+        variant: "success"
       });
     } catch (error) {
       // Handle the error, which could come from the setAudit
@@ -126,7 +127,7 @@ export function AuditCreateButton({
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Audit Name" {...field} />
+                        <Input variant="ny" placeholder="Audit Name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -3,7 +3,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useParams, useRouter } from "next/navigation";
 import useEvaluation from "../evaluate-context";
 import { useEffect, useState } from "react";
-import { allQuestions, getAudit } from "@/lib/firestore/audit";
+import { getAudit } from "@/lib/firestore/audit";
 import { Audit, EvaluationActionType, Questions } from "@/types/dto";
 import { toast } from "@/components/ui/use-toast";
 import { MainNav } from "@/components/nav/main-nav";
@@ -19,6 +19,7 @@ import { ProfileNav } from "@/components/nav/profile-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SiteFooter } from "@/components/site-footer";
 import { SidebarNavItem } from "@/types";
+import { getQuestionsById } from "@/lib/firestore/question";
 
 interface DocsLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
     const fetchEvaluation = async (auditId: string) => {
       try {
         const audit = await getAudit(auditId);
-        const questions = await allQuestions(auditId);
+        const questions = await getQuestionsById(auditId);
         const sideBarNav = getSidebarNav(audit, questions);
         let evaluate = {} as Evaluate;
         if (isAuthenticated) {
