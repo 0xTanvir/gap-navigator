@@ -59,3 +59,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* For WebKit browsers (Chrome, Safari) */
+#editorjs::-webkit-scrollbar {
+    width: 8px;
+}

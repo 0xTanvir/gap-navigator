@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,6 +36,13 @@ import { answerSchema } from "@/lib/validations/question";
 import * as z from "zod";
 import { Answer } from "@/types/dto";
 import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/editorjs/editor"),
+    {
+        ssr: false
+    }
+)
 
 type FormData = z.infer<typeof answerSchema>
 
@@ -69,6 +76,22 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false)
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
     const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false)
+
+    const [isTyping, setIsTyping] = useState<boolean>(false);
+    const handleEditorSave = (data: any) => {
+        setIsTyping(true);
+        setTimeout(() => {
+            if (!isTyping) {
+                form.trigger('recommendationDocument');
+            }
+        }, 100);
+
+        if (data.length > 0) {
+            form.setValue('recommendationDocument', JSON.stringify(data));
+        } else {
+            form.setValue('recommendationDocument', JSON.stringify(undefined));
+        }
+    };
 
     const form = useForm<FormData>({
         resolver: zodResolver(answerSchema),
@@ -214,11 +237,13 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    variant="ny"
-                                                    placeholder="Recommendation Document"
-                                                    {...field}
-                                                />
+                                                <Editor onSave={handleEditorSave}
+                                                        initialData={JSON.parse(answer.recommendationDocument)}/>
+                                                {/*<Textarea*/}
+                                                {/*    variant="ny"*/}
+                                                {/*    placeholder="Recommendation Document"*/}
+                                                {/*    {...field}*/}
+                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

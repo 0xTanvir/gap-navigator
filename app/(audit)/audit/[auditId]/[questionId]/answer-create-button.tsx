@@ -1,6 +1,6 @@
-import React from 'react';
-import {Icons} from "@/components/icons";
-import {Button, ButtonProps, buttonVariants} from "@/components/ui/button";
+import React, { useState } from 'react';
+import { Icons } from "@/components/icons";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -9,18 +9,24 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {cn} from "@/lib/utils";
-import {useForm} from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {v4 as uuidv4} from 'uuid'
-import {answerSchema} from "@/lib/validations/question";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Timestamp} from "firebase/firestore";
-import {toast} from "@/components/ui/use-toast";
-import {Textarea} from "@/components/ui/textarea";
+import { v4 as uuidv4 } from 'uuid'
+import { answerSchema } from "@/lib/validations/question";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Timestamp } from "firebase/firestore";
+import { toast } from "@/components/ui/use-toast";
 import { setQuestionAnswer } from "@/lib/firestore/answer";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/editorjs/editor"),
+    {
+        ssr: false
+    }
+)
 
 interface AnswerCreateButtonProps extends ButtonProps {
     auditId: string
@@ -42,6 +48,23 @@ const AnswerCreateButton = ({
                             }: AnswerCreateButtonProps) => {
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
+
+    const [isTyping, setIsTyping] = useState<boolean>(false);
+    const handleEditorSave = (data: any) => {
+        setIsTyping(true);
+        setTimeout(() => {
+            if (!isTyping) {
+                form.trigger('recommendationDocument');
+            }
+        }, 1);
+
+        if (data.length > 0) {
+            console.log(data)
+            form.setValue('recommendationDocument', JSON.stringify(data));
+        } else {
+            form.setValue('recommendationDocument', JSON.stringify(undefined));
+        }
+    };
 
     const form = useForm<FormData>({
         resolver: zodResolver(answerSchema),
@@ -91,7 +114,7 @@ const AnswerCreateButton = ({
                 New Answer
             </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[625px]">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
                             <DialogHeader>
@@ -124,8 +147,7 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Textarea variant="ny"
-                                                          placeholder="Recommendation Document" {...field} />
+                                                <Editor onSave={handleEditorSave}/>
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
