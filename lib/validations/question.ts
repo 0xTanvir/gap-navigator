@@ -30,9 +30,9 @@ export const evaluationQuestionListSchema = z.object({
     answerId: z.string({
         required_error: "You need to select a answer.",
     }),
-    additionalNote: z.string().max(160).optional(),
-    recommendedNote: z.string().max(160).optional(),
-    internalNote: z.string().max(160).optional(),
+    additionalNote: z.string().optional(),
+    recommendedNote: z.string().optional(),
+    internalNote: z.string().optional(),
 })
 
 export const evaluateParticipant = z.object({

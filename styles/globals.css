@@ -61,7 +61,7 @@
 }
 
 /* For WebKit browsers (Chrome, Safari) */
-#editorjs::-webkit-scrollbar {
+.editorjs::-webkit-scrollbar {
     width: 8px;
 }
 

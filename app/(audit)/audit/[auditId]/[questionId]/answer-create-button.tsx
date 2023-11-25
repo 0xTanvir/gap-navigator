@@ -59,7 +59,6 @@ const AnswerCreateButton = ({
         }, 1);
 
         if (data.length > 0) {
-            console.log(data)
             form.setValue('recommendationDocument', JSON.stringify(data));
         } else {
             form.setValue('recommendationDocument', JSON.stringify(undefined));
@@ -147,7 +146,7 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Editor onSave={handleEditorSave}/>
+                                                <Editor id="recommendationDocument" onSave={handleEditorSave}/>
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

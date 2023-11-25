@@ -16,7 +16,13 @@ import { Choice, EvaluationActionType } from "@/types/dto";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { setEvaluation } from "@/lib/firestore/evaluation";
+import dynamic from "next/dynamic";
 
+const Editor = dynamic(() => import("@/components/editorjs/editor"),
+    {
+        ssr: false
+    }
+)
 type FormData = z.infer<typeof evaluationQuestionListSchema>;
 
 export default function EvaluateQuestionPage({
@@ -42,6 +48,22 @@ export default function EvaluateQuestionPage({
         internalNote: evaluation?.evaluate?.choices?.find(choice => choice.questionId === questionId)?.internalNote || "",
     }
 
+    const handleEditorAdditionalNote = (data: any) => {
+        if (data.length > 0) {
+            form.setValue('additionalNote', JSON.stringify(data));
+        }
+    };
+    const handleEditorRecommendedNote = (data: any) => {
+        if (data.length > 0) {
+            form.setValue('recommendedNote', JSON.stringify(data));
+        }
+    };
+    const handleEditorInternalNote = (data: any) => {
+        if (data.length > 0) {
+            form.setValue('internalNote', JSON.stringify(data));
+        }
+    };
+
     const form = useForm<FormData>({
         resolver: zodResolver(evaluationQuestionListSchema),
         defaultValues: formDefaultValues
@@ -64,7 +86,6 @@ export default function EvaluateQuestionPage({
                 additionalNote: data.additionalNote || "",
             };
         }
-
 
         // setIsLoading(true);
         // Move to the next page if an answer is selected
@@ -163,12 +184,20 @@ export default function EvaluateQuestionPage({
                                 <FormItem>
                                     <FormLabel>Additional Note</FormLabel>
                                     <FormControl>
-                                        <Textarea
-                                            variant="ny"
-                                            placeholder="Share your thoughts and additional details..."
-                                            className="resize-none"
-                                            {...field}
+                                        <Editor
+                                            onSave={handleEditorAdditionalNote}
+                                            initialData={
+                                                formDefaultValues.additionalNote !== "" ?
+                                                    JSON.parse(formDefaultValues.additionalNote) : ''
+                                            }
+                                            id="additionalNote"
                                         />
+                                        {/*<Textarea*/}
+                                        {/*    variant="ny"*/}
+                                        {/*    placeholder="Share your thoughts and additional details..."*/}
+                                        {/*    className="resize-none"*/}
+                                        {/*    {...field}*/}
+                                        {/*/>*/}
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -183,12 +212,20 @@ export default function EvaluateQuestionPage({
                                         <FormItem>
                                             <FormLabel>Recommended Note</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    variant="ny"
-                                                    placeholder="Provide your recommended insights and suggestions..."
-                                                    className="resize-none"
-                                                    {...field}
+                                                <Editor
+                                                    onSave={handleEditorRecommendedNote}
+                                                    initialData={
+                                                        formDefaultValues.recommendedNote !== "" ?
+                                                            JSON.parse(formDefaultValues.recommendedNote) : ''
+                                                    }
+                                                    id="recommendedNote"
                                                 />
+                                                {/*<Textarea*/}
+                                                {/*    variant="ny"*/}
+                                                {/*    placeholder="Provide your recommended insights and suggestions..."*/}
+                                                {/*    className="resize-none"*/}
+                                                {/*    {...field}*/}
+                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
@@ -201,12 +238,20 @@ export default function EvaluateQuestionPage({
                                         <FormItem>
                                             <FormLabel>Internal Note</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    variant="ny"
-                                                    placeholder="Add internal notes or confidential information..."
-                                                    className="resize-none"
-                                                    {...field}
+                                                <Editor
+                                                    onSave={handleEditorInternalNote}
+                                                    initialData={
+                                                        formDefaultValues.internalNote !== "" ?
+                                                            JSON.parse(formDefaultValues.internalNote) : ''
+                                                    }
+                                                    id="internalNote"
                                                 />
+                                                {/*<Textarea*/}
+                                                {/*    variant="ny"*/}
+                                                {/*    placeholder="Add internal notes or confidential information..."*/}
+                                                {/*    className="resize-none"*/}
+                                                {/*    {...field}*/}
+                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

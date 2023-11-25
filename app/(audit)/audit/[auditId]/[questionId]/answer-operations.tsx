@@ -237,8 +237,11 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Editor onSave={handleEditorSave}
-                                                        initialData={JSON.parse(answer.recommendationDocument)}/>
+                                                <Editor
+                                                    onSave={handleEditorSave}
+                                                    initialData={JSON.parse(answer.recommendationDocument)}
+                                                    id="recommendationDocument"
+                                                />
                                                 {/*<Textarea*/}
                                                 {/*    variant="ny"*/}
                                                 {/*    placeholder="Recommendation Document"*/}
