@@ -24,7 +24,15 @@ export const EditorTools = {
     },
     checklist: CheckList,
     embed: Embed,
-    image: Image,
+    image: {
+        class: Image,
+        // config: {
+        //     endpoints: {
+        //         byFile: 'http://localhost:3000/uploadFile', // Your backend file uploader endpoint
+        //         byUrl: 'http://localhost:3000/fetchUrl', // Your endpoint that provides uploading by Url
+        //     }
+        // }
+    },
     link: {
         class: Link,
         inlineToolbar: true
