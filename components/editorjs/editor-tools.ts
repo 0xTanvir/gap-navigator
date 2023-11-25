@@ -11,6 +11,7 @@ import Header from "@editorjs/header"
 import Table from "@editorjs/table"
 import Marker from "@editorjs/marker"
 import Underline from "@editorjs/underline"
+import SimpleImage from "@editorjs/simple-image"
 
 export const EditorTools = {
     code: Code,
@@ -23,7 +24,18 @@ export const EditorTools = {
         inlineToolbar: true
     },
     checklist: CheckList,
-    embed: Embed,
+    embed: {
+        class: Embed,
+        inlineToolbar: true,
+        config: {
+            services: {
+                youtube: true,
+                facebook: true,
+                twitter:true,
+                instagram:true,
+            }
+        }
+    },
     image: {
         class: Image,
         // config: {
@@ -33,9 +45,14 @@ export const EditorTools = {
         //     }
         // }
     },
+    simpleImage: {
+        class:SimpleImage,
+        inlineToolbar:true
+    },
     link: {
         class: Link,
-        inlineToolbar: true
+        inlineToolbar: true,
+        isInline: true
     },
     list: {
         class: List,

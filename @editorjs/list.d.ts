@@ -77,3 +77,8 @@ declare module '@editorjs/underline' {
   const Underline: any; // You can replace 'any' with more specific types if available
   export default Underline;
 }
+
+declare module '@editorjs/simple-image' {
+  const SimpleImage: any; // You can replace 'any' with more specific types if available
+  export default SimpleImage;
+}
