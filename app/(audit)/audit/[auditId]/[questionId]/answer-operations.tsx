@@ -240,7 +240,6 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                                 <Editor
                                                     onSave={handleEditorSave}
                                                     initialData={JSON.parse(answer.recommendationDocument)}
-                                                    id="recommendationDocument"
                                                 />
                                                 {/*<Textarea*/}
                                                 {/*    variant="ny"*/}

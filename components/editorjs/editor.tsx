@@ -5,7 +5,7 @@ import { EditorTools } from "@/components/editorjs/editor-tools";
 interface EditorComponentProps {
     onSave: (data: any) => void;
     initialData?: any;
-    id:string
+    id?:string
 }
 
 const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
@@ -21,7 +21,7 @@ const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
 
         if (!editorRef.current) {
             const editor = new EditorJS({
-                holder: id,
+                holder: id || "editorjs",
                 // inlineToolbar: ['link', 'marker', 'bold', 'italic'],
                 tools: EditorTools,
                 data: data,
@@ -76,7 +76,7 @@ const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
 
     return (
         <div
-            id={id}
+            id={id || "editorjs"}
             className="prose max-w-full max-h-[100px] border p-2 overflow-y-auto editorjs"
         >
         </div>
