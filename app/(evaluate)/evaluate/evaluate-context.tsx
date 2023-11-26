@@ -1,7 +1,7 @@
-import React, {createContext, Dispatch, useContext, useReducer} from "react";
-import {Evaluation, EvaluationAction} from "@/types/dto";
-import {evaluateReducer} from "./evaluate-reducer";
-import {Timestamp} from "firebase/firestore";
+import React, { createContext, Dispatch, useContext, useReducer } from "react";
+import { Evaluate, Evaluation, EvaluationAction } from "@/types/dto";
+import { evaluateReducer } from "./evaluate-reducer";
+import { Timestamp } from "firebase/firestore";
 
 interface EvaluateContextType {
     evaluation: Evaluation
@@ -15,7 +15,7 @@ interface EvaluationProviderProps {
     initialEvaluation?: Evaluation
 }
 
-export const EvaluationProvider:React.FC<EvaluationProviderProps> = ({children, initialEvaluation}) => {
+export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children, initialEvaluation}) => {
     // Define the initial state
     const initialState: Evaluation = initialEvaluation || {
         // provide default values for your Evaluation structure
@@ -26,6 +26,14 @@ export const EvaluationProvider:React.FC<EvaluationProviderProps> = ({children, 
         createdAt: Timestamp.now(),
         questions: [],
         sideBarNav: [],
+        evaluate: {
+            uid: '',
+            participantFirstName: '',
+            participantLastName: '',
+            participantEmail: '',
+            choices: []
+        },
+        evaluations: [],
     };
 
     const [evaluation, dispatch] = useReducer(evaluateReducer, initialState)

@@ -45,6 +45,7 @@
     "lucide-react": "^0.290.0",
     "next": "14.0.0",
     "next-themes": "^0.2.1",
+    "pdfmake": "^0.2.8",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.48.2",
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@types/editorjs__header": "^2.6.3",
     "@types/node": "^20",
+    "@types/pdfmake": "^0.2.8",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.6",
