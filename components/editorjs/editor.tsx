@@ -6,9 +6,10 @@ interface EditorComponentProps {
     onSave: (data: any) => void;
     initialData?: any;
     id?:string
+    placeHolder?:string
 }
 
-const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
+const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) => {
     const [isMounted, setIsMounted] = useState<boolean>(false)
     const editorRef = useRef<EditorJS>()
 
@@ -25,7 +26,7 @@ const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
                 // inlineToolbar: ['link', 'marker', 'bold', 'italic'],
                 tools: EditorTools,
                 data: data,
-                placeholder: 'Let`s write recommendation document!',
+                placeholder: placeHolder || 'Let`s write your text!',
                 onChange: async () => {
                     await editorRef.current?.save().then((outputData) => {
                         onSave(outputData.blocks);
@@ -55,24 +56,6 @@ const Editor = ({onSave, initialData, id}: EditorComponentProps) => {
             }
         }
     }, [isMounted])
-
-    // const save = async () => {
-    //     if (editorRef.current) {
-    //         // editorRef.current?.save().then((outputData) => {
-    //         //     onSave(outputData.blocks);
-    //         // })
-    //         try {
-    //             const outputData = await editorRef.current?.save();
-    //             console.log('Output Data:', outputData);
-    //
-    //             if (outputData && outputData.blocks) {
-    //                 onSave(outputData.blocks);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error saving editor content:', error);
-    //         }
-    //     }
-    // }
 
     return (
         <div

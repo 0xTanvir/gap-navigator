@@ -59,37 +59,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* For WebKit browsers (Chrome, Safari) */
-.editorjs::-webkit-scrollbar {
-    width: 8px;
-}
-
-h1.ce-header{
-  @apply text-[32px] font-bold leading-5
-}
-h2.ce-header{
-  @apply text-[24px] font-bold leading-5
-}
-h3.ce-header{
-  @apply text-[18.72px] font-bold leading-5
-}
-h4.ce-header{
-  @apply text-[15.84px] font-bold leading-5
-}
-h5.ce-header{
-  @apply text-[13.28px] font-bold leading-5
-}
-h6.ce-header{
-  @apply text-[10.72px] font-bold leading-5
-}
-
-#additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content{
-  margin: 0 70px;
-  max-width: 100%;
-}
-#additionalNote .ce-toolbar__content, #recommendedNote .ce-toolbar__content, #internalNote .ce-toolbar__content{
-  margin: 0 60px;
-  max-width: 100%;
-}
-

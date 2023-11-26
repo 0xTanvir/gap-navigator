@@ -47,20 +47,9 @@ export default function EvaluateQuestionPage({
         recommendedNote: evaluation?.evaluate?.choices?.find(choice => choice.questionId === questionId)?.recommendedNote || "",
         internalNote: evaluation?.evaluate?.choices?.find(choice => choice.questionId === questionId)?.internalNote || "",
     }
-
-    const handleEditorAdditionalNote = (data: any) => {
-        if (data.length > 0) {
-            form.setValue('additionalNote', JSON.stringify(data));
-        }
-    };
     const handleEditorRecommendedNote = (data: any) => {
         if (data.length > 0) {
             form.setValue('recommendedNote', JSON.stringify(data));
-        }
-    };
-    const handleEditorInternalNote = (data: any) => {
-        if (data.length > 0) {
-            form.setValue('internalNote', JSON.stringify(data));
         }
     };
 
@@ -184,20 +173,12 @@ export default function EvaluateQuestionPage({
                                 <FormItem>
                                     <FormLabel>Additional Note</FormLabel>
                                     <FormControl>
-                                        <Editor
-                                            onSave={handleEditorAdditionalNote}
-                                            initialData={
-                                                formDefaultValues.additionalNote !== "" ?
-                                                    JSON.parse(formDefaultValues.additionalNote) : ''
-                                            }
-                                            id="additionalNote"
+                                        <Textarea
+                                            variant="ny"
+                                            placeholder="Share your thoughts and additional details..."
+                                            className="resize-none"
+                                            {...field}
                                         />
-                                        {/*<Textarea*/}
-                                        {/*    variant="ny"*/}
-                                        {/*    placeholder="Share your thoughts and additional details..."*/}
-                                        {/*    className="resize-none"*/}
-                                        {/*    {...field}*/}
-                                        {/*/>*/}
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -219,6 +200,7 @@ export default function EvaluateQuestionPage({
                                                             JSON.parse(formDefaultValues.recommendedNote) : ''
                                                     }
                                                     id="recommendedNote"
+                                                    placeHolder="Provide your recommended insights and suggestions..."
                                                 />
                                                 {/*<Textarea*/}
                                                 {/*    variant="ny"*/}
@@ -238,20 +220,12 @@ export default function EvaluateQuestionPage({
                                         <FormItem>
                                             <FormLabel>Internal Note</FormLabel>
                                             <FormControl>
-                                                <Editor
-                                                    onSave={handleEditorInternalNote}
-                                                    initialData={
-                                                        formDefaultValues.internalNote !== "" ?
-                                                            JSON.parse(formDefaultValues.internalNote) : ''
-                                                    }
-                                                    id="internalNote"
+                                                <Textarea
+                                                    variant="ny"
+                                                    placeholder="Add internal notes or confidential information..."
+                                                    className="resize-none"
+                                                    {...field}
                                                 />
-                                                {/*<Textarea*/}
-                                                {/*    variant="ny"*/}
-                                                {/*    placeholder="Add internal notes or confidential information..."*/}
-                                                {/*    className="resize-none"*/}
-                                                {/*    {...field}*/}
-                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

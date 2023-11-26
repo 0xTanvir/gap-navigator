@@ -113,7 +113,7 @@ const AnswerCreateButton = ({
                 New Answer
             </Button>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-lg">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
                             <DialogHeader>
@@ -146,7 +146,7 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Editor onSave={handleEditorSave}/>
+                                                <Editor onSave={handleEditorSave} placeHolder="Let`s write recommendation document!"/>
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

@@ -12,6 +12,7 @@ import Table from "@editorjs/table"
 import Marker from "@editorjs/marker"
 import Underline from "@editorjs/underline"
 import SimpleImage from "@editorjs/simple-image"
+import "@/styles/editor.css"
 
 export const EditorTools = {
     code: Code,

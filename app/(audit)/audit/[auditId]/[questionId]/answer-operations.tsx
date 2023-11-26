@@ -204,7 +204,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
             </AlertDialog>
 
             <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-lg">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onUpdateSubmit)}>
                             <DialogHeader>
@@ -240,6 +240,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                                 <Editor
                                                     onSave={handleEditorSave}
                                                     initialData={JSON.parse(answer.recommendationDocument)}
+                                                    placeHolder="Let`s write recommendation document!"
                                                 />
                                                 {/*<Textarea*/}
                                                 {/*    variant="ny"*/}
