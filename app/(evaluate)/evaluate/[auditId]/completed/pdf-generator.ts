@@ -8,8 +8,8 @@ interface EditorJsBlock {
     data: Record<string, any>;
 }
 
-const generatePDF = (editorJsData: { blocks: EditorJsBlock[] }) => {
-    const content = (editorJsData.blocks.map( (block) => {
+const generatePDF = async (editorJsData: { blocks: EditorJsBlock[] }) => {
+    const content = await Promise.all (editorJsData.blocks.map(async (block) => {
         switch (block.type) {
             case 'paragraph':
                 return {text: block.data.text, margin: [0, 0, 0, 10]};
@@ -48,6 +48,29 @@ const generatePDF = (editorJsData: { blocks: EditorJsBlock[] }) => {
                 return {ul: block.data.items, margin: [0, 0, 0, 10]};
             case 'checklist':
                 return {ul: block.data.items, margin: [0, 0, 0, 10]};
+            case 'image':
+                const imageData = await loadImage(block.data.file.url); // Assuming block.data.file.url contains the image URL
+                return {image: imageData, width: 200, margin: [0, 10, 0, 10]}; // Set the width as needed
+            case 'table':
+                return {
+                    table: {
+                        body: block.data.content.map((row: any[]) => row.map((cell: any) => ({text: cell}))),
+                    },
+                    margin: [0, 0, 0, 10],
+                };
+            case 'underline':
+                return {text: block.data.text, decoration: 'underline', margin: [0, 0, 0, 10]};
+            case 'marker':
+                return {text: block.data.text, background: 'yellow', margin: [0, 0, 0, 10]};
+            case 'embed':
+                return {text: `Embed: ${block.data.embed}`, margin: [0, 0, 0, 10]};
+            case 'delimiter':
+                return {text: '---------------------', margin: [0, 0, 0, 10]};
+            case 'code':
+                return {text: block.data.code, font: 'Courier', margin: [0, 0, 0, 10]};
+            case 'simple-image':
+                return {image: block.data.url, width: 200, height: 200, margin: [0, 0, 0, 10]};
+
             default:
                 return null;
         }
@@ -56,7 +79,28 @@ const generatePDF = (editorJsData: { blocks: EditorJsBlock[] }) => {
     const pdfDefinition = {
         content,
     };
+
     return pdfDefinition
 }
+
+// Helper function to load image data asynchronously
+const loadImage = async (imageUrl: string) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            // @ts-ignore
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            const imageData = canvas.toDataURL('image/*');
+            resolve(imageData);
+        };
+        img.onerror = (error) => reject(error);
+        img.src = imageUrl;
+    });
+};
 
 export default generatePDF;

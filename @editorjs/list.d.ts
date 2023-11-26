@@ -82,3 +82,19 @@ declare module '@editorjs/simple-image' {
   const SimpleImage: any; // You can replace 'any' with more specific types if available
   export default SimpleImage;
 }
+declare module '@editorjs/link-autocomplete' {
+  const LinkAutocomplete: any; // You can replace 'any' with more specific types if available
+  export default LinkAutocomplete;
+}
+declare module '@sotaproject/strikethrough' {
+  const Strikethrough: any; // You can replace 'any' with more specific types if available
+  export default Strikethrough;
+}
+declare module 'editorjs-change-case' {
+  const ChangeCase: any; // You can replace 'any' with more specific types if available
+  export default ChangeCase;
+}
+declare module '@editorjs/inline-code' {
+  const InlineCode: any; // You can replace 'any' with more specific types if available
+  export default InlineCode;
+}

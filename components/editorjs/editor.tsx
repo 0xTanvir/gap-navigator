@@ -5,8 +5,8 @@ import { EditorTools } from "@/components/editorjs/editor-tools";
 interface EditorComponentProps {
     onSave: (data: any) => void;
     initialData?: any;
-    id?:string
-    placeHolder?:string
+    id?: string
+    placeHolder?: string
 }
 
 const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) => {
@@ -23,7 +23,6 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
         if (!editorRef.current) {
             const editor = new EditorJS({
                 holder: id || "editorjs",
-                // inlineToolbar: ['link', 'marker', 'bold', 'italic'],
                 tools: EditorTools,
                 data: data,
                 placeholder: placeHolder || 'Let`s write your text!',

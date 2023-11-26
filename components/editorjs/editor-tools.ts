@@ -2,7 +2,7 @@ import CheckList from "@editorjs/checklist";
 import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";
 import Embed from "@editorjs/embed";
-import Image from "@editorjs/image";
+// import Image from "@editorjs/image";
 import Link from "@editorjs/link";
 import List from "@editorjs/list";
 import Quote from "@editorjs/quote";
@@ -12,7 +12,12 @@ import Table from "@editorjs/table"
 import Marker from "@editorjs/marker"
 import Underline from "@editorjs/underline"
 import SimpleImage from "@editorjs/simple-image"
+import LinkAutocomplete from "@editorjs/link-autocomplete"
+import Strikethrough from '@sotaproject/strikethrough';
+import ChangeCase from 'editorjs-change-case';
+import InlineCode from '@editorjs/inline-code';
 import "@/styles/editor.css"
+
 
 export const EditorTools = {
     code: Code,
@@ -32,28 +37,32 @@ export const EditorTools = {
             services: {
                 youtube: true,
                 facebook: true,
-                twitter:true,
-                instagram:true,
+                twitter: true,
+                instagram: true,
             }
         }
     },
     image: {
-        class: Image,
-        // config: {
-        //     endpoints: {
-        //         byFile: 'http://localhost:3000/uploadFile', // Your backend file uploader endpoint
-        //         byUrl: 'http://localhost:3000/fetchUrl', // Your endpoint that provides uploading by Url
-        //     }
-        // }
+        class: SimpleImage,
+        inlineToolbar: true
     },
-    simpleImage: {
-        class:SimpleImage,
-        inlineToolbar:true
-    },
+    // image: {
+    //     class: Image,
+    //     // config: {
+    //     //     endpoints: {
+    //     //         byFile: 'http://localhost:3000/uploadFile', // Your backend file uploader endpoint
+    //     //         byUrl: 'http://localhost:3000/fetchUrl', // Your endpoint that provides uploading by Url
+    //     //     }
+    //     // }
+    // },
+    // simpleImage: {
+    //     class:SimpleImage,
+    //     inlineToolbar:true
+    // },
     link: {
-        class: Link,
-        inlineToolbar: true,
-        isInline: true
+        class: LinkAutocomplete,
+        // inlineToolbar: true,
+        // isInline: true
     },
     list: {
         class: List,
@@ -70,4 +79,7 @@ export const EditorTools = {
         class: Underline,
         inlineToolbar: true
     },
+    strikethrough: Strikethrough,
+    changeCase:ChangeCase,
+    inlineCode:InlineCode
 }

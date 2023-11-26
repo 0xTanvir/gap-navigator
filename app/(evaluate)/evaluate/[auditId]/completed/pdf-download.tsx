@@ -12,53 +12,58 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const PdfDownload = () => {
     const {evaluation} = useEvaluation()
-    const output = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
-        .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
+    const generateAndDownloadPdf = async () => {
+        const output = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
+            .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
 
-    let data = {
-        blocks: output
-    }
+        let data = {
+            blocks: output
+        };
 
-    let docContent = pdfGenerator(data)
+        let docContent = await pdfGenerator(data); // Await the async function
 
-    const docDefinition: TDocumentDefinitions = {
-        header: {
-            text: 'Gap Navigator', fontSize: 14, alignment: 'center', margin: [10, 10]
-        },
-        footer: function (currentPage: number, pageCount: number) {
-            return {
-                text: currentPage.toString() + ' of ' + pageCount,
-                alignment: 'center'
-            }
-        },
-        watermark: {
-            text: 'Gap Navigator',
-            color: 'gray',
-            opacity: 0.3,
-            bold: true,
-            italics: false
-        },
-        pageSize: 'A4',
-        info: {
-            title: `${evaluation.name}`,
-            author: 'Gap Navigator',
-            subject: 'subject of document',
-            keywords: 'keywords for document',
-            creator: 'Gap Navigator',
-            producer: 'Gap Navigator',
-        },
-        content: [
-            ...(docContent.content as Content []),
-        ],
+        const docDefinition: TDocumentDefinitions = {
+            header: {
+                text: 'Gap Navigator', fontSize: 14, alignment: 'center', margin: [10, 10]
+            },
+            footer: function (currentPage: number, pageCount: number) {
+                return {
+                    text: currentPage.toString() + ' of ' + pageCount,
+                    alignment: 'center'
+                }
+            },
+            watermark: {
+                text: 'Gap Navigator',
+                color: 'gray',
+                opacity: 0.3,
+                bold: true,
+                italics: false
+            },
+            pageSize: 'A4',
+            info: {
+                title: `${evaluation.name}`,
+                author: 'Gap Navigator',
+                subject: 'subject of document',
+                keywords: 'keywords for document',
+                creator: 'Gap Navigator',
+                producer: 'Gap Navigator',
+            },
+            content: [
+                ...(docContent.content as Content []),
+            ],
+        };
+
+        const createPdf = () => {
+            const pdfGenerator = pdfMake.createPdf(docDefinition, {});
+            pdfGenerator.download(`${generateRandomText(6)}.pdf`);
+        };
+
+        createPdf();
     };
 
-    const createPdf = () => {
-        const pdfGenerator = pdfMake.createPdf(docDefinition, {})
-        pdfGenerator.download(`${generateRandomText(6)}.pdf`)
-    }
     return (
         <>
-            <Button  onClick={createPdf}>Generate PDF</Button>
+            <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
         </>
     );
 };
