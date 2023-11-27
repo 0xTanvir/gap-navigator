@@ -61,19 +61,30 @@ export default function EvaluatePage({
     });
 
     async function onSubmit(data: FormData) {
-        // setIsLoading(true);
         let evaluate = {
             uid: data.participantEmail,
             participantFirstName: data.participantFirstName,
             participantLastName: data.participantLastName,
             participantEmail: data.participantEmail,
         };
-        const emailExists = evaluation.evaluations.some(item => item.participantEmail === data.participantEmail);
+
+        const emailExists = evaluation.evaluations.find(item => item.uid === data.participantEmail);
 
         if (emailExists) {
+            dispatch({
+                type: EvaluationActionType.ADD_EVALUATE,
+                payload: emailExists,
+            });
+            form.reset();
+            setShowDialog(false);
+            if (evaluation.questions.length > 0) {
+                router.push(
+                    `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
+                );
+            }
             toast({
                 title: "This email already evaluation created.",
-                variant: "error"
+                variant: "default"
             });
         } else {
             dispatch({

@@ -12,7 +12,7 @@ import { EvaluatePager, getPagerForQuestions, } from "@/app/(evaluate)/evaluate/
 import { useAuth } from "@/components/auth/auth-provider";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
-import { Choice, EvaluationActionType } from "@/types/dto";
+import { Choice, Evaluate, EvaluationActionType } from "@/types/dto";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { setEvaluation } from "@/lib/firestore/evaluation";
@@ -76,19 +76,22 @@ export default function EvaluateQuestionPage({
             };
         }
 
-        // setIsLoading(true);
         // Move to the next page if an answer is selected
-
         const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
         if (hasAnswerSelected) {
-            console.log(hasAnswerSelected)
             dispatch({type: EvaluationActionType.ADD_QUESTION_ANSWER, payload: newEvaluate})
             if (pager.next && !pager.next.disabled) {
                 await router.push(pager.next.href);
             } else {
                 setIsLoading(true)
-                await setEvaluation(auditId, evaluation.evaluate)
-                await router.push(`/evaluate/${auditId}/completed`)
+                const dbFoundObject = evaluation.evaluations.find(item => item.uid === evaluation.evaluate.uid);
+                let result = dbFoundObject ? areObjectsEqual(dbFoundObject, evaluation.evaluate) : false;
+                if (result) {
+                    await router.push(`/evaluate/${auditId}/completed`)
+                } else {
+                    await setEvaluation(auditId, evaluation.evaluate)
+                    await router.push(`/evaluate/${auditId}/completed`)
+                }
                 toast({
                     title: "Evaluation Completed!",
                     variant: "success",
@@ -246,4 +249,44 @@ export default function EvaluateQuestionPage({
             )}
         </div>
     );
+}
+
+function areObjectsEqual(dbFoundObject: Evaluate, evaluate: Evaluate) {
+    let allMatching = true;
+
+    const participantEqual =
+        dbFoundObject.uid === evaluate.uid &&
+        dbFoundObject.participantFirstName === evaluate.participantFirstName &&
+        dbFoundObject.participantLastName === evaluate.participantLastName &&
+        dbFoundObject.participantEmail === evaluate.participantEmail;
+
+    if (!participantEqual) {
+        return false;
+    }
+
+    dbFoundObject.choices?.forEach((choices, i) => {
+        const evaluateIndexFound = evaluate?.choices?.findIndex(choice2 => choice2.questionId === choices.questionId) ?? -1;
+
+        if (evaluateIndexFound !== -1) {
+            let evaluateChoice: any;
+            if (evaluate?.choices) {
+                evaluateChoice = evaluate?.choices[evaluateIndexFound];
+            }
+            if (
+                choices.answerId === evaluateChoice.answerId &&
+                choices.additionalNote === evaluateChoice.additionalNote &&
+                choices.internalNote === evaluateChoice.internalNote &&
+                choices.recommendedNote === evaluateChoice.recommendedNote
+            ) {
+                // Keep allMatching as is, no need to change to true
+            } else {
+                allMatching = false;
+            }
+        } else {
+            allMatching = false;
+        }
+
+    });
+
+    return allMatching;
 }
