@@ -13,7 +13,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { Choice, Evaluate, EvaluationActionType } from "@/types/dto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { setEvaluation } from "@/lib/firestore/evaluation";
 import dynamic from "next/dynamic";
@@ -106,9 +106,11 @@ export default function EvaluateQuestionPage({
         form.handleSubmit(onSubmit)();
     };
 
-    if (Object.entries(evaluation.evaluate).length === 0) {
-        router.push(`/evaluate/${auditId}`)
-    }
+    useEffect(() => {
+        if (Object.entries(evaluation.evaluate).length === 0) {
+            router.push(`/evaluate/${auditId}`)
+        }
+    }, [evaluation, auditId, router]);
 
     return (
         <div className="py-6 lg:py-10">
