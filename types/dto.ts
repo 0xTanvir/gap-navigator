@@ -120,6 +120,7 @@ export interface Evaluate {
     participantLastName: string;
     participantEmail: string;
     choices?: Choice[];
+    count?: number;
     // runningStatus?: string // not-started, id, completed
 }
 
