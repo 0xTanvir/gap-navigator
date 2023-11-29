@@ -2,8 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Evaluate } from "@/types/dto";
 import { toast } from "@/components/ui/use-toast";
 import { getAllEvaluations } from "@/lib/firestore/evaluation";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataTable } from "@/components/data-table/data-table";
+import { columns } from "@/components/dashboard/table/columns";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 interface ConsultantClientsProps {
     userAuditsId: string[]
@@ -76,7 +85,15 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
     }
 
     return (
-        <div>
+        <>
+            <DataTable columns={columns} data={clientsUniqueEvaluation}/>
+        </>
+    );
+};
+
+ConsultantClients.Skeleton = function TableSkeleton() {
+    return (
+        <div className="rounded-md border">
             <Table>
                 <TableHeader>
                     <TableRow className="">
@@ -86,56 +103,22 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {
-                        clientsUniqueEvaluation.length > 0 ?
-                            clientsUniqueEvaluation.map((evaluation) => (
-                                <TableRow key={evaluation.uid}>
-                                    <TableCell className="font-medium p-3">
-                                        {evaluation.participantFirstName + " " + evaluation.participantLastName}
-                                    </TableCell>
-                                    <TableCell className="p-3">{evaluation.participantEmail}</TableCell>
-                                    <TableCell className="text-center p-3">{evaluation.count}</TableCell>
-                                </TableRow>
-                            ))
-                            :
-                            <TableRow>
-                                <TableCell colSpan={3} className="p-5 font-bold text-center">
-                                    No Data Found
-                                </TableCell>
-                            </TableRow>
-                    }
+                    {[1, 2, 3, 4].map((data) => (
+                        <TableRow key={data}>
+                            <TableCell className="p-3">
+                                <Skeleton className="p-3 w-full"/>
+                            </TableCell>
+                            <TableCell className="p-3">
+                                <Skeleton className="p-3 w-full"/>
+                            </TableCell>
+                            <TableCell className="p-3">
+                                <Skeleton className="p-3 w-full"/>
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
-
         </div>
-    );
-};
-ConsultantClients.Skeleton = function TableSkeleton() {
-    return (
-        <Table>
-            <TableHeader>
-                <TableRow className="">
-                    <TableHead className="h-10">Name</TableHead>
-                    <TableHead className="h-10">Email</TableHead>
-                    <TableHead className="text-center h-10">Evaluation Count</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {[1, 2, 3, 4].map((data) => (
-                    <TableRow key={data}>
-                        <TableCell className="p-3">
-                            <Skeleton className="p-3 w-full"/>
-                        </TableCell>
-                        <TableCell className="p-3">
-                            <Skeleton className="p-3 w-full"/>
-                        </TableCell>
-                        <TableCell className="p-3">
-                            <Skeleton className="p-3 w-full"/>
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
     )
 }
 
