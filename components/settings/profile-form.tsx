@@ -1,17 +1,20 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {toast} from "@/components/ui/use-toast";
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
+import React, { useEffect, useState } from "react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
-import {profileFormSchema} from "@/lib/validations/profile";
-import {useAuth} from "@/components/auth/auth-provider";
-import {updateDoc} from "firebase/firestore"
-import {Collections} from "@/lib/firestore/client";
+import { profileFormSchema } from "@/lib/validations/profile";
+import { useAuth } from "@/components/auth/auth-provider";
+import { updateDoc } from "firebase/firestore"
+import { Collections } from "@/lib/firestore/client";
+import { updateUserProfile } from "@/lib/firestore/user";
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
@@ -31,17 +34,21 @@ export function ProfileForm() {
     async function onSubmit(data: ProfileFormValues) {
         setLoader(true)
         try {
-            const userDocRef = Collections.user(user?.uid as string);
-            await updateDoc(userDocRef, {
+            await updateUserProfile(user?.uid as string, {
                 firstName: data.firstName,
                 lastName: data.lastName,
             })
             toast({
                 title: "Profile Updated successfully",
+                variant: "success"
             })
             setLoader(false)
         } catch (error) {
             console.error("Error updating user profile:", error);
+            toast({
+                title: "Error updating user profile",
+                variant: "error"
+            })
             setLoader(false)
         }
     }
@@ -99,7 +106,13 @@ export function ProfileForm() {
                         </FormItem>
                     )}
                 />
-                <Button disabled={loader || loading} type="submit">Update Profile</Button>
+                <Button
+                    className={cn(buttonVariants({variant: "default"}))}
+                    disabled={loader || loading}
+                    type="submit">
+                    {loader && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
+                    Update Profile
+                </Button>
             </form>
         </Form>
     )

@@ -1,4 +1,4 @@
-import { getDoc, setDoc } from "firebase/firestore"
+import { getDoc, setDoc, updateDoc } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -36,5 +36,15 @@ export async function setUser(id: string, user: User) {
         await setDoc(userDocRef, user)
     } catch (error) {
         return Promise.reject(error)
+    }
+}
+
+export async function updateUserProfile(id: string, formData: object) {
+    const userDocRef = Collections.user(id);
+    try {
+        await updateDoc(userDocRef, formData)
+        return true;
+    }catch (error){
+        throw new Error("Error updating user profile")
     }
 }
