@@ -16,9 +16,7 @@ export default function ClientsPage() {
     }
     if (isAuthenticated && user && user.role === "consultant") {
         return (
-            <AuditsProvider>
-                <ConsultantClients userAuditsId={user.audits}/>
-            </AuditsProvider>
+            <ConsultantClients userAuditsId={user.audits}/>
         )
     } else {
         return notFound()
