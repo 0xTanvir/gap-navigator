@@ -10,8 +10,6 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { profileFormSchema } from "@/lib/validations/profile";
 import { useAuth } from "@/components/auth/auth-provider";
-import { updateDoc } from "firebase/firestore"
-import { Collections } from "@/lib/firestore/client";
 import { updateUserProfile } from "@/lib/firestore/user";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons";
