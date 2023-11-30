@@ -131,3 +131,9 @@ export interface Choice {
     recommendedNote?: string
     internalNote?: string
 }
+
+
+export interface GroupedAudits {
+    name: string;
+    total: number;
+}
