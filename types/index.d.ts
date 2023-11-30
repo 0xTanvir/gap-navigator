@@ -44,6 +44,11 @@ export type SidebarNavItem = {
         }
     )
 
+export type AuditsConfig = {
+    mainNav: MainNavItem[]
+    sidebarNav: SidebarNavItem[]
+}
+
 export type SiteFooterConfig = {
     solutions: MainNavItem[]
     support: MainNavItem[]

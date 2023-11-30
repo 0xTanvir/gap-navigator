@@ -64,3 +64,7 @@ export const userAccountCompleteSchema = z.object({
         }, {message: 'Please select a valid account type'}
     )
 })
+
+export const userAuthRestPasswordSchema = z.object({
+    email: z.string({required_error: 'Please enter a valid email'}).email('Please enter a valid email')
+})

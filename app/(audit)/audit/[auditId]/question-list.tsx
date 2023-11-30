@@ -6,12 +6,13 @@ import {Icons} from "@/components/icons"
 import {AuditEditorShell} from './audit-editor-shell'
 import {AuditEditorHeader} from './audit-editor-header'
 import {QuestionCreateButton} from './question-create-button'
-import {allQuestions, getAudit} from "@/lib/firestore/audit";
+import {getAudit} from "@/lib/firestore/audit";
 import {Audit, QuestionActionType} from "@/types/dto";
 import {toast} from "@/components/ui/use-toast";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import QuestionItem from "@/app/(audit)/audit/[auditId]/question-item";
 import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
+import { getQuestionsById } from "@/lib/firestore/question";
 
 interface AuditEditorProps {
     userId: string;
@@ -42,7 +43,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
     useEffect(() => {
         async function allQuestion() {
             try {
-                let dbQuestions = await allQuestions(auditId)
+                let dbQuestions = await getQuestionsById(auditId)
                 dispatch({type: QuestionActionType.ADD_MULTIPLE_QUESTIONS, payload: dbQuestions})
             } catch (error) {
                 console.log(error)

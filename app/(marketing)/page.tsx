@@ -32,14 +32,14 @@ export default async function IndexPage() {
                         Your Trusted Platform for Streamlined Audits and Data-Driven Insights.
                     </p>
                     <div className="space-x-4">
-                        <Link href="/dashboard" className={cn(buttonVariants({ size: "lg" }))}>
+                        <Link href="/dashboard" className={cn(buttonVariants({ size: "xl" }), "text-sm font-semibold rounded-full")}>
                             Get Started
                         </Link>
                         <Link
                             href={siteConfig.links.github}
                             target="_blank"
                             rel="noreferrer"
-                            className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+                            className={cn(buttonVariants({ variant: "outline", size: "xl" }), "text-sm font-semibold rounded-full")}
                         >
                             Audits
                         </Link>
