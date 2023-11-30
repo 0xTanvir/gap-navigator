@@ -91,7 +91,7 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
                             <DialogHeader>
-                                <DialogTitle>Add Answer</DialogTitle>
+                                <DialogTitle>Add Question</DialogTitle>
                                 <DialogDescription>
                                     Type Question name.
                                 </DialogDescription>
@@ -127,7 +127,7 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
                                     {isLoading ? (
                                         <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                                     ) : (
-                                        <Icons.add className="mr-2 h-4 w-4"/>
+                                        <Icons.filePlus className="mr-2 h-4 w-4"/>
                                     )}
                                     Add Question
                                 </button>

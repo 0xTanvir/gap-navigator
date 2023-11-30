@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 interface ConsultantClientsProps {
     userAuditsId: string[]
@@ -85,12 +86,7 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 
     return (
         <>
-            <div className="flex items-center justify-between space-y-2">
-                <div className="grid gap-1">
-                    <h1 className="font-heading text-3xl md:text-4xl">Clients</h1>
-                    <p className="text-lg text-muted-foreground">Clients text</p>
-                </div>
-            </div>
+            <DashboardHeader heading="Clients" text="Manage clients"/>
 
             <DataTable columns={columns} data={clientsUniqueEvaluation}/>
         </>
@@ -100,12 +96,7 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 ConsultantClients.Skeleton = function TableSkeleton() {
     return (
         <div className="grid items-start gap-8">
-            <div className="flex flex-col justify-between space-y-2">
-                <div className="grid gap-1">
-                    <h1 className="font-heading text-3xl md:text-4xl">Clients</h1>
-                    <p className="text-lg text-muted-foreground">Clients text</p>
-                </div>
-            </div>
+            <DashboardHeader heading="Clients" text="Manage clients"/>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

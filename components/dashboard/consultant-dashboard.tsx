@@ -8,6 +8,7 @@ import { Audit, Evaluate, GroupedAudits } from "@/types/dto";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllEvaluations } from "@/lib/firestore/evaluation";
 import { toast } from "@/components/ui/use-toast";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 interface AuditsCounts {
     publicAuditsCount: number | undefined;
@@ -123,12 +124,7 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
     if (isLoading) {
         return <>
             <div className="flex-1 space-y-4">
-                <div className="flex flex-col justify-between space-y-2">
-                    <div className="grid gap-1">
-                        <h1 className="font-heading text-3xl md:text-4xl">Dashboard</h1>
-                        <p className="text-lg text-muted-foreground">Dashboard text</p>
-                    </div>
-                </div>
+                <DashboardHeader heading="Dashboard" text="Performance metrics"/>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <DashboardCard.Skeleton/>
                     <DashboardCard.Skeleton/>
@@ -151,12 +147,7 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
     return (
         <>
             <div className="flex-1 space-y-4">
-                <div className="flex items-center justify-between space-y-2">
-                    <div className="grid gap-1">
-                        <h1 className="font-heading text-3xl md:text-4xl">Dashboard</h1>
-                        <p className="text-lg text-muted-foreground">Dashboard text</p>
-                    </div>
-                </div>
+                <DashboardHeader heading="Dashboard" text="Performance metrics"/>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <DashboardCard

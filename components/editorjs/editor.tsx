@@ -59,7 +59,7 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
     return (
         <div
             id={id || "editorjs"}
-            className="prose max-w-full max-h-[100px] border p-2 overflow-y-auto editorjs"
+            className="prose max-w-full border p-2 overflow-y-auto editorjs"
         >
         </div>
     );
