@@ -147,8 +147,11 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Editor onSave={handleEditorSave}
-                                                        placeHolder="Let`s write recommendation document!"/>
+                                                <Editor
+                                                    id="recommendationDocument"
+                                                    onSave={handleEditorSave}
+                                                    placeHolder="Let`s write recommendation document!"
+                                                />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

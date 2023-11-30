@@ -230,6 +230,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
                                                 <Editor
+                                                    id="recommendationDocument"
                                                     onSave={handleEditorSave}
                                                     initialData={JSON.parse(answer.recommendationDocument)}
                                                     placeHolder="Let`s write recommendation document!"

@@ -15,17 +15,64 @@ const PdfDownload = () => {
     const {evaluation} = useEvaluation()
     const {uid} = evaluation
     const router = useRouter()
+
+
+    function evaluateFormat() {
+        const choices = evaluation.evaluate.choices;
+        let results: any[] = [];
+
+        choices?.forEach(choice => {
+            const questionId = choice.questionId;
+            const answerId = choice.answerId;
+
+            // Find the question with the specified questionId
+            const question = evaluation.questions.find(q => q.uid === questionId);
+
+            if (question) {
+                // Find the answer with the specified answerId
+                const answer = question.answers.find(a => a.uid === answerId);
+
+                if (answer) {
+                    // Retrieve the recommendationDocument for the answer
+                    const recommendationDocument = answer.recommendationDocument;
+
+                    // Update the choice with the recommendedNote
+                    choice.recommendedNote = recommendationDocument;
+
+                    // Push the result to the array
+                    results.push({
+                        questionId,
+                        answerId,
+                        questionName: question.name,
+                        recommendationDocument,
+                    });
+                }
+            }
+        });
+
+        return results;
+    }
+
+    // Call the function to evaluate choices and get the results array
+    const evaluationFormatData = evaluateFormat();
+
+
     const generateAndDownloadPdf = async () => {
         try {
             if (!evaluation || !evaluation.evaluate) {
                 throw new Error('Invalid evaluation data');
             }
 
-            const output = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
+            const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
                 .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
 
+            let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+                .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
+
+            reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+
             let data = {
-                blocks: output
+                blocks: reportData
             };
 
             let docContent = await pdfGenerator(data); // Await the async function
@@ -60,7 +107,6 @@ const PdfDownload = () => {
                     ...(docContent.content as Content []),
                 ],
             };
-
             const createPdf = () => {
                 const pdfGenerator = pdfMake.createPdf(docDefinition, {});
                 pdfGenerator.download(`${generateRandomText(6)}.pdf`);
