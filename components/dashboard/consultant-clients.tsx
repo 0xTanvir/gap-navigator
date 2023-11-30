@@ -85,6 +85,13 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 
     return (
         <>
+            <div className="flex items-center justify-between space-y-2">
+                <div className="grid gap-1">
+                    <h1 className="font-heading text-3xl md:text-4xl">Clients</h1>
+                    <p className="text-lg text-muted-foreground">Clients text</p>
+                </div>
+            </div>
+
             <DataTable columns={columns} data={clientsUniqueEvaluation}/>
         </>
     );
@@ -92,31 +99,39 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 
 ConsultantClients.Skeleton = function TableSkeleton() {
     return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow className="">
-                        <TableHead className="h-10">Name</TableHead>
-                        <TableHead className="h-10">Email</TableHead>
-                        <TableHead className="text-center h-10">Evaluation Count</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {[1, 2, 3, 4].map((data) => (
-                        <TableRow key={data}>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
+        <div className="grid items-start gap-8">
+            <div className="flex flex-col justify-between space-y-2">
+                <div className="grid gap-1">
+                    <h1 className="font-heading text-3xl md:text-4xl">Clients</h1>
+                    <p className="text-lg text-muted-foreground">Clients text</p>
+                </div>
+            </div>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="">
+                            <TableHead className="h-10">Name</TableHead>
+                            <TableHead className="h-10">Email</TableHead>
+                            <TableHead className="text-center h-10">Evaluation Count</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {[1, 2, 3, 4].map((data) => (
+                            <TableRow key={data}>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
