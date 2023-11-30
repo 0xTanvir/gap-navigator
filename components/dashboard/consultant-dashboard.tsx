@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-evaluation";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { getAuditsByIds } from "@/lib/firestore/audit";
-import { useAuth } from "@/components/auth/auth-provider";
 import { Audit, Evaluate, GroupedAudits } from "@/types/dto";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllEvaluations } from "@/lib/firestore/evaluation";
