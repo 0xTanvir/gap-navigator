@@ -1,4 +1,4 @@
-import {collection, CollectionReference, DocumentReference, doc} from "firebase/firestore"
+import {collection, CollectionReference, DocumentReference, doc, DocumentData} from "firebase/firestore"
 import {db} from '@/firebase'
 
 // Define an enum for your collection names
@@ -6,6 +6,7 @@ enum CollectionName {
     Users = "users",
     Audits = "audits",
     QUESTIONS = "questions",
+    EVALUATIONS = "evaluations"
 }
 
 // Utility functions using the enum for collection names
@@ -31,4 +32,10 @@ export const Collections = {
     question(auditId: string, questionId: string): DocumentReference {
         return doc(db, CollectionName.Audits, auditId, 'questions', questionId);
     },
+    evaluations(auditId: string): CollectionReference {
+        return collection(db, CollectionName.Audits, auditId, CollectionName.EVALUATIONS)
+    },
+    evaluation(auditId: string, evaluationId: string): DocumentReference {
+        return doc(db, CollectionName.Audits, auditId, CollectionName.EVALUATIONS, evaluationId)
+    }
 }

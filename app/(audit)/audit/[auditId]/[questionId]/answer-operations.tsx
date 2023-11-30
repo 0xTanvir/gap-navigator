@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {Icons} from "@/components/icons";
+import { Icons } from "@/components/icons";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -24,18 +24,25 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
-import {deleteQuestionAnswer, updateQuestionAnswer} from "@/lib/firestore/audit";
-import {toast} from "@/components/ui/use-toast";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {answerSchema} from "@/lib/validations/question";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { deleteAnswerById, updateQuestionAnswerById } from "@/lib/firestore/answer";
+import { toast } from "@/components/ui/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { answerSchema } from "@/lib/validations/question";
 import * as z from "zod";
-import {Answer} from "@/types/dto";
-import {Textarea} from "@/components/ui/textarea";
+import { Answer } from "@/types/dto";
+import { Textarea } from "@/components/ui/textarea";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/editorjs/editor"),
+    {
+        ssr: false
+    }
+)
 
 type FormData = z.infer<typeof answerSchema>
 
@@ -49,11 +56,11 @@ interface AnswerOperationProps {
 
 async function deleteAuditFromDB(auditId: string, questionId: string, answerId: string) {
     try {
-        await deleteQuestionAnswer(auditId, questionId, answerId)
+        await deleteAnswerById(auditId, questionId, answerId)
         return toast({
             title: "Answer deleted successfully!",
             description: "Your answer was deleted.",
-            variant: "default",
+            variant: "success",
         })
     } catch (error) {
         toast({
@@ -69,6 +76,22 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false)
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
     const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false)
+
+    const [isTyping, setIsTyping] = useState<boolean>(false);
+    const handleEditorSave = (data: any) => {
+        setIsTyping(true);
+        setTimeout(() => {
+            if (!isTyping) {
+                form.trigger('recommendationDocument');
+            }
+        }, 100);
+
+        if (data.length > 0) {
+            form.setValue('recommendationDocument', JSON.stringify(data));
+        } else {
+            form.setValue('recommendationDocument', JSON.stringify(undefined));
+        }
+    };
 
     const form = useForm<FormData>({
         resolver: zodResolver(answerSchema),
@@ -87,12 +110,30 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
             createdAt: answer.createdAt
         }
         try {
-            await updateQuestionAnswer(auditId, questionId, answerId, updateAnswer)
+            const response = await updateQuestionAnswerById(auditId, questionId, answerId, updateAnswer)
+            if (response) {
+                toast({
+                    title: "Answer updated successfully!",
+                    description: `Your answer was updated ${answerId}`,
+                    variant: "success",
+                });
+            } else {
+                toast({
+                    title: "Answer not found in the DB.",
+                    description: `Your answer was updated ${answerId}`,
+                    variant: "default",
+                });
+            }
             setIsUpdateLoading(false)
             setShowUpdateDialog(false)
             singleQuestionFetch()
         } catch (error) {
             setIsUpdateLoading(false)
+            toast({
+                title: "Answer document not found.",
+                description: `Your answer was updated ${answerId}`,
+                variant: "destructive",
+            });
         }
 
         return true
@@ -163,7 +204,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
             </AlertDialog>
 
             <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-lg">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onUpdateSubmit)}>
                             <DialogHeader>
@@ -196,11 +237,16 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Textarea
-                                                    variant="ny"
-                                                    placeholder="Recommendation Document"
-                                                    {...field}
+                                                <Editor
+                                                    onSave={handleEditorSave}
+                                                    initialData={JSON.parse(answer.recommendationDocument)}
+                                                    placeHolder="Let`s write recommendation document!"
                                                 />
+                                                {/*<Textarea*/}
+                                                {/*    variant="ny"*/}
+                                                {/*    placeholder="Recommendation Document"*/}
+                                                {/*    {...field}*/}
+                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

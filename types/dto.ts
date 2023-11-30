@@ -1,4 +1,5 @@
-import {Timestamp} from 'firebase/firestore'
+import { Timestamp } from 'firebase/firestore'
+import { SidebarNavItem } from '.'
 
 export interface EmailMsg {
     to: string,
@@ -31,6 +32,8 @@ export interface Audit {
     uid: string
     name: string
     type: string
+    exclusiveList?: string[];
+    authorId: string
     createdAt: Timestamp
 }
 
@@ -80,3 +83,50 @@ export type QuestionAction =
     | { type: QuestionActionType.ADD_MULTIPLE_QUESTIONS; payload: Question[] }
     | { type: QuestionActionType.UPDATE_QUESTION; payload: Question }
     | { type: QuestionActionType.DELETE_QUESTION; payload: string }
+
+export interface Preview extends Audit {
+    questions: Question[]
+    sideBarNav: SidebarNavItem[]
+}
+
+export enum PreviewActionType {
+    ADD_PREVIEW = "ADD_PREVIEW",
+}
+
+export type PreviewAction =
+    | { type: PreviewActionType.ADD_PREVIEW; payload: Preview }
+
+export interface Evaluation extends Audit {
+    questions: Question[]
+    sideBarNav: SidebarNavItem[]
+    evaluate: Evaluate
+    evaluations: Evaluate[]
+}
+
+export enum EvaluationActionType {
+    ADD_EVALUATION = "ADD_EVALUATION",
+    ADD_EVALUATE = "ADD_EVALUATE",
+    ADD_QUESTION_ANSWER = "ADD_QUESTION_ANSWER"
+}
+
+export type EvaluationAction =
+    | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
+    | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
+    | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
+
+export interface Evaluate {
+    uid: string;
+    participantFirstName: string;
+    participantLastName: string;
+    participantEmail: string;
+    choices?: Choice[];
+    // runningStatus?: string // not-started, id, completed
+}
+
+export interface Choice {
+    questionId: string
+    answerId: string
+    additionalNote?: string
+    recommendedNote?: string
+    internalNote?: string
+}

@@ -135,9 +135,9 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
 
                     <div className="flex items-center justify-end">
                         <div className="text-sm leading-6">
-                            <a href={void 0} className="font-semibold">
+                            <Link href="/reset-password" className="font-semibold">
                                 Forgot password?
-                            </a>
+                            </Link>
                         </div>
                     </div>
 

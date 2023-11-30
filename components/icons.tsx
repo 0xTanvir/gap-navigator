@@ -39,7 +39,7 @@ import {
     ScanEye,
     ClipboardCheck,
     Copy,
-    Save,
+    Save, CheckCircle2,
 } from "lucide-react"
 
 export const Icons = {
@@ -83,6 +83,7 @@ export const Icons = {
     evaluate: ClipboardCheck,
     copy: Copy,
     save: Save,
+    checkCircle2: CheckCircle2,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

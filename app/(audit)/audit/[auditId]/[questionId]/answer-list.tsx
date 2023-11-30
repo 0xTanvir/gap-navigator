@@ -6,7 +6,7 @@ import {Icons} from "@/components/icons"
 import {AuditEditorShell} from '../audit-editor-shell'
 import {AuditEditorHeader} from '../audit-editor-header'
 import {Question} from "@/types/dto";
-import {singleQuestion} from "@/lib/firestore/audit";
+import { getQuestionById } from "@/lib/firestore/question";
 import {questionSchema} from "@/lib/validations/question";
 import * as z from "zod";
 import AnswerCreateButton from "@/app/(audit)/audit/[auditId]/[questionId]/answer-create-button";
@@ -26,7 +26,7 @@ export default function AnswerList({auditId, questionId}: AuditEditorProps) {
     const [loading, setLoading] = useState<boolean>(true)
 
     async function singleQuestionFetch() {
-        const dbQuestion = await singleQuestion(auditId, questionId)
+        const dbQuestion = await getQuestionById(auditId, questionId)
         setQuestion(dbQuestion as Question)
         setLoading(false)
     }
