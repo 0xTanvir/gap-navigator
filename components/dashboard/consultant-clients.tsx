@@ -76,7 +76,6 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
             }
         }
 
-
         fetchUniqueEvaluations()
     }, [userAuditsId]) // Run this effect when the userId changes
 
