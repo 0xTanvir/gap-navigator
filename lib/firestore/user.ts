@@ -1,4 +1,4 @@
-import { getDoc, setDoc } from "firebase/firestore"
+import { getDoc, getDocs, setDoc } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -27,6 +27,41 @@ export async function getUserById(id: string): Promise<User> {
         return user
     } else {
         return Promise.reject(Error(`No such user: ${id}`))
+    }
+}
+
+export async function getUserByEmail(email: string): Promise<User> {
+    const userDocRef = Collections.users()
+    try {
+        const querySnapshot = await getDocs(userDocRef);
+
+        let user: User | null = {
+            uid: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            role: '',
+            image: '',
+            audits: [],
+        };
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.email === email) {
+                user = {
+                    uid: doc.id,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
+                    role: data.role,
+                    image: data.image,
+                    audits: data.audits,
+                };
+            }
+        });
+        return user;
+    } catch (error) {
+        throw new Error('Error getting user');
     }
 }
 

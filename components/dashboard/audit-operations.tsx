@@ -14,8 +14,8 @@ import { Icons } from "@/components/icons";
 import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
-import { auditSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType } from "@/types/dto";
+import { auditInviteSchema, auditSchema } from "@/lib/validations/audit";
+import { Audit, AuditActionType, User } from "@/types/dto";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -58,6 +58,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { getUserByEmail } from "@/lib/firestore/user";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -78,6 +79,8 @@ async function deleteAuditFromDB(userId: string, auditId: string) {
 
 type FormData = z.infer<typeof auditSchema>;
 
+type formData = z.infer<typeof auditInviteSchema>
+
 interface AuditOperationsProps {
     userId: string;
     audit: Audit;
@@ -88,6 +91,9 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
     const {user, updateUser} = useAuth();
     const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false);
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false);
+
+    const [inviteAlert, setInviteAlert] = React.useState<boolean>(false);
+    const [isInviteLoading, setIsInviteLoading] = React.useState<boolean>(false);
 
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
     const [showUpdateDialog, setShowUpdateDialog] =
@@ -113,7 +119,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                 createdAt: audit.createdAt,
             };
 
-            const auditId = await setAudit(userId, updatedAudit);
+            await setAudit(userId, updatedAudit);
             dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
             form.reset();
 
@@ -132,6 +138,62 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
         } finally {
             setIsUpdateLoading(false);
             setShowUpdateDialog(false);
+        }
+    }
+
+    const inviteForm = useForm<formData>({
+        resolver: zodResolver(auditInviteSchema),
+        defaultValues: {
+            email: ''
+        }
+    })
+
+    async function onInviteSubmit(data: formData) {
+        setIsInviteLoading(true)
+        try {
+            let user = await getUserByEmail(data.email)
+            if (user) {
+                const exclusiveExists = (audit.exclusiveList || []).includes(user.uid);
+                if (!exclusiveExists) {
+                    // Check if exclusiveList exists, if not, initialize it as an empty array
+                    const exclusiveList = audit.exclusiveList || [];
+
+                    const formattedAudit = {
+                        ...audit,
+                        exclusiveList: [...exclusiveList, user.uid]
+                    };
+                    await setAudit(userId, formattedAudit);
+                    dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+
+                    return toast({
+                        title: "Audit invited successfully.",
+                        description: `Your audit was updated.`,
+                        variant: "success"
+                    });
+                } else {
+                    return toast({
+                        title: "Already audit invited.",
+                        variant: "success"
+                    });
+                }
+
+            } else {
+                console.log('User not found');
+                return toast({
+                    title: "User not found.",
+                    variant: "default"
+                });
+            }
+        } catch (error) {
+            return toast({
+                title: "Something went wrong.",
+                description: "Your audit was not updated. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsInviteLoading(false)
+            setInviteAlert(false)
+            inviteForm.reset();
         }
     }
 
@@ -155,7 +217,10 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                     )}
                     {audit.type === "exclusive" && (
                         <>
-                            <DropdownMenuItem className="flex cursor-pointer items-center">
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center"
+                                onClick={() => setInviteAlert(true)}
+                            >
                                 <Icons.userPlus className="mr-2 h-4 w-4"/>
                                 Invite
                             </DropdownMenuItem>
@@ -256,7 +321,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Audit Name" {...field} />
+                                                <Input variant="ny" placeholder="Audit Name" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
@@ -307,6 +372,53 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                                         <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
                                     Save changes
+                                </button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={inviteAlert} onOpenChange={setInviteAlert}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <Form {...inviteForm}>
+                        <form onSubmit={inviteForm.handleSubmit(onInviteSubmit)}>
+                            <DialogHeader>
+                                <DialogTitle>Audit invite</DialogTitle>
+                                <DialogDescription>
+                                    lorem ipsum
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-4 py-4">
+                                <FormField
+                                    control={inviteForm.control}
+                                    name="email"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input variant="ny" placeholder="Please enter email" {...field} />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <button
+                                    type="submit"
+                                    className={cn(buttonVariants({variant: "default"}), {
+                                        "cursor-not-allowed opacity-60": isInviteLoading,
+                                    })}
+                                    disabled={isInviteLoading}
+                                >
+                                    {isInviteLoading ? (
+                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                                    ) : (
+                                        <Icons.filePlus className="mr-2 h-4 w-4"/>
+                                    )}
+                                    Invite
                                 </button>
                             </DialogFooter>
                         </form>
