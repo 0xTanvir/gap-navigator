@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Icons } from "@/components/icons";
 import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog";
+    Sheet,
+    SheetContent,
+    SheetDescription, SheetFooter,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -112,16 +111,18 @@ const AnswerCreateButton = ({
                 <Icons.filePlus className="mr-2 h-4 w-4"/>
                 New Answer
             </Button>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-lg">
+
+            <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
+                <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>Add Answer</SheetTitle>
+                        <SheetDescription>
+                            Type answer name and recommendation document.
+                        </SheetDescription>
+                    </SheetHeader>
+
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <DialogHeader>
-                                <DialogTitle>Add Answer</DialogTitle>
-                                <DialogDescription>
-                                    Type answer name and recommendation document.
-                                </DialogDescription>
-                            </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <FormField
                                     control={form.control}
@@ -146,7 +147,11 @@ const AnswerCreateButton = ({
                                         <FormItem>
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
-                                                <Editor onSave={handleEditorSave} placeHolder="Let`s write recommendation document!"/>
+                                                <Editor
+                                                    id="recommendationDocument"
+                                                    onSave={handleEditorSave}
+                                                    placeHolder="Let`s write recommendation document!"
+                                                />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
@@ -154,7 +159,7 @@ const AnswerCreateButton = ({
                                 />
 
                             </div>
-                            <DialogFooter>
+                            <SheetFooter>
                                 <button
                                     type="submit"
                                     className={cn(
@@ -170,15 +175,15 @@ const AnswerCreateButton = ({
                                     {isLoading ? (
                                         <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                                     ) : (
-                                        <Icons.add className="mr-2 h-4 w-4"/>
+                                        <Icons.filePlus className="mr-2 h-4 w-4"/>
                                     )}
                                     Add Answer
                                 </button>
-                            </DialogFooter>
+                            </SheetFooter>
                         </form>
                     </Form>
-                </DialogContent>
-            </Dialog>
+                </SheetContent>
+            </Sheet>
 
         </>
     );

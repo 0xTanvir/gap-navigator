@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-evaluation";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { getAuditsByIds } from "@/lib/firestore/audit";
-import { useAuth } from "@/components/auth/auth-provider";
-import { Audit, GroupedAudits } from "@/types/dto";
+import { Audit, Evaluate, GroupedAudits } from "@/types/dto";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAllEvaluations } from "@/lib/firestore/evaluation";
+import { toast } from "@/components/ui/use-toast";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 interface AuditsCounts {
     publicAuditsCount: number | undefined;
@@ -14,18 +16,19 @@ interface AuditsCounts {
     exclusiveAuditsCount: number | undefined;
 }
 
+interface ConsultantDashboardProps {
+    userAuditsId: string[]
+}
 
-
-const ConsultantDashboard = () => {
+const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
     const [auditsCounts, setAuditsCounts] = useState<AuditsCounts>({
         publicAuditsCount: undefined,
         privateAuditsCount: undefined,
         exclusiveAuditsCount: undefined,
     })
+    const [clientsUniqueEvaluation, setClientsUniqueEvaluation] = useState<Evaluate[] | []>([]);
     const [auditsGroupByMonth, setAuditsGroupByMonth] = useState<GroupedAudits[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const {user} = useAuth()
-    const userAuditsId = user?.audits
 
     function countAuditsByMonth(audits: Audit[]): GroupedAudits[] {
         const groupedAudits: { [key: string]: number } = {};
@@ -76,16 +79,52 @@ const ConsultantDashboard = () => {
         setIsLoading(false)
     }
 
+    async function fetchUniqueEvaluations() {
+        try {
+            // Use Set to store unique uids
+            const uniqueUids = new Set<string>();
+            // Use Promise.all to wait for all evaluations to be fetched
+            const evaluationPromises = userAuditsId.map(async (auditId) => {
+                const evaluations = await getAllEvaluations(auditId);
+                // Filter evaluations to keep only unique uids
+                const uniqueEvaluations = evaluations.filter((evaluation) => {
+                    if (!uniqueUids.has(evaluation.uid)) {
+                        uniqueUids.add(evaluation.uid);
+                        return true;
+                    }
+                    return false;
+                });
+                return uniqueEvaluations;
+            });
+
+            const evaluationsArray = await Promise.all(evaluationPromises);
+
+            // Flatten the array of arrays into a single array
+            const flattenedEvaluations = evaluationsArray.flat();
+
+            // Update evaluations state
+            setClientsUniqueEvaluation(flattenedEvaluations);
+
+        } catch (error) {
+            toast({
+                title: "Something went wrong.",
+                description: "Failed to fetch audits. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     useEffect(() => {
         fetchAuditsCount()
-    }, [])
+        fetchUniqueEvaluations()
+    }, [userAuditsId])
 
     if (isLoading) {
         return <>
             <div className="flex-1 space-y-4">
-                <div className="flex items-center justify-between space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                </div>
+                <DashboardHeader heading="Dashboard" text="Performance metrics"/>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <DashboardCard.Skeleton/>
                     <DashboardCard.Skeleton/>
@@ -108,14 +147,12 @@ const ConsultantDashboard = () => {
     return (
         <>
             <div className="flex-1 space-y-4">
-                <div className="flex items-center justify-between space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                </div>
+                <DashboardHeader heading="Dashboard" text="Performance metrics"/>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <DashboardCard
                         title="Total Client"
-                        totalNumber={450} iconName="users"
+                        totalNumber={clientsUniqueEvaluation?.length} iconName="users"
                     />
                     <DashboardCard
                         title="Public Audits"

@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 interface ConsultantClientsProps {
     userAuditsId: string[]
@@ -76,7 +77,6 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
             }
         }
 
-
         fetchUniqueEvaluations()
     }, [userAuditsId]) // Run this effect when the userId changes
 
@@ -86,6 +86,8 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 
     return (
         <>
+            <DashboardHeader heading="Clients" text="Manage clients"/>
+
             <DataTable columns={columns} data={clientsUniqueEvaluation}/>
         </>
     );
@@ -93,31 +95,34 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
 
 ConsultantClients.Skeleton = function TableSkeleton() {
     return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow className="">
-                        <TableHead className="h-10">Name</TableHead>
-                        <TableHead className="h-10">Email</TableHead>
-                        <TableHead className="text-center h-10">Evaluation Count</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {[1, 2, 3, 4].map((data) => (
-                        <TableRow key={data}>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
-                            <TableCell className="p-3">
-                                <Skeleton className="p-3 w-full"/>
-                            </TableCell>
+        <div className="grid items-start gap-8">
+            <DashboardHeader heading="Clients" text="Manage clients"/>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="">
+                            <TableHead className="h-10">Name</TableHead>
+                            <TableHead className="h-10">Email</TableHead>
+                            <TableHead className="text-center h-10">Evaluation Count</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {[1, 2, 3, 4].map((data) => (
+                            <TableRow key={data}>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                                <TableCell className="p-3">
+                                    <Skeleton className="p-3 w-full"/>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }

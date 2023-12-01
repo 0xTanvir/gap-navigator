@@ -16,14 +16,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -35,8 +27,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { answerSchema } from "@/lib/validations/question";
 import * as z from "zod";
 import { Answer } from "@/types/dto";
-import { Textarea } from "@/components/ui/textarea";
 import dynamic from "next/dynamic";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"),
     {
@@ -203,16 +195,16 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                 </AlertDialogContent>
             </AlertDialog>
 
-            <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                <DialogContent className="sm:max-w-lg">
+            <Sheet open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+                <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>Update Answer</SheetTitle>
+                        <SheetDescription>
+                            Make changes to your question answer here. Click save when you're done.
+                        </SheetDescription>
+                    </SheetHeader>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onUpdateSubmit)}>
-                            <DialogHeader>
-                                <DialogTitle>Update Answer</DialogTitle>
-                                <DialogDescription>
-                                    Make changes to your question answer here. Click save when you're done.
-                                </DialogDescription>
-                            </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <FormField
                                     control={form.control}
@@ -238,22 +230,18 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                             <FormLabel>Recommendation Document</FormLabel>
                                             <FormControl>
                                                 <Editor
+                                                    id="recommendationDocument"
                                                     onSave={handleEditorSave}
                                                     initialData={JSON.parse(answer.recommendationDocument)}
                                                     placeHolder="Let`s write recommendation document!"
                                                 />
-                                                {/*<Textarea*/}
-                                                {/*    variant="ny"*/}
-                                                {/*    placeholder="Recommendation Document"*/}
-                                                {/*    {...field}*/}
-                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                            <DialogFooter>
+                            <SheetFooter>
                                 <button
                                     type="submit"
                                     className={cn(
@@ -271,11 +259,11 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                     )}
                                     Save changes
                                 </button>
-                            </DialogFooter>
+                            </SheetFooter>
                         </form>
                     </Form>
-                </DialogContent>
-            </Dialog>
+                </SheetContent>
+            </Sheet>
         </>
 
     );

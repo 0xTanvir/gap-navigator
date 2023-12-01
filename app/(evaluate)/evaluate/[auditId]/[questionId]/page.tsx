@@ -207,12 +207,6 @@ export default function EvaluateQuestionPage({
                                                     id="recommendedNote"
                                                     placeHolder="Provide your recommended insights and suggestions..."
                                                 />
-                                                {/*<Textarea*/}
-                                                {/*    variant="ny"*/}
-                                                {/*    placeholder="Provide your recommended insights and suggestions..."*/}
-                                                {/*    className="resize-none"*/}
-                                                {/*    {...field}*/}
-                                                {/*/>*/}
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>

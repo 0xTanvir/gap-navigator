@@ -19,7 +19,7 @@ export default function DashboardsPage() {
         )
     } else if (isAuthenticated && user && user.role === "consultant") {
         return (
-            <ConsultantDashboard />
+            <ConsultantDashboard userAuditsId={user?.audits} />
         )
     } else {
         return notFound()

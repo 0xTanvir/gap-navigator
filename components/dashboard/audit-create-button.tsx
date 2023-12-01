@@ -180,7 +180,7 @@ export function AuditCreateButton({
                   {isLoading ? (
                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <Icons.add className="mr-2 h-4 w-4" />
+                    <Icons.filePlus className="mr-2 h-4 w-4" />
                   )}
                   Add audit
                 </button>
