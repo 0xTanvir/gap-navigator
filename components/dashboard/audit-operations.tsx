@@ -15,7 +15,7 @@ import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
 import { auditInviteSchema, auditSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType, User } from "@/types/dto";
+import { Audit, AuditActionType, Notification, User } from "@/types/dto";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -59,6 +59,9 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { getUserByEmail } from "@/lib/firestore/user";
+import { setNotificationData } from "@/lib/firestore/notification";
+import { Timestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -162,7 +165,18 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                         ...audit,
                         exclusiveList: [...exclusiveList, user.uid]
                     };
+                    const notificationData: Notification = {
+                        uid: uuidv4(),
+                        auditName: audit.name,
+                        type: "AUDIT_INVITED",
+                        ownerAuditUserId: audit.authorId,
+                        inviteUserId: user.uid,
+                        auditId: audit.uid,
+                        isSeen: false,
+                        createdAt: Timestamp.now(),
+                    }
                     await setAudit(userId, formattedAudit);
+                    await setNotificationData(user.uid, notificationData)
                     dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
 
                     return toast({
@@ -185,6 +199,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                 });
             }
         } catch (error) {
+            console.log(error)
             return toast({
                 title: "Something went wrong.",
                 description: "Your audit was not updated. Please try again.",

@@ -137,3 +137,14 @@ export interface GroupedAudits {
     name: string;
     total: number;
 }
+
+export interface Notification {
+    uid: string;
+    auditName: string;
+    type:string;
+    ownerAuditUserId: string;
+    inviteUserId: string;
+    auditId: string;
+    isSeen: boolean;
+    createdAt: Timestamp;
+}
