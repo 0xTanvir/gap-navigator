@@ -2,25 +2,24 @@
 import React, { useEffect, useState } from 'react';
 import { Notification } from "@/types/dto";
 import NotificationItem from "@/components/notification/notification-item";
-import { getNotificationById } from "@/lib/firestore/notification";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getDatabase, onValue, ref } from "firebase/database";
+
 
 const NotificationList = () => {
     const [notifications, setNotifications] = useState<Notification[] | null>([])
     const [isLoading, setIsLoading] = useState(true)
     const {user} = useAuth()
-
-    async function getNotificationList() {
-        if (user) {
-            let dbNotification = await getNotificationById(user.uid)
-            setNotifications(dbNotification)
-            setIsLoading(false)
-        }
-    }
+    const db = getDatabase()
 
     useEffect(() => {
-        getNotificationList()
+        if (user) {
+            onValue(ref(db, `notifications/${user.uid}`), (snapshot) => {
+                setNotifications((snapshot.exists() ? Object.values(snapshot.val()) : null))
+                setIsLoading(false)
+            });
+        }
     }, [user?.uid])
 
     if (isLoading) {

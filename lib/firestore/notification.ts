@@ -5,10 +5,8 @@ const db = getDatabase();
 
 export async function setNotificationData(userId: string, notificationData: Notification) {
     try {
-        const userNotificationsRef = ref(db, `notifications/${userId}/${notificationData.uid}`);
-
-
-        // Set the notification data using the generated key
+        const userNotificationsRef = ref(db, `notifications/${userId}/` + notificationData.uid);
+        // Set the custom data using the generated UID under the user's notifications
         await set(userNotificationsRef, notificationData);
 
         return true
