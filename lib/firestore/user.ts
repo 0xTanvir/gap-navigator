@@ -1,4 +1,4 @@
-import { getDoc, getDocs, setDoc } from "firebase/firestore"
+import { getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -22,7 +22,8 @@ export async function getUserById(id: string): Promise<User> {
             email: data.email,
             role: data.role,
             image: data.image,
-            audits: data.audits
+            audits: data.audits,
+            invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
         }
         return user
     } else {
@@ -43,6 +44,7 @@ export async function getUserByEmail(email: string): Promise<User> {
             role: '',
             image: '',
             audits: [],
+            invitedAuditsList: [],
         };
 
         querySnapshot.forEach((doc) => {
@@ -56,6 +58,7 @@ export async function getUserByEmail(email: string): Promise<User> {
                     role: data.role,
                     image: data.image,
                     audits: data.audits,
+                    invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList,
                 };
             }
         });
@@ -72,5 +75,15 @@ export async function setUser(id: string, user: User) {
         await setDoc(userDocRef, user)
     } catch (error) {
         return Promise.reject(error)
+    }
+}
+
+export async function updateUserById(userId: string, userData: User) {
+    const userRef = Collections.user(userId)
+    try {
+        await updateDoc(userRef, {...userData})
+        return true
+    } catch (error) {
+        throw new Error("Error updating user information")
     }
 }

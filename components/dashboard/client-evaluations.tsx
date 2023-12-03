@@ -1,6 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { User } from "@/types/dto";
+import { getEvaluationByIds } from "@/lib/firestore/evaluation";
 
-const ClientEvaluations = () => {
+interface clientEvaluationsProps {
+    user: User
+}
+
+const ClientEvaluations = ({user}: clientEvaluationsProps) => {
+
+    useEffect(() => {
+        async function fetchEvaluations() {
+            let evaluation = await getEvaluationByIds(user?.invitedAuditsList, user.email)
+        }
+
+        fetchEvaluations()
+    }, [])
+
     return (
         <div>
             Hello from client evaluations

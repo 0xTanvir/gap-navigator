@@ -85,3 +85,27 @@ export async function getAllEvaluations(auditId: string) {
         throw new Error('Error getting evaluations:');
     }
 }
+
+export async function getEvaluationByIds(auditIds: string[], evaluationID: string): Promise<Evaluate[]> {
+    const evaluations: Evaluate[] = [];
+
+    // Iterate through each auditId
+    for (const auditId of auditIds) {
+        const evaluationsRef = Collections.evaluation(auditId, evaluationID);
+        const docSnapshot = await getDoc(evaluationsRef);
+
+        // If the document exists, add it to the evaluations array
+        if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            const evaluation: Evaluate = {
+                uid: data.uid,
+                participantFirstName: data.participantFirstName,
+                participantLastName: data.participantLastName,
+                participantEmail: data.participantEmail,
+                choices: data.choices,
+            };
+            evaluations.push(evaluation);
+        }
+    }
+    return evaluations;
+}

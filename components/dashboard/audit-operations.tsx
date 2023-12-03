@@ -58,7 +58,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
-import { getUserByEmail } from "@/lib/firestore/user";
+import { getUserByEmail, updateUserById } from "@/lib/firestore/user";
 import { setNotificationData } from "@/lib/firestore/notification";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
@@ -154,31 +154,32 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
     async function onInviteSubmit(data: formData) {
         setIsInviteLoading(true)
         try {
-            let user = await getUserByEmail(data.email)
-            if (user) {
-                const exclusiveExists = (audit.exclusiveList || []).includes(user.uid);
+            let inviteUser = await getUserByEmail(data.email)
+            if (inviteUser) {
+                const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
                 if (!exclusiveExists) {
                     // Check if exclusiveList exists, if not, initialize it as an empty array
                     const exclusiveList = audit.exclusiveList || [];
 
                     const formattedAudit = {
                         ...audit,
-                        exclusiveList: [...exclusiveList, user.uid]
+                        exclusiveList: [...exclusiveList, inviteUser.uid]
                     };
                     const notificationData: Notification = {
                         uid: uuidv4(),
                         auditName: audit.name,
                         type: "AUDIT_INVITED",
                         ownerAuditUserId: audit.authorId,
-                        inviteUserId: user.uid,
+                        inviteUserId: inviteUser.uid,
                         auditId: audit.uid,
                         isSeen: false,
                         createdAt: Timestamp.now(),
                     }
                     await setAudit(userId, formattedAudit);
-                    await setNotificationData(user.uid, notificationData)
+                    await setNotificationData(inviteUser.uid, notificationData)
+                    inviteUser.invitedAuditsList.push(audit.uid)
+                    await updateUserById(inviteUser.uid, inviteUser)
                     dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
-
                     return toast({
                         title: "Audit invited successfully.",
                         description: `Your audit was updated.`,

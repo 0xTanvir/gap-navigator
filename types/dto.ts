@@ -17,6 +17,7 @@ export interface User {
     role: string
     image: string,
     audits: string[],
+    invitedAuditsList: string[],
 }
 
 export interface TeamCardProps {
