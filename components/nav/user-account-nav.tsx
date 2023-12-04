@@ -32,19 +32,21 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
     const db = getDatabase()
 
     const notificationAlertUpdate = async () => {
-        if (user?.uid) {
-            const notification = await updateNotificationsAlertById(user?.uid)
-            if (notification) {
-                toast({
-                    title: 'Notification alert update successfully',
-                    variant: "success"
-                })
-            } else {
-                toast({
-                    title: "Something went wrong.",
-                    description: "Failed to notification alert update. Please try again.",
-                    variant: "destructive",
-                })
+        if (notificationAlert) {
+            if (user?.uid) {
+                const notification = await updateNotificationsAlertById(user?.uid)
+                if (notification) {
+                    toast({
+                        title: 'Notification alert update successfully',
+                        variant: "success"
+                    })
+                } else {
+                    toast({
+                        title: "Something went wrong.",
+                        description: "Failed to notification alert update. Please try again.",
+                        variant: "destructive",
+                    })
+                }
             }
         }
     }
@@ -107,10 +109,9 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
                 <DropdownMenuItem onClick={notificationAlertUpdate}>
                     {
                         notificationAlert ?
-                            <Icons.notificationRing className="mr-2 h-4 w-4"/>
-                            : <Icons.notificationOff className="mr-2 h-4 w-4"/>
+                            <Icons.notificationRing fill="blue" stroke="blue" className="mr-2 h-4 w-4"/> :
+                            <Icons.notificationOff className="mr-2 h-4 w-4"/>
                     }
-
                     <Link href="/notification">Notification</Link>
                 </DropdownMenuItem>
 
