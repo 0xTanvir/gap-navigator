@@ -5,19 +5,24 @@ const db = getDatabase();
 
 export async function setNotificationData(userId: string, notificationData: Notification) {
     try {
-        const userNotificationsRef = ref(db, `notifications/${userId}/` + notificationData.uid);
+        const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.uid);
+        const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/`);
+
         // Set the custom data using the generated UID under the user's notifications
         await set(userNotificationsRef, notificationData);
 
-        return true
+        // Update notificationAlert to true
+        await update(userNotificationsAlert, {notificationAlert: true});
+
+        return true;
     } catch (error) {
-        throw new Error("Error setting notification data:");
+        throw new Error("Error notification data");
     }
 }
 
 export async function updateNotificationById(userId: string, notification: Notification) {
     try {
-        const notificationRef = ref(db, `notifications/${userId}/${notification.uid}`);
+        const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.uid}`);
 
         // Update the notification with the provided data
         await update(notificationRef, {isSeen: true});
@@ -28,9 +33,21 @@ export async function updateNotificationById(userId: string, notification: Notif
     }
 }
 
+export async function updateNotificationsAlertById(userId: string) {
+    try {
+        const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/`);
+
+        // Update notificationAlert to true
+        await update(userNotificationsAlert, {notificationAlert: false});
+        return true;
+    } catch (error) {
+        throw new Error("Error update Notifications Alert");
+    }
+}
+
 export async function getNotificationById(userId: string): Promise<Notification [] | null> {
     try {
-        const userNotificationsRef = ref(db, `notifications/${userId}`)
+        const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`)
 
         return new Promise((resolve) => {
             onValue(userNotificationsRef, (snapshot) => {

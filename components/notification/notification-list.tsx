@@ -15,7 +15,7 @@ const NotificationList = () => {
 
     useEffect(() => {
         if (user) {
-            onValue(ref(db, `notifications/${user.uid}`), (snapshot) => {
+            onValue(ref(db, `root/audit-notifications/${user.uid}/notifications/`), (snapshot) => {
                 setNotifications((snapshot.exists() ? Object.values(snapshot.val()) : null))
                 setIsLoading(false)
             });

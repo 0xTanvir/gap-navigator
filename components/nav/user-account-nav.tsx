@@ -13,9 +13,10 @@ import {
 import { UserAvatar } from "@/components/user-avatar"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth/auth-provider";
-import { getNotificationById } from "@/lib/firestore/notification";
 import { useEffect, useState } from "react";
-import { Notification } from "@/types/dto";
+import { getDatabase, onValue, ref } from "firebase/database";
+import { updateNotificationsAlertById } from "@/lib/firestore/notification";
+import { toast } from "@/components/ui/use-toast";
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
     name?: string
@@ -25,21 +26,37 @@ interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps) {
-    const [notifications, setNotifications] = useState<Notification[] | null>([])
+    const [notificationAlert, setNotificationAlert] = useState<boolean>(false)
     const router = useRouter()
     const {user} = useAuth()
+    const db = getDatabase()
 
-    async function getNotificationList() {
-        if (user) {
-            let dbNotification = await getNotificationById(user.uid)
-            if (dbNotification) {
-                setNotifications(dbNotification?.filter(notification => !notification.isSeen))
+    const notificationAlertUpdate = async () => {
+        if (user?.uid) {
+            const notification = await updateNotificationsAlertById(user?.uid)
+            if (notification) {
+                toast({
+                    title: 'Notification alert update successfully',
+                    variant: "success"
+                })
+            } else {
+                toast({
+                    title: "Something went wrong.",
+                    description: "Failed to notification alert update. Please try again.",
+                    variant: "destructive",
+                })
             }
         }
     }
 
     useEffect(() => {
-        getNotificationList()
+        if (user) {
+            if (user) {
+                onValue(ref(db, `root/audit-notifications/${user.uid}/`), (snapshot) => {
+                    setNotificationAlert(snapshot.val()?.notificationAlert)
+                });
+            }
+        }
     }, [user?.uid])
     return (
         <DropdownMenu>
@@ -87,9 +104,9 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
                     <Link href="/clients">Clients</Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={notificationAlertUpdate}>
                     {
-                        notifications?.length ?
+                        notificationAlert ?
                             <Icons.notificationRing className="mr-2 h-4 w-4"/>
                             : <Icons.notificationOff className="mr-2 h-4 w-4"/>
                     }
