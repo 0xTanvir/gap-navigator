@@ -64,6 +64,7 @@ export interface Question {
 export interface Answer {
     uid: string,
     name: string,
+    questionId: string,
     recommendationDocument: string
     createdAt: Timestamp
 }
@@ -142,7 +143,7 @@ export interface GroupedAudits {
 export interface Notification {
     uid: string;
     auditName: string;
-    type:string;
+    type: string;
     ownerAuditUserId: string;
     inviteUserId: string;
     auditId: string;

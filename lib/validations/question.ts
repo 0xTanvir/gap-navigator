@@ -13,17 +13,9 @@ export const answerSchema = z.object({
     name: z
         .string()
         .min(1, {message: "Please type an answer name."}),
-    recommendationDocument: z
-        .string()
-        .min(1, {message: "Please type an recommendation document."})
-})
-export const answerUpdateSchema = z.object({
-    name: z
-        .string()
-        .min(1, {message: "Please type an answer name."}),
     questionId: z.string({
         required_error: "Please select an question name.",
-    }).min(1),
+    }).optional(),
     recommendationDocument: z
         .string()
         .min(1, {message: "Please type an recommendation document."})

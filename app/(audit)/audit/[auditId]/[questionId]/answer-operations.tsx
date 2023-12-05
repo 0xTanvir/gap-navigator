@@ -24,7 +24,7 @@ import { deleteAnswerById, updateQuestionAnswerById } from "@/lib/firestore/answ
 import { toast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { answerUpdateSchema } from "@/lib/validations/question";
+import { answerSchema } from "@/lib/validations/question";
 import * as z from "zod";
 import { Answer } from "@/types/dto";
 import dynamic from "next/dynamic";
@@ -38,7 +38,7 @@ const Editor = dynamic(() => import("@/components/editorjs/editor"),
     }
 )
 
-type FormData = z.infer<typeof answerUpdateSchema>
+type FormData = z.infer<typeof answerSchema>
 
 interface AnswerOperationProps {
     auditId: string
@@ -95,9 +95,10 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
     };
 
     const form = useForm<FormData>({
-        resolver: zodResolver(answerUpdateSchema),
+        resolver: zodResolver(answerSchema),
         defaultValues: {
             name: answer.name,
+            questionId: answer?.questionId ? answer?.questionId : "",
             recommendationDocument: answer.recommendationDocument
         },
     })
@@ -107,7 +108,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
         const updateAnswer = {
             uid: answer.uid,
             name: data.name,
-            questionId: data.questionId,
+            questionId: data.questionId ? data.questionId : '',
             recommendationDocument: data.recommendationDocument,
             createdAt: answer.createdAt
         }

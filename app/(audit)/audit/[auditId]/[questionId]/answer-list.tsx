@@ -19,8 +19,6 @@ interface AuditEditorProps {
     questionId: string
 }
 
-type FormData = z.infer<typeof questionSchema>
-
 export default function AnswerList({auditId, questionId}: AuditEditorProps) {
     const [question, setQuestion] = useState<Question | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
