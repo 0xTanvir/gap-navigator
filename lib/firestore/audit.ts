@@ -21,7 +21,7 @@ export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
 
     // If no audits are found, return an empty array instead of rejecting.
     if (querySnapshot.empty) {
-      return [];
+        return [];
     }
     const audits: Audit[] = querySnapshot.docs.map((doc) => {
       const data = doc.data();
@@ -34,7 +34,7 @@ export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
         createdAt: data.createdAt,
       } as Audit;
     });
-    return audits;
+    return audits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
   } else {
     return [];
   }

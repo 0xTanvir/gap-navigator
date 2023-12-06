@@ -1,6 +1,6 @@
 import { Question } from "@/types/dto";
 import { Collections } from "@/lib/firestore/client";
-import { deleteDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { deleteDoc, getDocs, query, setDoc, updateDoc, where, orderBy } from "firebase/firestore";
 
 export async function setQuestion(auditId: string, question: Question) {
     const questionsRef = Collections.question(auditId, question.uid);
@@ -19,13 +19,13 @@ export async function setQuestion(auditId: string, question: Question) {
 export async function getQuestionsById(auditId: string) {
     try {
         const questionsRef = Collections.questions(auditId);
-        const snap = await getDocs(questionsRef);
+        const snap = await getDocs(query(questionsRef, orderBy("createdAt", 'asc')));
         const questions: Question[] = snap.docs.map((doc) => {
             const data = doc.data();
             return {
                 uid: doc.id,
                 name: data.name,
-                answers: data.answers,
+                answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
                 createdAt: data.createdAt,
             } as Question;
         });
@@ -50,10 +50,10 @@ export async function getQuestionById(auditId: string, questionId: string) {
     }
     const doc = querySnapshot.docs[0]; // Assuming there is only one matching document
     const data = doc.data();
-    const question: object = {
+    const question: Question = {
         uid: doc.id,
         name: data.name,
-        answers: data.answers,
+        answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
         createdAt: data.createdAt,
     };
 

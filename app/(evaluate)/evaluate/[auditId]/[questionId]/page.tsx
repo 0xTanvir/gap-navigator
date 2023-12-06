@@ -81,7 +81,13 @@ export default function EvaluateQuestionPage({
         if (hasAnswerSelected) {
             dispatch({type: EvaluationActionType.ADD_QUESTION_ANSWER, payload: newEvaluate})
             if (pager.next && !pager.next.disabled) {
-                await router.push(pager.next.href);
+                console.log(question?.answers.find(answer => answer.uid === data.answerId))
+                let nextQuestion = question?.answers?.find(answer => answer?.uid === data?.answerId)
+                if (nextQuestion?.questionId) {
+                    await router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`)
+                } else {
+                    await router.push(pager.next.href);
+                }
             } else {
                 setIsLoading(true)
                 const dbFoundObject = evaluation.evaluations.find(item => item.uid === evaluation.evaluate.uid);

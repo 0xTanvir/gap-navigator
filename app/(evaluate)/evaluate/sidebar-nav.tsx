@@ -1,15 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import {usePathname} from "next/navigation"
+import { usePathname } from "next/navigation"
 
-import {SidebarNavItem} from "@/types"
-import {cn} from "@/lib/utils"
-import {Skeleton} from "@/components/ui/skeleton";
+import { SidebarNavItem } from "@/types"
+import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
-import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
+import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 import PreviewsPage from "@/app/(evaluate)/preview/[auditId]/page";
-import {useAuth} from "@/components/auth/auth-provider";
+import { useAuth } from "@/components/auth/auth-provider";
 
 export interface DocsSidebarNavProps {
     items: SidebarNavItem[]
@@ -50,7 +50,8 @@ export function DocsSidebarNavItems({
                     !item.disabled && item.href ? (
                         <Link
                             key={index}
-                            href={user ? item.href : "#"}
+                            href={"#"}
+                            // href={user ? item.href : "#"}
                             className={cn(
                                 "flex w-full items-center rounded-md p-2 hover:underline",
                                 {
