@@ -30,7 +30,15 @@ import { Answer } from "@/types/dto";
 import dynamic from "next/dynamic";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"),
     {
@@ -245,20 +253,23 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                             >
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select an audit type"/>
+                                                        <SelectValue placeholder="Select an question Name"/>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {
-                                                        questionsData.map((question) => (
-                                                            <SelectItem
-                                                                key={question.uid}
-                                                                value={question.uid}
-                                                            >
-                                                                {question.name}
-                                                            </SelectItem>
-                                                        ))
-                                                    }
+                                                    <SelectGroup>
+                                                        <SelectLabel>Select a question Name</SelectLabel>
+                                                        {
+                                                            questionsData.map((question) => (
+                                                                <SelectItem
+                                                                    key={question.uid}
+                                                                    value={question.uid}
+                                                                >
+                                                                    {question.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage/>

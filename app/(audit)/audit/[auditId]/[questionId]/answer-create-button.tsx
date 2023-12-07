@@ -20,7 +20,15 @@ import { Timestamp } from "firebase/firestore";
 import { toast } from "@/components/ui/use-toast";
 import { setQuestionAnswer } from "@/lib/firestore/answer";
 import dynamic from "next/dynamic";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"),
@@ -164,20 +172,23 @@ const AnswerCreateButton = ({
                                             >
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select an audit type"/>
+                                                        <SelectValue placeholder="Select an question Name"/>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {
-                                                        questionsData.map((question) => (
-                                                            <SelectItem
-                                                                key={question.uid}
-                                                                value={question.uid}
-                                                            >
-                                                                {question.name}
-                                                            </SelectItem>
-                                                        ))
-                                                    }
+                                                    <SelectGroup>
+                                                        <SelectLabel>Select a question Name</SelectLabel>
+                                                        {
+                                                            questionsData.map((question) => (
+                                                                <SelectItem
+                                                                    key={question.uid}
+                                                                    value={question.uid}
+                                                                >
+                                                                    {question.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage/>

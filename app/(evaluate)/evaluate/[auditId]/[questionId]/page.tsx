@@ -84,7 +84,6 @@ export default function EvaluateQuestionPage({
             dispatch({type: EvaluationActionType.ADD_QUESTION_ANSWER, payload: newEvaluate})
             if (pager.next && !pager.next.disabled) {
                 let nextQuestion = question?.answers?.find(answer => answer?.uid === data?.answerId)
-                console.log(evaluation.evaluate.choices?.findIndex(choice => choice.answerId === nextQuestion?.uid))
                 let index = evaluation.evaluate.choices?.findIndex(choice => choice.answerId === nextQuestion?.uid)
                 if (nextQuestion?.questionId) {
                     if (index !== -1) {

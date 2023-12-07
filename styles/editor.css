@@ -101,7 +101,7 @@ h6.ce-header {
 }
 
 .ce-toolbar__actions {
-    right: 100%;
+    right: 100% !important;
 }
 
 @media (max-width: 639.98px) {
