@@ -15,7 +15,7 @@ import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
 import { auditInviteSchema, auditSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType, Notification, User } from "@/types/dto";
+import { Audit, AuditActionType, Notification } from "@/types/dto";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -94,6 +94,8 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
     const {user, updateUser} = useAuth();
     const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false);
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false);
+    const [isArchiveLoading, setIsArchiveLoading] = React.useState<boolean>(false);
+    const [showArchiveAlert, setShowArchiveAlert] = React.useState<boolean>(false);
 
     const [inviteAlert, setInviteAlert] = React.useState<boolean>(false);
     const [isInviteLoading, setIsInviteLoading] = React.useState<boolean>(false);
@@ -274,6 +276,13 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                         <Icons.trash className="mr-2 h-4 w-4"/>
                         Delete
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center text-destructive focus:text-destructive"
+                        onSelect={() => setShowArchiveAlert(true)}
+                    >
+                        <Icons.archive className="mr-2 h-4 w-4"/>
+                        Archive
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
             <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
@@ -319,6 +328,62 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <AlertDialog open={showArchiveAlert} onOpenChange={setShowArchiveAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure you want to archive this audit?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={async (event) => {
+                                event.preventDefault();
+                                setIsArchiveLoading(true);
+
+                                const updatedAudit = {
+                                    ...audit,
+                                    status: 'archive'
+                                }
+                                try {
+                                    await setAudit(userId, updatedAudit);
+                                    dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
+                                    return toast({
+                                        title: "Audit updated successfully.",
+                                        description: `Your audit was updated.`,
+                                        variant: "success"
+                                    });
+
+                                } catch (error) {
+                                    // Handle the error, which could come from the setAudit
+                                    return toast({
+                                        title: "Something went wrong.",
+                                        description: "Your audit was not updated. Please try again.",
+                                        variant: "destructive",
+                                    });
+                                } finally {
+                                    setShowArchiveAlert(false)
+                                    setIsArchiveLoading(false);
+                                }
+                            }}
+                            className="bg-red-600 focus:ring-red-600"
+                        >
+                            {isArchiveLoading ? (
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                            ) : (
+                                <Icons.trash className="mr-2 h-4 w-4"/>
+                            )}
+                            <span>Archive</span>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <Form {...form}>

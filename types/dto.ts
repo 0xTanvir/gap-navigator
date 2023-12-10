@@ -34,6 +34,7 @@ export interface Audit {
     name: string
     type: string
     exclusiveList?: string[];
+    status?: string,
     authorId: string
     createdAt: Timestamp
 }
