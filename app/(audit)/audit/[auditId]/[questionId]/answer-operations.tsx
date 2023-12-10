@@ -82,7 +82,17 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
 
     const {questions} = useQuestions()
 
-    let questionsData = questions.filter(question => question.uid !== questionId).map(item => ({
+    let questionIndex = questions.findIndex(question => question.uid === questionId);
+
+    let allQuestions: any[] = [];
+
+    if (questionIndex !== -1) {
+        allQuestions = [...questions]; // Create a copy of the original array
+        // Remove elements from index 0 to the found index
+        let removedQuestions = allQuestions.splice(0, questionIndex + 1);
+    }
+
+    let questionsData = allQuestions?.filter(question => question.uid !== questionId).map(item => ({
         name: item.name,
         uid: item.uid
     }))
