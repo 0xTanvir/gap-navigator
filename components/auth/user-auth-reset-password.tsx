@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import {useAuth} from "@/components/auth/auth-provider";
 
 interface UserAuthResetPasswordProps extends React.HTMLAttributes<HTMLDivElement> {
 }
@@ -22,6 +23,7 @@ const UserAuthResetPassword = ({className, ...props}: UserAuthResetPasswordProps
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const auth = getAuth()
     const router = useRouter()
+    const {user} = useAuth()
     const form = useForm<FormData>({
         resolver: zodResolver(userAuthRestPasswordSchema)
     })
@@ -44,6 +46,10 @@ const UserAuthResetPassword = ({className, ...props}: UserAuthResetPasswordProps
                     description: error.message,
                 })
             })
+    }
+
+    if (user) {
+        return router.push("/")
     }
 
     return (
