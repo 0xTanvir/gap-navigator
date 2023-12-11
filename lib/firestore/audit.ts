@@ -12,7 +12,7 @@ import {
 import { Collections } from "./client";
 import { Audit, Audits, Question } from "@/types/dto";
 
-export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
+export async function getAuditsByIds(userAuditsId: string[], status: string = ""): Promise<Audits> {
     if (userAuditsId.length > 0) {
         const userAuditsCollectionRef = Collections.audits();
         const q = query(userAuditsCollectionRef, where("uid", "in", userAuditsId));
@@ -34,8 +34,12 @@ export async function getAuditsByIds(userAuditsId: string[]): Promise<Audits> {
                 authorId: data.authorId,
                 createdAt: data.createdAt,
             } as Audit;
-        }).filter((audit) => audit.status !== "archive");
-        return audits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+        });
+        // Dynamic status filtering
+        const filteredAudits = status
+            ? audits.filter((audit) => audit.status === status)
+            : audits;
+        return filteredAudits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
     } else {
         return [];
     }
