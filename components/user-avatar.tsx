@@ -10,8 +10,10 @@ interface UserAvatarProps extends AvatarProps {
 }
 
 export function UserAvatar({ name, image, ...props }: UserAvatarProps) {
+  console.log(image)
   return (
     <Avatar {...props}>
+      <AvatarImage alt="Picture" src={image} />
       {<AvatarFallback>
         <span className="sr-only">{name}</span>
         <Icons.user className="h-4 w-4" />
