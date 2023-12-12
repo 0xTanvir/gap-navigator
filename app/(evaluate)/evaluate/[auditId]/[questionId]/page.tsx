@@ -39,7 +39,7 @@ export default function EvaluateQuestionPage({
         (question) => question.uid === questionId
     );
 
-    console.log(evaluation)
+    // console.log(evaluation)
 
     const pager = getPagerForQuestions(questionId, evaluation);
 

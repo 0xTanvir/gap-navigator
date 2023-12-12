@@ -47,6 +47,16 @@ export function EvaluatePager({currentQuestion, isLoading, handleNextClick}: Eva
 }
 
 export function getPagerForQuestions(currentQuestion: string, preview: Evaluation) {
+
+    preview?.evaluate?.choices?.sort((a, b) => {
+        const questionA: any = preview.questions.find((question) => question.uid === a.questionId);
+        const questionB: any = preview.questions.find((question) => question.uid === b.questionId);
+        // Assuming questions with matching UIDs always exist
+        return questionA.createdAt.seconds - questionB.createdAt.seconds;
+    });
+
+    // console.log(preview)
+
     const currentQuestionIndex = preview.questions.findIndex(
         (question) => question.uid === currentQuestion
     )
@@ -57,10 +67,10 @@ export function getPagerForQuestions(currentQuestion: string, preview: Evaluatio
         if (findObject) {
             let indexFind = preview.evaluate.choices.findIndex(choice => choice.questionId === findObject?.questionId);
             prevFound = preview.evaluate.choices[indexFind - 1]?.questionId;
+        } else {
+            prevFound = preview.evaluate.choices.slice(-1)[0]?.questionId;
+            // console.log(preview.evaluate.choices.slice(-1)[0]?.questionId)
         }
-        // else {
-        //     console.log(preview.evaluate.choices.slice(-1)[0]?.questionId)
-        // }
     }
 
     let previewQuestionsIndex: number | undefined;
@@ -70,6 +80,7 @@ export function getPagerForQuestions(currentQuestion: string, preview: Evaluatio
             (question) => question.uid === prevFound
         );
     }
+    console.log(previewQuestionsIndex, prevFound)
 
     const prevQuestion = previewQuestionsIndex !== undefined ? preview.questions[previewQuestionsIndex] : preview.questions[currentQuestionIndex - 1];
     const nextQuestion = preview.questions[currentQuestionIndex + 1];
