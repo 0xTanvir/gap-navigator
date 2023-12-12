@@ -118,11 +118,11 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem>
                     <Icons.helpingHand className="mr-2 h-4 w-4"/>
-                    <span>Help</span>
+                    <Link href="faqs">Help</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <Icons.lifeBuoy className="mr-2 h-4 w-4"/>
-                    <span>Support</span>
+                    <Link href="/contact">Support</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem
