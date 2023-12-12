@@ -31,8 +31,16 @@ export const auditsReducer = (state: Audit[], action: AuditAction): Audit[] => {
         }
         case AuditActionType.UPDATE_AUDIT:
             return state.map(audit =>
-                audit.uid === action.payload.uid ? { ...audit, ...action.payload } : audit
+                audit.uid === action.payload.uid ? {...audit, ...action.payload} : audit
+            )
+        case AuditActionType.UPDATE_AUDIT_ARCHIVE:
+            return state.map(audit =>
+                audit.uid === action.payload.uid ? {...audit, ...action.payload} : audit
             ).filter((audit) => audit.status !== "archive")
+        case AuditActionType.UPDATE_AUDIT_RESTORE:
+            return state.map(audit =>
+                audit.uid === action.payload.uid ? {...audit, ...action.payload} : audit
+            ).filter((audit) => audit.status !== "")
         case AuditActionType.DELETE_AUDIT:
             return state.filter(audit => audit.uid !== action.payload)
         default:

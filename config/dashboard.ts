@@ -44,6 +44,11 @@ export const consultantDashboardConfig: DashboardConfig = {
             icon: "audit",
         },
         {
+            title: "Archive",
+            href: "/archive",
+            icon: "archive",
+        },
+        {
             title: "Clients",
             href: "/clients",
             icon: "users",

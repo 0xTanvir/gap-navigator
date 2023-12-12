@@ -36,9 +36,7 @@ export async function getAuditsByIds(userAuditsId: string[], status: string = ""
             } as Audit;
         });
         // Dynamic status filtering
-        const filteredAudits = status
-            ? audits.filter((audit) => audit.status === status)
-            : audits;
+        const filteredAudits = audits.filter((audit) => audit.status === status)
         return filteredAudits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
     } else {
         return [];

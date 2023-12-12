@@ -39,7 +39,7 @@ import {
     ScanEye,
     ClipboardCheck,
     Copy,
-    Save, CheckCircle2, BellRing, Bell, Archive,
+    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore,
 } from "lucide-react"
 
 export const Icons = {
@@ -87,6 +87,7 @@ export const Icons = {
     notificationOff:Bell,
     notificationRing:BellRing,
     archive:Archive,
+    archiveRestore:ArchiveRestore,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path
