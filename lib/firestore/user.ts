@@ -43,8 +43,10 @@ export async function updateUserProfile(id: string, formData: object) {
     const userDocRef = Collections.user(id);
     try {
         await updateDoc(userDocRef, formData)
-        return true;
-    }catch (error){
+        // Retrieve the updated user data after the update
+        const updatedDocSnapshot = await getDoc(userDocRef);
+        return updatedDocSnapshot.data() as User
+    } catch (error) {
         throw new Error("Error updating user profile")
     }
 }

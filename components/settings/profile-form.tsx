@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -13,18 +13,25 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { updateUserProfile } from "@/lib/firestore/user";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getDownloadURL, ref, uploadBytesResumable } from "@firebase/storage";
+import { storage } from "@/firebase";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 export function ProfileForm() {
+    const [file, setFile] = useState<File | undefined>(undefined);
+    const [fileName, setFileName] = useState<string>("");
+    const [preview, setPreview] = useState<string>("");
     const [loader, setLoader] = useState<boolean>(false)
-    const {user, loading} = useAuth()
+    const {user, loading, setUser} = useAuth()
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileFormSchema),
         defaultValues: {
             firstName: '',
             lastName: '',
             email: '',
+            image: ''
         },
         mode: "onChange",
     })
@@ -32,20 +39,29 @@ export function ProfileForm() {
     async function onSubmit(data: ProfileFormValues) {
         setLoader(true)
         try {
-            await updateUserProfile(user?.uid as string, {
+            const url: any | string = await userImageUpload(fileName, file as File)
+                .then(url => {
+                    return url
+                }).catch((error) => {
+                    console.error("Error uploading image:", error);
+                });
+            let dbUser = await updateUserProfile(user?.uid as string, {
                 firstName: data.firstName,
                 lastName: data.lastName,
+                image: url
             })
+            setUser(dbUser)
             toast({
                 title: "Profile Updated successfully",
-                variant: "success"
+                // variant: "success"
             })
             setLoader(false)
+            setPreview("")
         } catch (error) {
             console.error("Error updating user profile:", error);
             toast({
                 title: "Error updating user profile",
-                variant: "error"
+                // variant: "error"
             })
             setLoader(false)
         }
@@ -57,6 +73,7 @@ export function ProfileForm() {
                 firstName: user?.firstName || '',
                 lastName: user?.lastName || '',
                 email: user?.email || '',
+                image: user?.image || ''
             });
         }
     }, [loading, user, form]);
@@ -104,6 +121,53 @@ export function ProfileForm() {
                         </FormItem>
                     )}
                 />
+
+                <FormField
+                    control={form.control}
+                    name="image"
+                    render={({field: {value, onChange, ...rest}}) => (
+                        <div className="relative w-3/6 h-3/6">
+                            <div>
+                                <Avatar className="w-full h-3/6 userImage" style={{borderRadius: 5}}>
+                                    <AvatarImage src={preview ? preview : user?.image}/>
+                                    <AvatarFallback>{user && user?.firstName[0] + user?.lastName[1]}</AvatarFallback>
+                                </Avatar>
+                                {preview &&
+                                    <div className="mt-3 cursor-pointer" onClick={() => setPreview("")}>Change</div>}
+                            </div>
+                            {!loading &&
+                                <FormItem
+                                    className="absolute z-10 top-[-10px] right-[-10px] w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                                    style={{
+                                        boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
+                                    }}
+                                >
+                                    <FormLabel
+                                        htmlFor="thumbnail"
+                                        className="cursor-pointer inline-block w-8 h-8 rounded-2xl grid place-items-center">
+                                        <Icons.fileEdit className="h-5 w-5"/>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            className="hidden"
+                                            type='file' id="thumbnail"
+                                            accept=".png, .jpg, .jpeg"
+                                            {...rest}
+                                            onChange={async (event) => {
+                                                const {files, displayUrl} = getImageData(event)
+                                                setFile(files)
+                                                setFileName(files.name)
+                                                setPreview(displayUrl)
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            }
+                        </div>
+                    )}
+                />
+
                 <Button
                     className={cn(buttonVariants({variant: "default"}))}
                     disabled={loader || loading}
@@ -114,4 +178,47 @@ export function ProfileForm() {
             </form>
         </Form>
     )
+}
+
+
+function getImageData(event: ChangeEvent<HTMLInputElement>) {
+    // FileList is immutable, so we need to create a new one
+    const dataTransfer = new DataTransfer();
+    // Add newly uploaded images
+    Array.from(event.target.files!).forEach((image) =>
+        dataTransfer.items.add(image)
+    );
+
+    const files = dataTransfer.files[0];
+    const displayUrl = URL.createObjectURL(event.target.files![0]);
+
+    return {files, displayUrl};
+}
+
+export async function userImageUpload(imageName: string, imageFile: File) {
+    return new Promise((resolve, reject) => {
+        // Create a reference to the storage location with the image name
+        const imageRef = ref(storage, `images/${imageName}`);
+
+        const imageTask = uploadBytesResumable(imageRef, imageFile)
+
+        imageTask.on(
+            "state_changed",
+            (snapshot) => {
+                const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+                console.log(percent)
+            },
+            (err) => console.log(err),
+            () => {
+                getDownloadURL(imageTask.snapshot.ref)
+                    .then((url) => {
+                        resolve(url); // Resolve the promise with the download URL
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        reject(err); // Reject the promise if there's an error
+                    });
+            }
+        )
+    })
 }

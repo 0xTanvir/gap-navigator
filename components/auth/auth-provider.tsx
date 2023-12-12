@@ -8,6 +8,7 @@ import {User} from '@/types/dto'
 
 interface AuthContextValue {
     user: User | null
+    setUser: (user: User | null) => Promise<void>
     isAuthenticated: boolean
     loading: boolean
     logOut: () => Promise<void>
@@ -15,6 +16,7 @@ interface AuthContextValue {
 
 export const AuthContext = createContext<AuthContextValue>({
     user: null,
+    setUser: async () => {},
     isAuthenticated: false,
     loading: true,
     logOut: async () => {
@@ -72,7 +74,13 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({children}) => 
         return unsubscribe
     }, [])
 
-    return <AuthContext.Provider value={{user, isAuthenticated, loading, logOut}}>{children}</AuthContext.Provider>
+    const setUserAsync = async (newUser: User | null) => {
+        // You can perform additional async operations if needed
+        setUser(newUser);
+    };
+
+    return <AuthContext.Provider
+        value={{user, setUser:setUserAsync, isAuthenticated, loading, logOut}}>{children}</AuthContext.Provider>
 };
 
 export const useAuth = () => useContext(AuthContext)
