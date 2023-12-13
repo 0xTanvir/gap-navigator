@@ -69,7 +69,9 @@ const PdfDownload = () => {
             let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
                 .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
 
-            reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+            // console.log(evaluationChoiceRecommendedNote)
+            // console.log(reportData)
+            // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
 
             let data = {
                 blocks: reportData

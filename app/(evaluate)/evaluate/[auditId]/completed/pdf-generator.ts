@@ -49,7 +49,7 @@ const generatePDF = async (editorJsData: { blocks: EditorJsBlock[] }) => {
             case 'checklist':
                 return {ul: block.data.items, margin: [0, 0, 0, 10]};
             case 'image':
-                const imageData = await loadImage(block.data.file.url); // Assuming block.data.file.url contains the image URL
+                const imageData = await loadImage(block.data.url); // Assuming block.data.file.url contains the image URL
                 return {image: imageData, width: 200, margin: [0, 10, 0, 10]}; // Set the width as needed
             case 'table':
                 return {
