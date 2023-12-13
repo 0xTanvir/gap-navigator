@@ -126,25 +126,32 @@ export function ProfileForm() {
                     control={form.control}
                     name="image"
                     render={({field: {value, onChange, ...rest}}) => (
-                        <div className="relative w-3/6 h-3/6">
-                            <div>
-                                <Avatar className="w-full h-3/6 userImage" style={{borderRadius: 5}}>
+                        <div className="relative w-40 h-40">
+                            <div className="space-y-2">
+                                <Avatar className="w-40 h-40">
                                     <AvatarImage src={preview ? preview : user?.image}/>
                                     <AvatarFallback>{user && user?.firstName[0] + user?.lastName[1]}</AvatarFallback>
                                 </Avatar>
-                                {preview &&
-                                    <div className="mt-3 cursor-pointer" onClick={() => setPreview("")}>Change</div>}
+                                {
+                                    preview &&
+                                    <div
+                                        className="mt-3 cursor-pointer"
+                                        onClick={() => setPreview("")}
+                                    >
+                                        Change
+                                    </div>
+                                }
                             </div>
                             {!loading &&
                                 <FormItem
-                                    className="absolute z-10 top-[-10px] right-[-10px] w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                                    className="absolute z-10 bottom-5 right-0 w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
                                     style={{
                                         boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
                                     }}
                                 >
                                     <FormLabel
                                         htmlFor="thumbnail"
-                                        className="cursor-pointer inline-block w-8 h-8 rounded-2xl grid place-items-center">
+                                        className="cursor-pointer w-8 h-8 rounded-2xl grid place-items-center">
                                         <Icons.fileEdit className="h-5 w-5"/>
                                     </FormLabel>
                                     <FormControl>
@@ -169,7 +176,7 @@ export function ProfileForm() {
                 />
 
                 <Button
-                    className={cn(buttonVariants({variant: "default"}))}
+                    className={cn(buttonVariants({variant: "default"})) }
                     disabled={loader || loading}
                     type="submit">
                     {loader && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
