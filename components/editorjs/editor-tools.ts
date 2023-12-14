@@ -2,8 +2,7 @@ import CheckList from "@editorjs/checklist";
 import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";
 import Embed from "@editorjs/embed";
-// import Image from "@editorjs/image";
-import Link from "@editorjs/link";
+import Image from "@editorjs/image";
 import List from "@editorjs/list";
 import Quote from "@editorjs/quote";
 import Paragraph from "@editorjs/paragraph";
@@ -17,7 +16,6 @@ import Strikethrough from '@sotaproject/strikethrough';
 import ChangeCase from 'editorjs-change-case';
 import InlineCode from '@editorjs/inline-code';
 import "@/styles/editor.css"
-
 
 export const EditorTools = {
     code: Code,
@@ -48,12 +46,42 @@ export const EditorTools = {
     },
     // image: {
     //     class: Image,
-    //     // config: {
-    //     //     endpoints: {
-    //     //         byFile: 'http://localhost:3000/uploadFile', // Your backend file uploader endpoint
-    //     //         byUrl: 'http://localhost:3000/fetchUrl', // Your endpoint that provides uploading by Url
-    //     //     }
-    //     // }
+    //     config: {
+    //         uploader: {
+    //             async uploadByFile(file: any) {
+    //                 const formData = new FormData()
+    //                 formData.append('file', file)
+    //                 const response = await fetch('/api/create', {
+    //                         method: 'POST',
+    //                         headers: {
+    //                             // 'Accept': 'application.json',
+    //                             'Content-Type': 'multipart/form-data',
+    //                         },
+    //                         body: JSON.stringify(formData),
+    //                         credentials: "same-origin"
+    //                     }
+    //                 )
+    //                 const res = await response.json()
+    //                 if (res.data.success === 1) {
+    //                     return res.data
+    //                 }
+    //             },
+    //             async uploadByUrl(url: string) {
+    //                 const response = await fetch('', {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'Accept': 'application.json',
+    //                     },
+    //                     body: JSON.stringify(url),
+    //                     credentials: "same-origin"
+    //                 })
+    //                 const res = await response.json()
+    //                 if (res.data.success === 1) {
+    //                     return res.data
+    //                 }
+    //             }
+    //         }
+    //     }
     // },
     // simpleImage: {
     //     class:SimpleImage,
@@ -61,8 +89,6 @@ export const EditorTools = {
     // },
     link: {
         class: LinkAutocomplete,
-        // inlineToolbar: true,
-        // isInline: true
     },
     list: {
         class: List,
@@ -80,6 +106,6 @@ export const EditorTools = {
         inlineToolbar: true
     },
     strikethrough: Strikethrough,
-    changeCase:ChangeCase,
-    inlineCode:InlineCode
+    changeCase: ChangeCase,
+    inlineCode: InlineCode
 }

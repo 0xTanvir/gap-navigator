@@ -55,8 +55,6 @@ export function getPagerForQuestions(currentQuestion: string, preview: Evaluatio
         return questionA.createdAt.seconds - questionB.createdAt.seconds;
     });
 
-    // console.log(preview)
-
     const currentQuestionIndex = preview.questions.findIndex(
         (question) => question.uid === currentQuestion
     )
@@ -80,7 +78,6 @@ export function getPagerForQuestions(currentQuestion: string, preview: Evaluatio
             (question) => question.uid === prevFound
         );
     }
-    console.log(previewQuestionsIndex, prevFound)
 
     const prevQuestion = previewQuestionsIndex !== undefined ? preview.questions[previewQuestionsIndex] : preview.questions[currentQuestionIndex - 1];
     const nextQuestion = preview.questions[currentQuestionIndex + 1];
