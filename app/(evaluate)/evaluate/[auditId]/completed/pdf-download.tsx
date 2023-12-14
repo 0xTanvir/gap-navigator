@@ -1,13 +1,15 @@
 "use client"
 import React, { useEffect } from 'react';
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
-import pdfGenerator, { outputHtml } from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-generator";
+import pdfGenerator from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-generator";
 import pdfMake from "pdfmake/build/pdfmake";
 import { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import { generateRandomText } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import htmlToPdfmake from "html-to-pdfmake"
+import edjsParser from "editorjs-parser";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -15,6 +17,7 @@ const PdfDownload = () => {
     const {evaluation} = useEvaluation()
     const {uid} = evaluation
     const router = useRouter()
+    const parser = new edjsParser();
 
 
     function evaluateFormat() {
@@ -69,15 +72,16 @@ const PdfDownload = () => {
             let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
                 .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
 
-            // console.log(evaluationChoiceRecommendedNote)
-            // console.log(reportData)
             // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
 
             let data = {
                 blocks: reportData
             };
 
-            let docContent = await pdfGenerator(data); // Await the async function
+            const markup = parser.parse(data);
+            let html = htmlToPdfmake(markup)
+
+            // let docContent = await pdfGenerator(data); // Await the async function
 
             const docDefinition: TDocumentDefinitions = {
                 header: {
@@ -106,7 +110,8 @@ const PdfDownload = () => {
                     producer: 'Gap Navigator',
                 },
                 content: [
-                    ...(docContent.content as Content []),
+                    html
+                    // ...(docContent.content as Content []),
                 ],
             };
             const createPdf = () => {
