@@ -1,5 +1,6 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts"
+import { editorToHTML } from "@/app/(evaluate)/evaluate/[auditId]/completed/jsonToHtml";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -9,7 +10,7 @@ interface EditorJsBlock {
 }
 
 const generatePDF = async (editorJsData: { blocks: EditorJsBlock[] }) => {
-    const content = await Promise.all (editorJsData.blocks.map(async (block) => {
+    const content = await Promise.all(editorJsData.blocks.map(async (block) => {
         switch (block.type) {
             case 'paragraph':
                 return {text: block.data.text, margin: [0, 0, 0, 10]};
@@ -82,6 +83,60 @@ const generatePDF = async (editorJsData: { blocks: EditorJsBlock[] }) => {
 
     return pdfDefinition
 }
+
+
+export function outputHtml(articleObj: any) {
+    let articleHTML: string = ''
+    articleObj.map((obj: { type: any; data: { html: any; }; }) => {
+        switch (obj.type) {
+            case 'paragraph':
+                articleHTML += editorToHTML.methods.makeParagraph(obj);
+                break;
+            case 'image':
+                articleHTML += editorToHTML.methods.makeImage(obj);
+                break;
+            case 'header':
+                articleHTML += editorToHTML.methods.makeHeader(obj);
+                break;
+            case 'raw':
+                articleHTML += `<div class="ce-block">
+                  <div class="ce-block__content">
+                  <div class="ce-code">
+                    <code>${obj.data.html}</code>
+                  </div>
+                  </div>
+                </div>\n`;
+                break;
+            case 'code':
+                articleHTML += editorToHTML.methods.makeCode(obj);
+                break;
+            case 'list':
+                articleHTML += editorToHTML.methods.makeList(obj)
+                break;
+            case "quote":
+                articleHTML += editorToHTML.methods.makeQuote(obj)
+                break;
+            case "warning":
+                articleHTML += editorToHTML.methods.makeWarning(obj)
+                break;
+            case "checklist":
+                articleHTML += editorToHTML.methods.makeChecklist(obj)
+                break;
+            case "embed":
+                articleHTML += editorToHTML.methods.makeEmbed(obj)
+                break;
+
+
+            case 'delimeter':
+                articleHTML += editorToHTML.methods.makeDelimeter(obj);
+                break;
+            default:
+                return '';
+        }
+    });
+    return articleHTML
+}
+
 
 // Helper function to load image data asynchronously
 const loadImage = async (imageUrl: string) => {

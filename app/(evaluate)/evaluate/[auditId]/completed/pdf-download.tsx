@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react';
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
-import pdfGenerator from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-generator";
+import pdfGenerator, { outputHtml } from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-generator";
 import pdfMake from "pdfmake/build/pdfmake";
 import { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import pdfFonts from "pdfmake/build/vfs_fonts"

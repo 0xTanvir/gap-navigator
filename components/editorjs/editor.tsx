@@ -33,12 +33,9 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
                     editorRef.current = editor
                 },
                 onChange: async () => {
-                    await editor.saver.save().then((outputData) => {
+                    await editorRef.current?.save().then((outputData) => {
                         onSave(outputData.blocks);
                     })
-                    // await editorRef.current?.save().then((outputData) => {
-                    //     onSave(outputData.blocks);
-                    // })
                 },
             });
             editorRef.current = editor
