@@ -27,10 +27,13 @@ export const EditorTools = {
         class: Paragraph,
         inlineToolbar: true
     },
-    checklist: CheckList,
+    checklist: {
+        class: CheckList,
+        inlineToolbar: true
+    },
     embed: {
         class: Embed,
-        inlineToolbar: true,
+        inlineToolbar: false,
         config: {
             services: {
                 youtube: true,
@@ -42,7 +45,7 @@ export const EditorTools = {
     },
     image: {
         class: SimpleImage,
-        inlineToolbar: true
+        inlineToolbar: false
     },
     // image: {
     //     class: Image,
@@ -85,7 +88,7 @@ export const EditorTools = {
     // },
     // simpleImage: {
     //     class:SimpleImage,
-    //     inlineToolbar:true
+    //     inlineToolbar:false
     // },
     link: {
         class: LinkAutocomplete,

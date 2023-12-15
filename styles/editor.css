@@ -123,7 +123,8 @@ h6.ce-header {
 }
 
 @media (min-width: 651px) {
-    .codex-editor--narrow .ce-toolbox .ce-popover {
+    .ce-popover--opened {
         right: unset !important;
+        left: 0 !important;
     }
 }
