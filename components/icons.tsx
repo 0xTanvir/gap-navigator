@@ -34,7 +34,7 @@ import {
     Lock,
     Building,
     Phone,
-    Mail,
+    Mail, XCircle,
 } from "lucide-react"
 
 export const Icons = {
@@ -73,6 +73,7 @@ export const Icons = {
     building:Building,
     phone:Phone,
     mail: Mail,
+    cancel:XCircle,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

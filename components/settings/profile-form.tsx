@@ -132,51 +132,57 @@ export function ProfileForm() {
                                     <AvatarImage src={preview ? preview : user?.image}/>
                                     <AvatarFallback>{user && user?.firstName[0] + user?.lastName[1]}</AvatarFallback>
                                 </Avatar>
-                                {
-                                    preview &&
-                                    <div
-                                        className="mt-3 cursor-pointer"
-                                        onClick={() => setPreview("")}
-                                    >
-                                        Change
-                                    </div>
-                                }
                             </div>
                             {!loading &&
-                                <FormItem
-                                    className="absolute z-10 bottom-5 right-0 w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
-                                    style={{
-                                        boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
-                                    }}
-                                >
-                                    <FormLabel
-                                        htmlFor="thumbnail"
-                                        className="cursor-pointer w-8 h-8 rounded-2xl grid place-items-center">
-                                        <Icons.fileEdit className="h-5 w-5"/>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            className="hidden"
-                                            type='file' id="thumbnail"
-                                            accept=".png, .jpg, .jpeg"
-                                            {...rest}
-                                            onChange={async (event) => {
-                                                const {files, displayUrl} = getImageData(event)
-                                                setFile(files)
-                                                setFileName(files.name)
-                                                setPreview(displayUrl)
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
+                                <>
+                                    {
+                                        preview ?
+                                            <div
+                                                className="absolute z-10 bottom-5 right-0 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                                                style={{
+                                                    boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
+                                                }}
+                                            >
+                                                <div className="cursor-pointer rounded-2xl grid place-items-center">
+                                                    <Icons.cancel onClick={() => setPreview("")} className="h-6 w-6"/>
+                                                </div>
+                                            </div> :
+                                            <FormItem
+                                                className="absolute z-10 bottom-5 right-0 w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                                                style={{
+                                                    boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)"
+                                                }}
+                                            >
+                                                <FormLabel
+                                                    htmlFor="thumbnail"
+                                                    className="cursor-pointer w-8 h-8 rounded-2xl grid place-items-center">
+                                                    <Icons.fileEdit className="h-5 w-5"/>
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        className="hidden"
+                                                        type='file' id="thumbnail"
+                                                        accept=".png, .jpg, .jpeg"
+                                                        {...rest}
+                                                        onChange={async (event) => {
+                                                            const {files, displayUrl} = getImageData(event)
+                                                            setFile(files)
+                                                            setFileName(files.name)
+                                                            setPreview(displayUrl)
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                    }
+                                </>
                             }
                         </div>
                     )}
                 />
 
                 <Button
-                    className={cn(buttonVariants({variant: "default"})) }
+                    className={cn(buttonVariants({variant: "default"}))}
                     disabled={loader || loading}
                     type="submit">
                     {loader && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
@@ -213,7 +219,7 @@ export async function userImageUpload(imageName: string, imageFile: File) {
             "state_changed",
             (snapshot) => {
                 const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-                console.log(percent)
+                // console.log(percent)
             },
             (err) => console.log(err),
             () => {
