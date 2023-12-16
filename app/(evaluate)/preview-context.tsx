@@ -24,6 +24,7 @@ export const PreviewProvider: React.FC<PreviewProviderProps> = ({ children, init
         uid: '',
         name: '',
         type: '',
+        authorId: '',
         createdAt: Timestamp.now(),
         questions: [],
         sideBarNav: [],
