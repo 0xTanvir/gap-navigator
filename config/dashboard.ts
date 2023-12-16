@@ -69,10 +69,10 @@ export const clientDashboardConfig: DashboardConfig = {
             href: "/audits",
             icon: "audit",
         },
-        {
-            title: "Evaluations",
-            href: "/evaluations",
-            icon: "evaluate",
-        },
+        // {
+        //     title: "Evaluations",
+        //     href: "/evaluations",
+        //     icon: "evaluate",
+        // },
     ],
 }
