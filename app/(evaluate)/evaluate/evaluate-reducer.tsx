@@ -29,7 +29,7 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
                 ]
                 : [
                     {
-                       ...action.payload
+                        ...action.payload
                     },
                 ];
             return {
@@ -39,6 +39,23 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
                     choices: updatedChoices
                 }
             }
+        }
+        case EvaluationActionType.REMOVE_QUESTION_ANSWER: {
+
+            // Check if the choices array exists in evaluate
+            if (state.evaluate && state.evaluate.choices) {
+                const updatedChoices = state.evaluate.choices.filter(
+                    (choice) => choice.questionId !== action.payload
+                );
+                return {
+                    ...state,
+                    evaluate: {
+                        ...state.evaluate,
+                        choices: updatedChoices,
+                    },
+                };
+            }
+            return state;
         }
         default: {
             return state

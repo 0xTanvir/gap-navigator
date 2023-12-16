@@ -17,7 +17,9 @@ const DashboardCard = ({title, totalNumber, iconName}: DashboardCardProps) => {
                     {title}
                 </CardTitle>
                 {
-                    iconName === 'users' ? <Icons.users/> : <Icons.audit/>
+                    iconName === 'users' ? <Icons.users/> :
+                        iconName === 'evaluate' ? <Icons.evaluate/> :
+                            <Icons.audit/>
                 }
             </CardHeader>
             <CardContent>

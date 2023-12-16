@@ -39,6 +39,8 @@ export default function EvaluateQuestionPage({
         (question) => question.uid === questionId
     );
 
+    // console.log(evaluation)
+
     const pager = getPagerForQuestions(questionId, evaluation);
 
     let formDefaultValues = {
@@ -81,7 +83,23 @@ export default function EvaluateQuestionPage({
         if (hasAnswerSelected) {
             dispatch({type: EvaluationActionType.ADD_QUESTION_ANSWER, payload: newEvaluate})
             if (pager.next && !pager.next.disabled) {
-                await router.push(pager.next.href);
+                let nextQuestion = question?.answers?.find(answer => answer?.uid === data?.answerId)
+                let index = evaluation.evaluate.choices?.findIndex(choice => choice.answerId === nextQuestion?.uid)
+                if (nextQuestion?.questionId) {
+                    if (index !== -1) {
+                        if (pager.next.href !== `/evaluate/${auditId}/${nextQuestion?.questionId}`) {
+                            await router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`)
+                            let urlParts = pager.next.href.split('/');
+                            dispatch({
+                                type: EvaluationActionType.REMOVE_QUESTION_ANSWER,
+                                payload: urlParts[urlParts.length - 1]
+                            })
+                        }
+                    }
+                    await router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`)
+                } else {
+                    await router.push(pager.next.href);
+                }
             } else {
                 setIsLoading(true)
                 const dbFoundObject = evaluation.evaluations.find(item => item.uid === evaluation.evaluate.uid);

@@ -1,19 +1,19 @@
 import Link from "next/link"
 
-import {cn} from "@/lib/utils"
-import {buttonVariants} from "@/components/ui/button"
-import {Icons} from "@/components/icons"
-import {Evaluation} from "@/types/dto"
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+import { Icons } from "@/components/icons"
+import { Evaluation } from "@/types/dto"
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 
 interface EvaluatePagerProps {
     currentQuestion: string
     isLoading: boolean
-    handleNextClick:() => void;
+    handleNextClick: () => void;
 }
 
 export function EvaluatePager({currentQuestion, isLoading, handleNextClick}: EvaluatePagerProps) {
-    const {evaluation} = useEvaluation()
+    const {evaluation, dispatch} = useEvaluation()
     const pager = getPagerForQuestions(currentQuestion, evaluation)
 
     if (!pager) {
@@ -47,11 +47,40 @@ export function EvaluatePager({currentQuestion, isLoading, handleNextClick}: Eva
 }
 
 export function getPagerForQuestions(currentQuestion: string, preview: Evaluation) {
+
+    preview?.evaluate?.choices?.sort((a, b) => {
+        const questionA: any = preview.questions.find((question) => question.uid === a.questionId);
+        const questionB: any = preview.questions.find((question) => question.uid === b.questionId);
+        // Assuming questions with matching UIDs always exist
+        return questionA.createdAt.seconds - questionB.createdAt.seconds;
+    });
+
     const currentQuestionIndex = preview.questions.findIndex(
         (question) => question.uid === currentQuestion
     )
-    const prevQuestion = preview.questions[currentQuestionIndex - 1]
-    const nextQuestion = preview.questions[currentQuestionIndex + 1]
+
+    let prevFound: string | undefined;
+    if (preview.evaluate.choices) {
+        let findObject = preview.evaluate.choices.find(item => item.questionId === currentQuestion)
+        if (findObject) {
+            let indexFind = preview.evaluate.choices.findIndex(choice => choice.questionId === findObject?.questionId);
+            prevFound = preview.evaluate.choices[indexFind - 1]?.questionId;
+        } else {
+            prevFound = preview.evaluate.choices.slice(-1)[0]?.questionId;
+            // console.log(preview.evaluate.choices.slice(-1)[0]?.questionId)
+        }
+    }
+
+    let previewQuestionsIndex: number | undefined;
+
+    if (prevFound) {
+        previewQuestionsIndex = preview.questions.findIndex(
+            (question) => question.uid === prevFound
+        );
+    }
+
+    const prevQuestion = previewQuestionsIndex !== undefined ? preview.questions[previewQuestionsIndex] : preview.questions[currentQuestionIndex - 1];
+    const nextQuestion = preview.questions[currentQuestionIndex + 1];
 
     const prev = {
         title: prevQuestion?.name ?? "Previous Question",

@@ -1,4 +1,4 @@
-import { getDoc, setDoc } from "firebase/firestore"
+import { getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -22,11 +22,49 @@ export async function getUserById(id: string): Promise<User> {
             email: data.email,
             role: data.role,
             image: data.image,
-            audits: data.audits
+            audits: data.audits,
+            invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
         }
         return user
     } else {
         return Promise.reject(Error(`No such user: ${id}`))
+    }
+}
+
+export async function getUserByEmail(email: string): Promise<User> {
+    const userDocRef = Collections.users()
+    try {
+        const querySnapshot = await getDocs(userDocRef);
+
+        let user: User | null = {
+            uid: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            role: '',
+            image: '',
+            audits: [],
+            invitedAuditsList: [],
+        };
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.email === email) {
+                user = {
+                    uid: doc.id,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
+                    role: data.role,
+                    image: data.image,
+                    audits: data.audits,
+                    invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList,
+                };
+            }
+        });
+        return user;
+    } catch (error) {
+        throw new Error('Error getting user');
     }
 }
 
@@ -37,5 +75,15 @@ export async function setUser(id: string, user: User) {
         await setDoc(userDocRef, user)
     } catch (error) {
         return Promise.reject(error)
+    }
+}
+
+export async function updateUserById(userId: string, userData: User) {
+    const userRef = Collections.user(userId)
+    try {
+        await updateDoc(userRef, {...userData})
+        return true
+    } catch (error) {
+        throw new Error("Error updating user information")
     }
 }

@@ -17,6 +17,7 @@ export interface User {
     role: string
     image: string,
     audits: string[],
+    invitedAuditsList: string[],
 }
 
 export interface TeamCardProps {
@@ -33,8 +34,13 @@ export interface Audit {
     name: string
     type: string
     exclusiveList?: string[];
+    status?: string,
     authorId: string
     createdAt: Timestamp
+}
+
+export enum AuditStatus {
+    AUDIT_ARCHIVE = "archive"
 }
 
 // Define an array type of Audit
@@ -44,6 +50,8 @@ export enum AuditActionType {
     ADD_AUDIT = "ADD_AUDIT",
     ADD_MULTIPLE_AUDITS = "ADD_MULTIPLE_AUDITS",
     UPDATE_AUDIT = "UPDATE_AUDIT",
+    UPDATE_AUDIT_ARCHIVE = "UPDATE_AUDIT_ARCHIVE",
+    UPDATE_AUDIT_RESTORE = "UPDATE_AUDIT_RESTORE",
     DELETE_AUDIT = "DELETE_AUDIT",
 }
 
@@ -51,6 +59,8 @@ export type AuditAction =
     | { type: AuditActionType.ADD_AUDIT; payload: Audit }
     | { type: AuditActionType.ADD_MULTIPLE_AUDITS; payload: Audit[] }
     | { type: AuditActionType.UPDATE_AUDIT; payload: Audit }
+    | { type: AuditActionType.UPDATE_AUDIT_ARCHIVE; payload: Audit }
+    | { type: AuditActionType.UPDATE_AUDIT_RESTORE; payload: Audit }
     | { type: AuditActionType.DELETE_AUDIT; payload: string }
 
 export interface Question {
@@ -63,6 +73,7 @@ export interface Question {
 export interface Answer {
     uid: string,
     name: string,
+    questionId: string,
     recommendationDocument: string
     createdAt: Timestamp
 }
@@ -106,13 +117,15 @@ export interface Evaluation extends Audit {
 export enum EvaluationActionType {
     ADD_EVALUATION = "ADD_EVALUATION",
     ADD_EVALUATE = "ADD_EVALUATE",
-    ADD_QUESTION_ANSWER = "ADD_QUESTION_ANSWER"
+    ADD_QUESTION_ANSWER = "ADD_QUESTION_ANSWER",
+    REMOVE_QUESTION_ANSWER = "REMOVE_QUESTION_ANSWER",
 }
 
 export type EvaluationAction =
     | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
     | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
     | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
+    | { type: EvaluationActionType.REMOVE_QUESTION_ANSWER; payload: string }
 
 export interface Evaluate {
     uid: string;
@@ -120,6 +133,7 @@ export interface Evaluate {
     participantLastName: string;
     participantEmail: string;
     choices?: Choice[];
+    count?: number;
     // runningStatus?: string // not-started, id, completed
 }
 
@@ -135,4 +149,15 @@ export interface Choice {
 export interface GroupedAudits {
     name: string;
     total: number;
+}
+
+export interface Notification {
+    uid: string;
+    auditName: string;
+    type: string;
+    ownerAuditUserId: string;
+    inviteUserId: string;
+    auditId: string;
+    isSeen: boolean;
+    createdAt: Timestamp;
 }

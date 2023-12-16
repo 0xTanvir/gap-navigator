@@ -4,7 +4,7 @@ import * as React from "react";
 import * as z from "zod";
 
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { deleteAudit } from "@/lib/firestore/audit";
 import { toast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,8 @@ import { Icons } from "@/components/icons";
 import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
-import { auditSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType } from "@/types/dto";
+import { auditInviteSchema, auditSchema } from "@/lib/validations/audit";
+import { Audit, AuditActionType, Notification } from "@/types/dto";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -58,6 +58,10 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { getUserByEmail, updateUserById } from "@/lib/firestore/user";
+import { setNotificationData } from "@/lib/firestore/notification";
+import { Timestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -78,16 +82,29 @@ async function deleteAuditFromDB(userId: string, auditId: string) {
 
 type FormData = z.infer<typeof auditSchema>;
 
+type formData = z.infer<typeof auditInviteSchema>
+
 interface AuditOperationsProps {
     userId: string;
     audit: Audit;
+    archive?: boolean
 }
 
-export function AuditOperations({userId, audit}: AuditOperationsProps) {
+export function AuditOperations({userId, audit, archive}: AuditOperationsProps) {
     const {dispatch} = useAudits();
     const {user, updateUser} = useAuth();
+
     const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false);
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false);
+
+    const [isArchiveLoading, setIsArchiveLoading] = React.useState<boolean>(false);
+    const [showArchiveAlert, setShowArchiveAlert] = React.useState<boolean>(false);
+
+    const [isArchiveRestoreLoading, setIsArchiveRestoreLoading] = React.useState<boolean>(false);
+    const [showArchiveRestoreAlert, setShowArchiveRestoreAlert] = React.useState<boolean>(false);
+
+    const [inviteAlert, setInviteAlert] = React.useState<boolean>(false);
+    const [isInviteLoading, setIsInviteLoading] = React.useState<boolean>(false);
 
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
     const [showUpdateDialog, setShowUpdateDialog] =
@@ -113,7 +130,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                 createdAt: audit.createdAt,
             };
 
-            const auditId = await setAudit(userId, updatedAudit);
+            await setAudit(userId, updatedAudit);
             dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
             form.reset();
 
@@ -135,66 +152,214 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
         }
     }
 
+    const inviteForm = useForm<formData>({
+        resolver: zodResolver(auditInviteSchema),
+        defaultValues: {
+            email: ''
+        }
+    })
+
+    async function onInviteSubmit(data: formData) {
+        setIsInviteLoading(true)
+        try {
+            let inviteUser = await getUserByEmail(data.email)
+            if (inviteUser) {
+                const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
+                if (!exclusiveExists) {
+                    // Check if exclusiveList exists, if not, initialize it as an empty array
+                    const exclusiveList = audit.exclusiveList || [];
+
+                    const formattedAudit = {
+                        ...audit,
+                        exclusiveList: [...exclusiveList, inviteUser.uid]
+                    };
+                    const notificationData: Notification = {
+                        uid: uuidv4(),
+                        auditName: audit.name,
+                        type: "AUDIT_INVITED",
+                        ownerAuditUserId: audit.authorId,
+                        inviteUserId: inviteUser.uid,
+                        auditId: audit.uid,
+                        isSeen: false,
+                        createdAt: Timestamp.now(),
+                    }
+                    await setAudit(userId, formattedAudit);
+                    await setNotificationData(inviteUser.uid, notificationData)
+                    inviteUser.invitedAuditsList.push(audit.uid)
+                    await updateUserById(inviteUser.uid, inviteUser)
+                    dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+                    return toast({
+                        title: "Audit invited successfully.",
+                        description: `Your audit was updated.`,
+                        variant: "success"
+                    });
+                } else {
+                    return toast({
+                        title: "Already audit invited.",
+                        variant: "success"
+                    });
+                }
+
+            } else {
+                console.log('User not found');
+                return toast({
+                    title: "User not found.",
+                    variant: "default"
+                });
+            }
+        } catch (error) {
+            console.log(error)
+            return toast({
+                title: "Something went wrong.",
+                description: "Your audit was not updated. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsInviteLoading(false)
+            setInviteAlert(false)
+            inviteForm.reset();
+        }
+    }
+
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger
-                    className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
-                    <Icons.ellipsis className="h-4 w-4"/>
-                    <span className="sr-only">Open</span>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    {audit.type === "public" && (
-                        <>
-                            <DropdownMenuItem className="flex cursor-pointer items-center">
-                                <Icons.copy className="mr-2 h-4 w-4"/>
-                                Share Audit
+            {
+                archive ?
+                    <Button
+                        variant="secondary"
+                        onClick={() => {
+                            setShowArchiveRestoreAlert(true)
+                        }}
+                    >
+                        <Icons.archiveRestore className="mr-2 h-4 w-4"/>
+                        Restore
+                    </Button>
+                    :
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
+                            <Icons.ellipsis className="h-4 w-4"/>
+                            <span className="sr-only">Open</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {audit.type === "public" && (
+                                <>
+                                    <DropdownMenuItem className="flex cursor-pointer items-center">
+                                        <Icons.copy className="mr-2 h-4 w-4"/>
+                                        Share Audit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator/>
+                                </>
+                            )}
+                            {audit.type === "exclusive" && (
+                                <>
+                                    <DropdownMenuItem
+                                        className="flex cursor-pointer items-center"
+                                        onClick={() => setInviteAlert(true)}
+                                    >
+                                        <Icons.userPlus className="mr-2 h-4 w-4"/>
+                                        Invite
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator/>
+                                </>
+                            )}
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center"
+                                onClick={() => router.push(`/preview/${audit.uid}`)}
+                            >
+                                <Icons.preview className="mr-2 h-4 w-4"/>
+                                Preview
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
-                        </>
-                    )}
-                    {audit.type === "exclusive" && (
-                        <>
-                            <DropdownMenuItem className="flex cursor-pointer items-center">
-                                <Icons.userPlus className="mr-2 h-4 w-4"/>
-                                Invite
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center"
+                                onClick={() => router.push(`/evaluate/${audit.uid}`)}
+                            >
+                                <Icons.evaluate className="mr-2 h-4 w-4"/>
+                                Evaluate
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
-                        </>
-                    )}
-                    <DropdownMenuItem
-                        className="flex cursor-pointer items-center"
-                        onClick={() => router.push(`/preview/${audit.uid}`)}
-                    >
-                        <Icons.preview className="mr-2 h-4 w-4"/>
-                        Preview
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem
-                        className="flex cursor-pointer items-center"
-                        onClick={() => router.push(`/evaluate/${audit.uid}`)}
-                    >
-                        <Icons.evaluate className="mr-2 h-4 w-4"/>
-                        Evaluate
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem
-                        className="flex cursor-pointer items-center"
-                        onSelect={() => setShowUpdateDialog(true)}
-                    >
-                        <Icons.fileEdit className="mr-2 h-4 w-4"/>
-                        Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
-                    <DropdownMenuItem
-                        className="flex cursor-pointer items-center text-destructive focus:text-destructive"
-                        onSelect={() => setShowDeleteAlert(true)}
-                    >
-                        <Icons.trash className="mr-2 h-4 w-4"/>
-                        Delete
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center"
+                                onSelect={() => setShowUpdateDialog(true)}
+                            >
+                                <Icons.fileEdit className="mr-2 h-4 w-4"/>
+                                Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center text-destructive focus:text-destructive"
+                                onSelect={() => setShowArchiveAlert(true)}
+                            >
+                                <Icons.archive className="mr-2 h-4 w-4"/>
+                                Archive
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem
+                                className="flex cursor-pointer items-center text-destructive focus:text-destructive"
+                                onSelect={() => setShowDeleteAlert(true)}
+                            >
+                                <Icons.trash className="mr-2 h-4 w-4"/>
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+            }
+
+            <AlertDialog open={showArchiveRestoreAlert} onOpenChange={setShowArchiveRestoreAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure you want to Restore this audit?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action can be restore.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-primary"
+                            onClick={async (event) => {
+                                event.preventDefault();
+                                setIsArchiveRestoreLoading(true)
+                                const updatedAudit = {
+                                    ...audit,
+                                    status: ""
+                                }
+                                try {
+                                    await setAudit(userId, updatedAudit);
+                                    dispatch({type: AuditActionType.UPDATE_AUDIT_RESTORE, payload: updatedAudit});
+                                    return toast({
+                                        title: "Audit updated successfully.",
+                                        description: `Your audit was updated.`,
+                                        variant: "success"
+                                    });
+
+                                } catch (error) {
+                                    // Handle the error, which could come from the setAudit
+                                    return toast({
+                                        title: "Something went wrong.",
+                                        description: "Your audit was not updated. Please try again.",
+                                        variant: "destructive",
+                                    });
+                                } finally {
+                                    setIsArchiveRestoreLoading(false)
+                                    setShowArchiveRestoreAlert(false)
+                                }
+                            }}
+                        >
+                            {isArchiveRestoreLoading ? (
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                            ) : (
+                                <Icons.archiveRestore className="mr-2 h-4 w-4"/>
+                            )}
+                            Yes
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
@@ -238,6 +403,62 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <AlertDialog open={showArchiveAlert} onOpenChange={setShowArchiveAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure you want to archive this audit?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={async (event) => {
+                                event.preventDefault();
+                                setIsArchiveLoading(true);
+
+                                const updatedAudit = {
+                                    ...audit,
+                                    status: 'archive'
+                                }
+                                try {
+                                    await setAudit(userId, updatedAudit);
+                                    dispatch({type: AuditActionType.UPDATE_AUDIT_ARCHIVE, payload: updatedAudit});
+                                    return toast({
+                                        title: "Audit updated successfully.",
+                                        description: `Your audit was updated.`,
+                                        variant: "success"
+                                    });
+
+                                } catch (error) {
+                                    // Handle the error, which could come from the setAudit
+                                    return toast({
+                                        title: "Something went wrong.",
+                                        description: "Your audit was not updated. Please try again.",
+                                        variant: "destructive",
+                                    });
+                                } finally {
+                                    setShowArchiveAlert(false)
+                                    setIsArchiveLoading(false);
+                                }
+                            }}
+                            className="bg-red-600 focus:ring-red-600"
+                        >
+                            {isArchiveLoading ? (
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                            ) : (
+                                <Icons.trash className="mr-2 h-4 w-4"/>
+                            )}
+                            <span>Archive</span>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
                 <DialogContent className="sm:max-w-[425px]">
                     <Form {...form}>
@@ -256,7 +477,7 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                                         <FormItem>
                                             <FormLabel>Name</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Audit Name" {...field} />
+                                                <Input variant="ny" placeholder="Audit Name" {...field} />
                                             </FormControl>
                                             <FormMessage/>
                                         </FormItem>
@@ -307,6 +528,53 @@ export function AuditOperations({userId, audit}: AuditOperationsProps) {
                                         <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
                                     Save changes
+                                </button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={inviteAlert} onOpenChange={setInviteAlert}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <Form {...inviteForm}>
+                        <form onSubmit={inviteForm.handleSubmit(onInviteSubmit)}>
+                            <DialogHeader>
+                                <DialogTitle>Audit invite</DialogTitle>
+                                <DialogDescription>
+                                    lorem ipsum
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-4 py-4">
+                                <FormField
+                                    control={inviteForm.control}
+                                    name="email"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input variant="ny" placeholder="Please enter email" {...field} />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <button
+                                    type="submit"
+                                    className={cn(buttonVariants({variant: "default"}), {
+                                        "cursor-not-allowed opacity-60": isInviteLoading,
+                                    })}
+                                    disabled={isInviteLoading}
+                                >
+                                    {isInviteLoading ? (
+                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                                    ) : (
+                                        <Icons.filePlus className="mr-2 h-4 w-4"/>
+                                    )}
+                                    Invite
                                 </button>
                             </DialogFooter>
                         </form>

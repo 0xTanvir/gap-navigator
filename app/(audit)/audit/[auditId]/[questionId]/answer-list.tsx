@@ -1,25 +1,21 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from "next/link"
-import {cn} from "@/lib/utils"
-import {buttonVariants} from "@/components/ui/button"
-import {Icons} from "@/components/icons"
-import {AuditEditorShell} from '../audit-editor-shell'
-import {AuditEditorHeader} from '../audit-editor-header'
-import {Question} from "@/types/dto";
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+import { Icons } from "@/components/icons"
+import { AuditEditorShell } from '../audit-editor-shell'
+import { AuditEditorHeader } from '../audit-editor-header'
+import { Question } from "@/types/dto";
 import { getQuestionById } from "@/lib/firestore/question";
-import {questionSchema} from "@/lib/validations/question";
-import * as z from "zod";
 import AnswerCreateButton from "@/app/(audit)/audit/[auditId]/[questionId]/answer-create-button";
 import AnswerItem from "@/app/(audit)/audit/[auditId]/[questionId]/answer-item";
-import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
+import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 
 interface AuditEditorProps {
     userId: string;
     auditId: string;
     questionId: string
 }
-
-type FormData = z.infer<typeof questionSchema>
 
 export default function AnswerList({auditId, questionId}: AuditEditorProps) {
     const [question, setQuestion] = useState<Question | null>(null)

@@ -14,10 +14,13 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
     const editorRef = useRef<EditorJS>()
 
     const initializeEditor = async (initialData: any) => {
-        let data: { blocks: OutputData['blocks'] } = {blocks: []};
+        let data: { time: number, blocks: OutputData['blocks'] } = {time: new Date().getTime(), blocks: []};
 
         if (initialData) {
-            data = {blocks: [...initialData]};
+            data = {
+                time: new Date().getTime(),
+                blocks: [...initialData]
+            };
         }
 
         if (!editorRef.current) {
@@ -26,6 +29,9 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
                 tools: EditorTools,
                 data: data,
                 placeholder: placeHolder || 'Let`s write your text!',
+                onReady() {
+                    editorRef.current = editor
+                },
                 onChange: async () => {
                     await editorRef.current?.save().then((outputData) => {
                         onSave(outputData.blocks);
@@ -51,6 +57,8 @@ const Editor = ({onSave, initialData, id, placeHolder}: EditorComponentProps) =>
             return () => {
                 if (editorRef.current) {
                     editorRef.current?.destroy()
+                    // @ts-ignore
+                    editorRef.current = null
                 }
             }
         }

@@ -2,8 +2,7 @@ import CheckList from "@editorjs/checklist";
 import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";
 import Embed from "@editorjs/embed";
-// import Image from "@editorjs/image";
-import Link from "@editorjs/link";
+import Image from "@editorjs/image";
 import List from "@editorjs/list";
 import Quote from "@editorjs/quote";
 import Paragraph from "@editorjs/paragraph";
@@ -18,7 +17,6 @@ import ChangeCase from 'editorjs-change-case';
 import InlineCode from '@editorjs/inline-code';
 import "@/styles/editor.css"
 
-
 export const EditorTools = {
     code: Code,
     header: {
@@ -29,10 +27,13 @@ export const EditorTools = {
         class: Paragraph,
         inlineToolbar: true
     },
-    checklist: CheckList,
+    checklist: {
+        class: CheckList,
+        inlineToolbar: true
+    },
     embed: {
         class: Embed,
-        inlineToolbar: true,
+        inlineToolbar: false,
         config: {
             services: {
                 youtube: true,
@@ -44,25 +45,53 @@ export const EditorTools = {
     },
     image: {
         class: SimpleImage,
-        inlineToolbar: true
+        inlineToolbar: false
     },
     // image: {
     //     class: Image,
-    //     // config: {
-    //     //     endpoints: {
-    //     //         byFile: 'http://localhost:3000/uploadFile', // Your backend file uploader endpoint
-    //     //         byUrl: 'http://localhost:3000/fetchUrl', // Your endpoint that provides uploading by Url
-    //     //     }
-    //     // }
+    //     config: {
+    //         uploader: {
+    //             async uploadByFile(file: any) {
+    //                 const formData = new FormData()
+    //                 formData.append('file', file)
+    //                 const response = await fetch('/api/create', {
+    //                         method: 'POST',
+    //                         headers: {
+    //                             // 'Accept': 'application.json',
+    //                             'Content-Type': 'multipart/form-data',
+    //                         },
+    //                         body: JSON.stringify(formData),
+    //                         credentials: "same-origin"
+    //                     }
+    //                 )
+    //                 const res = await response.json()
+    //                 if (res.data.success === 1) {
+    //                     return res.data
+    //                 }
+    //             },
+    //             async uploadByUrl(url: string) {
+    //                 const response = await fetch('', {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'Accept': 'application.json',
+    //                     },
+    //                     body: JSON.stringify(url),
+    //                     credentials: "same-origin"
+    //                 })
+    //                 const res = await response.json()
+    //                 if (res.data.success === 1) {
+    //                     return res.data
+    //                 }
+    //             }
+    //         }
+    //     }
     // },
     // simpleImage: {
     //     class:SimpleImage,
-    //     inlineToolbar:true
+    //     inlineToolbar:false
     // },
     link: {
         class: LinkAutocomplete,
-        // inlineToolbar: true,
-        // isInline: true
     },
     list: {
         class: List,
@@ -80,6 +109,6 @@ export const EditorTools = {
         inlineToolbar: true
     },
     strikethrough: Strikethrough,
-    changeCase:ChangeCase,
-    inlineCode:InlineCode
+    changeCase: ChangeCase,
+    inlineCode: InlineCode
 }

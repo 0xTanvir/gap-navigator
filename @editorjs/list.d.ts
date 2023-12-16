@@ -98,3 +98,5 @@ declare module '@editorjs/inline-code' {
   const InlineCode: any; // You can replace 'any' with more specific types if available
   export default InlineCode;
 }
+
+declare module 'editorjs-parser';

@@ -20,6 +20,16 @@ import { Timestamp } from "firebase/firestore";
 import { toast } from "@/components/ui/use-toast";
 import { setQuestionAnswer } from "@/lib/firestore/answer";
 import dynamic from "next/dynamic";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import useQuestions from "@/app/(audit)/audit/QuestionContext";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"),
     {
@@ -47,8 +57,25 @@ const AnswerCreateButton = ({
                             }: AnswerCreateButtonProps) => {
     const [isLoading, setIsLoading] = React.useState<boolean>(false)
     const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
-
     const [isTyping, setIsTyping] = useState<boolean>(false);
+
+    const {questions} = useQuestions()
+
+    let questionIndex = questions.findIndex(question => question.uid === questionId);
+
+    let allQuestions: any[] = [];
+
+    if (questionIndex !== -1) {
+        allQuestions = [...questions]; // Create a copy of the original array
+        // Remove elements from index 0 to the found index
+        allQuestions.splice(0, questionIndex + 1);
+    }
+
+    let questionsData = allQuestions?.filter(question => question.uid !== questionId).map(item => ({
+        name: item.name,
+        uid: item.uid
+    }))
+
     const handleEditorSave = (data: any) => {
         setIsTyping(true);
         setTimeout(() => {
@@ -68,6 +95,7 @@ const AnswerCreateButton = ({
         resolver: zodResolver(answerSchema),
         defaultValues: {
             name: '',
+            questionId: '',
             recommendationDocument: ''
         },
     })
@@ -77,6 +105,7 @@ const AnswerCreateButton = ({
         const newAnswer = {
             uid: uuidv4(),
             name: data.name,
+            questionId: data.questionId ? data.questionId : '',
             recommendationDocument: data.recommendationDocument,
             createdAt: Timestamp.now()
         }
@@ -139,6 +168,45 @@ const AnswerCreateButton = ({
                                 />
 
                             </div>
+
+                            <div className="grid gap-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="questionId"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Question Name</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select an question Name"/>
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Select a question Name</SelectLabel>
+                                                        {
+                                                            questionsData.map((question) => (
+                                                                <SelectItem
+                                                                    key={question.uid}
+                                                                    value={question.uid}
+                                                                >
+                                                                    {question.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
                             <div className="grid gap-4 py-4">
                                 <FormField
                                     control={form.control}

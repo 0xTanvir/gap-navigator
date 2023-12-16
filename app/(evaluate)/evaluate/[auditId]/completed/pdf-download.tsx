@@ -8,6 +8,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts"
 import { generateRandomText } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import htmlToPdfmake from "html-to-pdfmake"
+import edjsParser from "editorjs-parser";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -15,6 +17,7 @@ const PdfDownload = () => {
     const {evaluation} = useEvaluation()
     const {uid} = evaluation
     const router = useRouter()
+    const parser = new edjsParser();
 
 
     function evaluateFormat() {
@@ -69,13 +72,16 @@ const PdfDownload = () => {
             let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
                 .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
 
-            reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+            // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
 
             let data = {
                 blocks: reportData
             };
 
-            let docContent = await pdfGenerator(data); // Await the async function
+            const markup = parser.parse(data);
+            let html = htmlToPdfmake(markup)
+
+            // let docContent = await pdfGenerator(data); // Await the async function
 
             const docDefinition: TDocumentDefinitions = {
                 header: {
@@ -104,7 +110,8 @@ const PdfDownload = () => {
                     producer: 'Gap Navigator',
                 },
                 content: [
-                    ...(docContent.content as Content []),
+                    html
+                    // ...(docContent.content as Content []),
                 ],
             };
             const createPdf = () => {

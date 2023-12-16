@@ -29,6 +29,16 @@ import * as z from "zod";
 import { Answer } from "@/types/dto";
 import dynamic from "next/dynamic";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import useQuestions from "@/app/(audit)/audit/QuestionContext";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"),
     {
@@ -68,8 +78,25 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false)
     const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
     const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false)
-
     const [isTyping, setIsTyping] = useState<boolean>(false);
+
+    const {questions} = useQuestions()
+
+    let questionIndex = questions.findIndex(question => question.uid === questionId);
+
+    let allQuestions: any[] = [];
+
+    if (questionIndex !== -1) {
+        allQuestions = [...questions]; // Create a copy of the original array
+        // Remove elements from index 0 to the found index
+        let removedQuestions = allQuestions.splice(0, questionIndex + 1);
+    }
+
+    let questionsData = allQuestions?.filter(question => question.uid !== questionId).map(item => ({
+        name: item.name,
+        uid: item.uid
+    }))
+
     const handleEditorSave = (data: any) => {
         setIsTyping(true);
         setTimeout(() => {
@@ -89,6 +116,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
         resolver: zodResolver(answerSchema),
         defaultValues: {
             name: answer.name,
+            questionId: answer?.questionId ? answer?.questionId : "",
             recommendationDocument: answer.recommendationDocument
         },
     })
@@ -98,6 +126,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
         const updateAnswer = {
             uid: answer.uid,
             name: data.name,
+            questionId: data.questionId ? data.questionId : '',
             recommendationDocument: data.recommendationDocument,
             createdAt: answer.createdAt
         }
@@ -218,6 +247,41 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                                                     placeholder="Answer Name" {...field}
                                                 />
                                             </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="questionId"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Question Name</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select an question Name"/>
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Select a question Name</SelectLabel>
+                                                        {
+                                                            questionsData.map((question) => (
+                                                                <SelectItem
+                                                                    key={question.uid}
+                                                                    value={question.uid}
+                                                                >
+                                                                    {question.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        }
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
                                             <FormMessage/>
                                         </FormItem>
                                     )}
