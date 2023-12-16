@@ -26,7 +26,7 @@ interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
 
 type FormData = z.infer<typeof userAuthSignupSchema>
 
-export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
+export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
     const provider = new GoogleAuthProvider()
     const auth = getAuth()
     const router = useRouter()
@@ -35,7 +35,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<FormData>({
         resolver: zodResolver(userAuthSignupSchema),
     })
@@ -105,7 +105,7 @@ export function UserAuthSignup({ className, ...props }: UserAuthSignupProps) {
     }
 
     if (user) {
-        return router.push("/")
+        router.push("/")
     }
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
