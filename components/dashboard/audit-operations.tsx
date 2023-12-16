@@ -62,6 +62,7 @@ import { getUserByEmail, updateUserById } from "@/lib/firestore/user";
 import { setNotificationData } from "@/lib/firestore/notification";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
+import { siteConfig } from "@/config/site";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -188,6 +189,26 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                     inviteUser.invitedAuditsList.push(audit.uid)
                     await updateUserById(inviteUser.uid, inviteUser)
                     dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+                    let requestBody = {
+                        inviterEmail: inviteUser.email,
+                        inviterFirstName: inviteUser.firstName,
+                        receiverEmail: inviteUser.email,
+                        receiverFirstName: inviteUser.firstName,
+                        auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+                    }
+                    const response = await fetch('/api/mailer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody),
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                    } else {
+                        const error = await response.json();
+                        console.error('Error sending email:', error);
+                    }
                     return toast({
                         title: "Audit invited successfully.",
                         description: `Your audit was updated.`,

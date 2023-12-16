@@ -41,6 +41,7 @@
     "@react-email/render": "^0.0.9",
     "@sendgrid/mail": "^7.7.0",
     "@sotaproject/strikethrough": "^1.0.1",
+    "@tanstack/react-table": "^8.10.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "editorjs-parser": "^1.5.3",

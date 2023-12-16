@@ -9,6 +9,7 @@ export const siteConfig: SiteConfig = {
     stitchedName: "GapNavigator",
     description: "Simplify Audits, Empower Decisions",
     emailFrom: "team@gapnavigator.com",
+    url: "http://localhost:3000",
     links: {
         twitter: "https://twitter.com/#",
         github: "https://github.com/#",
