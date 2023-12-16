@@ -190,7 +190,7 @@ const AnswerOperations = ({auditId, questionId, answerId, singleQuestionFetch, a
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure you want to delete this audit?
+                            Are you sure you want to delete this answer?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone.
