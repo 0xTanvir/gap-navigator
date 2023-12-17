@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
-import {useAuth} from "@/components/auth/auth-provider";
+import { useAuth } from "@/components/auth/auth-provider";
 
 interface UserAuthResetPasswordProps extends React.HTMLAttributes<HTMLDivElement> {
 }
@@ -49,7 +49,7 @@ const UserAuthResetPassword = ({className, ...props}: UserAuthResetPasswordProps
     }
 
     if (user) {
-        return router.push("/")
+        router.push("/")
     }
 
     return (

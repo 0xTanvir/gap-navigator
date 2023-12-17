@@ -84,7 +84,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
     }
 
     if (user) {
-        return router.push("/")
+        router.push("/")
     }
 
     return (
