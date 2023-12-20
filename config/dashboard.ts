@@ -69,10 +69,25 @@ export const clientDashboardConfig: DashboardConfig = {
             href: "/audits",
             icon: "audit",
         },
-        // {
-        //     title: "Evaluations",
-        //     href: "/evaluations",
-        //     icon: "evaluate",
-        // },
+    ],
+}
+export const adminDashboardConfig: DashboardConfig = {
+    mainNav: [],
+    sidebarNav: [
+        {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: "layoutDashboard",
+        },
+        {
+            title: "Audits",
+            href: "/audits",
+            icon: "audit",
+        },
+        {
+            title: "Clients",
+            href: "/clients",
+            icon: "users",
+        },
     ],
 }

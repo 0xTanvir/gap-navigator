@@ -1,16 +1,18 @@
 import {
-    getDocs,
-    setDoc,
-    deleteDoc,
-    updateDoc,
-    arrayUnion,
     arrayRemove,
-    where,
-    query,
+    arrayUnion,
+    deleteDoc,
     getDoc,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    setDoc,
+    updateDoc,
+    where
 } from "firebase/firestore";
 import { Collections } from "./client";
-import { Audit, Audits, Question } from "@/types/dto";
+import { Audit, Audits } from "@/types/dto";
 
 export async function getAuditsByIds(userAuditsId: string[], status: string = ""): Promise<Audits> {
     if (userAuditsId.length > 0) {
@@ -85,4 +87,28 @@ export async function getAudit(auditId: string) {
     const result = Collections.audit(auditId);
     const snap = await getDoc(result);
     return snap.data() as Audit;
+}
+
+export async function getAudits(pageSize: number = 10): Promise<Audits> {
+    const auditsCollectionRef = Collections.audits();
+    let q = query(auditsCollectionRef, orderBy("createdAt", 'asc'), limit(pageSize))
+
+    const querySnapshots = await getDocs(q);
+
+    // If no audits are found, return an empty array instead of rejecting.
+    if (querySnapshots.empty) {
+        return [];
+    }
+    return querySnapshots.docs.map((doc) => {
+        const data = doc.data();
+        return {
+            uid: doc.id,
+            name: data.name,
+            type: data.type,
+            exclusiveList: data.exclusiveList ? data.exclusiveList : [],
+            status: data.status ? data.status : "",
+            authorId: data.authorId,
+            createdAt: data.createdAt,
+        } as Audit;
+    });
 }
