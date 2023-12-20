@@ -74,7 +74,12 @@ const UserList = ({auditId}: UserListProps) => {
                     <div className="divide-y divide-border rounded-md border mt-8">
                         {
                             users.map((user) =>
-                                <UserItem key={user.uid} user={user} auditId={auditId}/>
+                                <UserItem
+                                    key={user.uid}
+                                    user={user}
+                                    auditId={auditId}
+                                    setUsers={setUsers}
+                                />
                             )
                         }
                     </div>

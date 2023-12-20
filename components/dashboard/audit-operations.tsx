@@ -184,36 +184,39 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                         isSeen: false,
                         createdAt: Timestamp.now(),
                     }
-                    await setAudit(userId, formattedAudit);
-                    await setNotificationData(inviteUser.uid, notificationData)
-                    inviteUser.invitedAuditsList.push(audit.uid)
-                    await updateUserById(inviteUser.uid, inviteUser)
-                    dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
-                    let requestBody = {
-                        inviterEmail: inviteUser.email,
-                        inviterFirstName: inviteUser.firstName,
-                        receiverEmail: inviteUser.email,
-                        receiverFirstName: inviteUser.firstName,
-                        auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+                    let isSuccess = await setNotificationData(inviteUser.uid, notificationData)
+                    if (isSuccess) {
+                        await setAudit(userId, formattedAudit);
+                        inviteUser.invitedAuditsList.push(audit.uid)
+                        await updateUserById(inviteUser.uid, inviteUser)
+                        dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+                        let requestBody = {
+                            inviterEmail: inviteUser.email,
+                            inviterFirstName: inviteUser.firstName,
+                            receiverEmail: inviteUser.email,
+                            receiverFirstName: inviteUser.firstName,
+                            auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+                        }
+                        const response = await fetch('/api/mailer', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestBody),
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                        } else {
+                            const error = await response.json();
+                            console.error('Error sending email:', error);
+                        }
+                        return toast({
+                            title: "Audit invited successfully.",
+                            description: `Your audit was updated.`,
+                            variant: "success"
+                        });
                     }
-                    const response = await fetch('/api/mailer', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestBody),
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                    } else {
-                        const error = await response.json();
-                        console.error('Error sending email:', error);
-                    }
-                    return toast({
-                        title: "Audit invited successfully.",
-                        description: `Your audit was updated.`,
-                        variant: "success"
-                    });
+
                 } else {
                     return toast({
                         title: "Already audit invited.",
@@ -306,8 +309,8 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                                         className="flex cursor-pointer items-center"
                                         onClick={() => router.push(`/${audit?.uid}`)}
                                     >
-                                        <Icons.user className="mr-2 h-4 w-4"/>
-                                        Audit Invited User List
+                                        <Icons.users className="mr-2 h-4 w-4"/>
+                                        Tag list
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
                                 </>

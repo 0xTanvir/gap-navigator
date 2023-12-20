@@ -86,3 +86,26 @@ export async function getAudit(auditId: string) {
     const snap = await getDoc(result);
     return snap.data() as Audit;
 }
+
+export async function updateAuditUser(userId: string, auditId: string) {
+    const auditRef = Collections.audit(auditId);
+    const userRef = Collections.userAudits(userId);
+    try {
+        await updateDoc(auditRef, {
+            exclusiveList: arrayRemove(userId),
+        });
+        await updateDoc(userRef, {
+            invitedAuditsList: arrayRemove(auditId),
+        });
+        return true
+    } catch (error) {
+        // Check if the error is an instance of Error and throw it directly if so
+        if (error instanceof Error) {
+            throw error;
+        }
+        // Otherwise, throw a new Error with a default or generic message
+        // or convert the unknown error to string if possible
+        throw new Error("An error occurred while deleting the audit.");
+    }
+
+}
