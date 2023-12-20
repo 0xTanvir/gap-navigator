@@ -154,7 +154,7 @@ export default function EvaluateQuestionPage({
                                             {question.answers.map((answer, index) => (
                                                 <FormItem
                                                     key={answer.uid}
-                                                    className={`cursor-pointer rounded-lg border p-3 shadow-sm focus:outline-none grid grid-cols-12 space-x-3 space-y-0 w-full ${
+                                                    className={`rounded-lg border shadow-sm focus:outline-none grid grid-cols-12 space-x-0 space-y-0 w-full ${
                                                         form.getValues("answerId") === answer.uid
                                                             ? "border-indigo-600 ring-2 ring-indigo-600"
                                                             : "border-gray-300"
@@ -164,14 +164,15 @@ export default function EvaluateQuestionPage({
                                                         <RadioGroupItem value={answer.uid}/>
                                                     </FormControl>
                                                     <FormLabel
-                                                        className="font-normal block text-sm cursor-pointer col-span-11">
+                                                        className="font-normal block text-sm cursor-pointer col-span-11 py-2.5 px-1.5">
                                                         {index + 1 + ". "}
                                                         {answer.name}
                                                     </FormLabel>
 
                                                     {/* Custom check icon */}
                                                     {form.getValues("answerId") === answer.uid && (
-                                                        <div className="text-green-500 col-span-1 flex justify-end">
+                                                        <div
+                                                            className="text-green-500 col-span-1 grid place-content-center mr-0.5">
                                                             {/* Replace the content below with your custom check icon */}
                                                             <Icons.checkCircle2 size={20}/>
                                                         </div>

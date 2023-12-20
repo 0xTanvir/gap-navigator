@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -48,9 +48,11 @@ const UserAuthResetPassword = ({className, ...props}: UserAuthResetPasswordProps
             })
     }
 
-    if (user) {
-        router.push("/")
-    }
+    useEffect(() => {
+        if (user) {
+            router.push("/")
+        }
+    }, [])
 
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
