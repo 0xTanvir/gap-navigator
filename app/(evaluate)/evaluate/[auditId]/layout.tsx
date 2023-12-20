@@ -41,43 +41,52 @@ export default function DocsLayout({children}: DocsLayoutProps) {
                 const questions = await getQuestionsById(auditId);
                 const sideBarNav = getSidebarNav(audit, questions);
                 let evaluate = {} as Evaluate;
-                if (isAuthenticated) {
-                    // public, private, exclusive
-                    // use case for audit.type
-                    switch (audit.type) {
-                        case "public":
-                            toast({
-                                variant: "success",
-                                description: `you are authenticated and audit is public so you can do it.`,
-                            });
-                            break;
-                        case "private":
-                            if (user?.role === "consultant") {
+                if (!loading) {
+                    if (isAuthenticated) {
+                        // public, private, exclusive
+                        // use case for audit.type
+                        switch (audit.type) {
+                            case "public":
                                 toast({
                                     variant: "success",
-                                    description: `you are authenticated and audit is private so you can do it.`,
+                                    description: `you are authenticated and audit is public so you can do it.`,
                                 });
-                            } else {
-                                toast({
-                                    variant: "error",
-                                    description: `You do not have access to this evaluation. please ask your consultant to give you access.`,
-                                });
-                                router.push("/");
-                                return;
-                            }
-                            break;
-                        case "exclusive":
-                            if (user?.role === "consultant") {
-                                toast({
-                                    variant: "success",
-                                    description: `you are authenticated and audit is exclusive so you can do it.`,
-                                });
-                            } else if (user?.role === "client") {
-                                if (audit.exclusiveList?.includes(user?.uid)) {
+                                break;
+                            case "private":
+                                if (user?.role === "consultant") {
                                     toast({
                                         variant: "success",
-                                        description: `you are authenticated client and audit is exclusive so you can do it.`,
+                                        description: `you are authenticated and audit is private so you can do it.`,
                                     });
+                                } else {
+                                    toast({
+                                        variant: "error",
+                                        description: `You do not have access to this evaluation. please ask your consultant to give you access.`,
+                                    });
+                                    router.push("/");
+                                    return;
+                                }
+                                break;
+                            case "exclusive":
+                                if (user?.role === "consultant") {
+                                    toast({
+                                        variant: "success",
+                                        description: `you are authenticated and audit is exclusive so you can do it.`,
+                                    });
+                                } else if (user?.role === "client") {
+                                    if (audit.exclusiveList?.includes(user?.uid)) {
+                                        toast({
+                                            variant: "success",
+                                            description: `you are authenticated client and audit is exclusive so you can do it.`,
+                                        });
+                                    } else {
+                                        toast({
+                                            variant: "error",
+                                            description: `You do not have access to this evaluation.`,
+                                        });
+                                        router.push("/");
+                                        return;
+                                    }
                                 } else {
                                     toast({
                                         variant: "error",
@@ -86,32 +95,25 @@ export default function DocsLayout({children}: DocsLayoutProps) {
                                     router.push("/");
                                     return;
                                 }
-                            } else {
-                                toast({
-                                    variant: "error",
-                                    description: `You do not have access to this evaluation.`,
-                                });
-                                router.push("/");
-                                return;
-                            }
-                            break;
-                    }
-                } else {
-                    if (audit.type === "public") {
-                        // User is unauthenticated but audit is public
-                        // so we can do it continue and show the popup
-                        // for first name, last name, and email
-                        toast({
-                            variant: "success",
-                            description: `you are unauthenticated but audit is public so you can do it.`,
-                        });
+                                break;
+                        }
                     } else {
-                        toast({
-                            variant: "error",
-                            description: `You must be logged in to view this evaluation.`,
-                        });
-                        router.push("/login");
-                        return;
+                        if (audit.type === "public") {
+                            // User is unauthenticated but audit is public
+                            // so we can do it continue and show the popup
+                            // for first name, last name, and email
+                            toast({
+                                variant: "success",
+                                description: `you are unauthenticated but audit is public so you can do it.`,
+                            });
+                        } else {
+                            toast({
+                                variant: "error",
+                                description: `You must be logged in to view this evaluation.`,
+                            });
+                            router.push("/login");
+                            return;
+                        }
                     }
                 }
 
@@ -141,7 +143,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
         } else {
             setEvaluateLoading(false);
         }
-    }, [auditId]);
+    }, [auditId, loading]);
 
     let content: any;
     let childrenContent: any;

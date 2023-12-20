@@ -39,7 +39,7 @@ import {
     ScanEye,
     ClipboardCheck,
     Copy,
-    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore,
+    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore, Circle,
 } from "lucide-react"
 
 export const Icons = {
@@ -84,6 +84,7 @@ export const Icons = {
     copy: Copy,
     save: Save,
     checkCircle2: CheckCircle2,
+    circle: Circle,
     notificationOff:Bell,
     notificationRing:BellRing,
     archive:Archive,

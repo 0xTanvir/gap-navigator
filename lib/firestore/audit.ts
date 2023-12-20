@@ -10,7 +10,7 @@ import {
     getDoc,
 } from "firebase/firestore";
 import { Collections } from "./client";
-import { Audit, Audits, Question } from "@/types/dto";
+import { Audit, Audits } from "@/types/dto";
 
 export async function getAuditsByIds(userAuditsId: string[], status: string = ""): Promise<Audits> {
     if (userAuditsId.length > 0) {
@@ -85,4 +85,27 @@ export async function getAudit(auditId: string) {
     const result = Collections.audit(auditId);
     const snap = await getDoc(result);
     return snap.data() as Audit;
+}
+
+export async function updateAuditUser(userId: string, auditId: string) {
+    const auditRef = Collections.audit(auditId);
+    const userRef = Collections.userAudits(userId);
+    try {
+        await updateDoc(auditRef, {
+            exclusiveList: arrayRemove(userId),
+        });
+        await updateDoc(userRef, {
+            invitedAuditsList: arrayRemove(auditId),
+        });
+        return true
+    } catch (error) {
+        // Check if the error is an instance of Error and throw it directly if so
+        if (error instanceof Error) {
+            throw error;
+        }
+        // Otherwise, throw a new Error with a default or generic message
+        // or convert the unknown error to string if possible
+        throw new Error("An error occurred while deleting the audit.");
+    }
+
 }
