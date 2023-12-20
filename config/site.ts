@@ -4,12 +4,14 @@ import {
     FAQs,
 } from "@/types"
 
+export const url = process.env.NODE_ENV === 'development' ? "http://localhost:3000" : "https://gap-navigator.vercel.app";
+
 export const siteConfig: SiteConfig = {
     name: "Gap Navigator",
     stitchedName: "GapNavigator",
     description: "Simplify Audits, Empower Decisions",
     emailFrom: "team@gapnavigator.com",
-    url: "http://localhost:3000",
+    url: url,
     links: {
         twitter: "https://twitter.com/#",
         github: "https://github.com/#",
@@ -22,6 +24,7 @@ export enum AccountType {
     Client = 'client',
     Consultant = 'consultant',
 }
+
 
 export const siteFooterConfig: SiteFooterConfig = {
     solutions: [

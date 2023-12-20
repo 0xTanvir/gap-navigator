@@ -62,7 +62,7 @@ import { getUserByEmail, updateUserById } from "@/lib/firestore/user";
 import { setNotificationData } from "@/lib/firestore/notification";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
-import { siteConfig } from "@/config/site";
+import { siteConfig, url } from "@/config/site";
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
     try {
@@ -265,7 +265,23 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                         <DropdownMenuContent align="end">
                             {audit.type === "public" && (
                                 <>
-                                    <DropdownMenuItem className="flex cursor-pointer items-center">
+                                    <DropdownMenuItem
+                                        className="flex cursor-pointer items-center"
+                                        onClick={() => {
+                                            let shareURL = url + `/audits/${audit.uid}`
+                                            navigator.clipboard.writeText(shareURL).then(() => {
+                                                    toast({
+                                                        title: 'Audit link copy!',
+                                                        description: `Audit url : ${shareURL}`,
+                                                        variant: "success"
+                                                    })
+                                                },
+                                                (err) => {
+                                                    console.error(err);
+                                                }
+                                            );
+                                        }}
+                                    >
                                         <Icons.copy className="mr-2 h-4 w-4"/>
                                         Share Audit
                                     </DropdownMenuItem>
