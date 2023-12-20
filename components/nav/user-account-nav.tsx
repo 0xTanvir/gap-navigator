@@ -44,10 +44,12 @@ export function UserAccountNav({ name, image, email, logOut }: UserAccountNavPro
         </div>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
+        <Link href="/settings">
+        <DropdownMenuItem className="cursor-pointer">
           <Icons.user2 className="mr-2 h-4 w-4" />
-          <Link href="/settings">Profile</Link>
+          Profile
         </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem>
           <Icons.creditCard className="mr-2 h-4 w-4" />
           <span>Billing</span>
