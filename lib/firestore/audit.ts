@@ -10,7 +10,7 @@ import {
     getDoc,
 } from "firebase/firestore";
 import { Collections } from "./client";
-import { Audit, Audits, Question } from "@/types/dto";
+import { Audit, Audits } from "@/types/dto";
 
 export async function getAuditsByIds(userAuditsId: string[], status: string = ""): Promise<Audits> {
     if (userAuditsId.length > 0) {

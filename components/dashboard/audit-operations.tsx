@@ -300,6 +300,18 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                                     <DropdownMenuSeparator/>
                                 </>
                             )}
+                            {audit.type === "exclusive" && (
+                                <>
+                                    <DropdownMenuItem
+                                        className="flex cursor-pointer items-center"
+                                        onClick={() => router.push(`/${audit?.uid}`)}
+                                    >
+                                        <Icons.user className="mr-2 h-4 w-4"/>
+                                        Audit Invited User List
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator/>
+                                </>
+                            )}
                             <DropdownMenuItem
                                 className="flex cursor-pointer items-center"
                                 onClick={() => router.push(`/preview/${audit.uid}`)}
