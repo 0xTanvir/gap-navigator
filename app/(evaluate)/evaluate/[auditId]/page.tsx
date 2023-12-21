@@ -4,10 +4,8 @@ import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/components/auth/auth-provider";
 import {
     Dialog,
     DialogContent,
@@ -32,10 +30,9 @@ import { Icons } from "@/components/icons";
 import { evaluateParticipant } from "@/lib/validations/question";
 import * as z from "zod";
 
-import { Evaluate, EvaluationActionType } from "@/types/dto";
+import { EvaluationActionType } from "@/types/dto";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { getEvaluationById, setEvaluation } from "@/lib/firestore/evaluation";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -47,7 +44,6 @@ export default function EvaluatePage({
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const {evaluation, dispatch} = useEvaluation();
-    const {user, loading, isAuthenticated} = useAuth();
     const router = useRouter();
     const {auditId} = params;
 
@@ -79,7 +75,7 @@ export default function EvaluatePage({
             setShowDialog(false);
             if (evaluation.questions.length > 0) {
                 router.push(
-                    `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
+                    `/evaluate/${auditId}/${evaluation.questions[0]?.uid}`
                 );
             }
             toast({
@@ -99,61 +95,6 @@ export default function EvaluatePage({
                 );
             }
         }
-
-        // try {
-        //     // First fetch evaluation from firestore
-        //     // if evaluation exist then populate it to state
-        //     // else create new evaluation at firestore and populate it to state
-        //     let evaluate = await getEvaluationById(auditId, data.participantEmail);
-        //     if (evaluate) {
-        //         // Save it to state and redirect to first question
-        //         dispatch({
-        //             type: EvaluationActionType.ADD_EVALUATE,
-        //             payload: evaluate,
-        //         });
-        //         form.reset();
-        //         setShowDialog(false);
-        //         if (evaluation.questions.length > 0) {
-        //             router.push(
-        //                 `/evaluate/${params.auditId}/${evaluation.evaluate?.runningStatus}`
-        //             );
-        //         }
-        //     } else {
-        //         // Create new evaluation and save it to state and redirect to first question
-        //         evaluate = {
-        //             uid: data.participantEmail,
-        //             participantFirstName: data.participantFirstName,
-        //             participantLastName: data.participantLastName,
-        //             participantEmail: data.participantEmail,
-        //             // runningStatus: evaluation?.questions[0]?.uid,
-        //         };
-        //
-        //         await setEvaluation(auditId, evaluate);
-        //         dispatch({
-        //             type: EvaluationActionType.ADD_EVALUATE,
-        //             payload: evaluate,
-        //         });
-        //         toast({
-        //             title: "Evaluation created successfully.",
-        //             description: `Your evaluation was created with id ${evaluate.uid}.`,
-        //         });
-        //         form.reset();
-        //         setShowDialog(false);
-        //         if (evaluation.questions.length > 0) {
-        //             router.push(
-        //                 `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
-        //             );
-        //         }
-        //     }
-        // } catch (error) {
-        //     toast({
-        //         title: "Something went wrong.",
-        //         description: "Your evaluation was not created. Please try again.",
-        //         variant: "destructive",
-        //     });
-        // } finally {
-        //     setIsLoading(false);
-        // }
     }
 
     return (
@@ -174,30 +115,15 @@ export default function EvaluatePage({
                     Total {evaluation.questions.length}
                     {evaluation.questions.length >= 2 ? " Questions" : " Question"}
                 </EmptyPlaceholder.Title>
-                {user && user.role == "client" ? (
-                    <Button
-                        size="xl"
-                        className="mt-8 text-sm font-semibold rounded-full"
-                        asChild
-                    >
-                        {evaluation.questions.length > 0 && (
-                            <Link
-                                className="flex-none"
-                                href={`/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`}
-                            >
-                                Lets Get Started
-                            </Link>
-                        )}
-                    </Button>
-                ) : (
-                    <Button
-                        size="xl"
-                        className="mt-8 text-sm font-semibold rounded-full"
-                        onClick={() => setShowDialog(true)}
-                    >
-                        Lets Get Started
-                    </Button>
-                )}
+
+                <Button
+                    size="xl"
+                    className="mt-8 text-sm font-semibold rounded-full"
+                    onClick={() => setShowDialog(true)}
+                >
+                    Lets Get Started
+                </Button>
+
             </EmptyPlaceholder>
 
             <Dialog open={showDialog} onOpenChange={setShowDialog}>

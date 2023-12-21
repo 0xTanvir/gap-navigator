@@ -19,6 +19,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPas
 import Link from "next/link";
 import { AccountType } from "@/config/site";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useEffect } from "react";
 
 
 interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -104,9 +105,11 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
         setIsGoogleLoading(false)
     }
 
-    if (user) {
-        router.push("/")
-    }
+    useEffect(() => {
+        if (user) {
+            router.push("/")
+        }
+    }, [])
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
             <div className=" px-6 py-12 shadow-xl mx-2 md:mx-0 sm:rounded-lg sm:px-12 border">

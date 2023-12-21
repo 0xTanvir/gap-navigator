@@ -1,4 +1,4 @@
-import { getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
+import { getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -28,6 +28,35 @@ export async function getUserById(id: string): Promise<User> {
         return user
     } else {
         return Promise.reject(Error(`No such user: ${id}`))
+    }
+}
+
+export async function getUserByIds(usersId: string[]): Promise<User[]> {
+    if (usersId.length > 0) {
+        const usersCollectionRef = Collections.users();
+        const q = query(usersCollectionRef, where("uid", "in", usersId));
+
+        const querySnapshot = await getDocs(q);
+
+        // If no audits are found, return an empty array instead of rejecting.
+        if (querySnapshot.empty) {
+            return [];
+        }
+        return querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                uid: doc.id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                role: data.role,
+                image: data.image,
+                audits: data.audits,
+                invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
+            } as User;
+        })
+    } else {
+        return [];
     }
 }
 

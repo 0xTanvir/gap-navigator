@@ -93,37 +93,54 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
 
                 <DropdownMenuSeparator/>
 
-                <DropdownMenuItem>
-                    <Icons.layoutDashboard className="mr-2 h-4 w-4"/>
-                    <Link href="/dashboard">Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Icons.audit className="mr-2 h-4 w-4"/>
-                    <Link href="/audits">Audits</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Icons.users className="mr-2 h-4 w-4"/>
-                    <Link href="/clients">Clients</Link>
-                </DropdownMenuItem>
+                <Link href="/dashboard">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <Icons.layoutDashboard className="mr-2 h-4 w-4"/>
+                        Dashboard
+                    </DropdownMenuItem>
+                </Link>
+                <Link href="/audits">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <Icons.audit className="mr-2 h-4 w-4"/>
+                        Audits
+                    </DropdownMenuItem>
+                </Link>
+                {
+                    user?.role === 'consultant' && (
+                        <Link href="/clients">
+                            <DropdownMenuItem className="cursor-pointer">
+                                <Icons.users className="mr-2 h-4 w-4"/>
+                                Clients
+                            </DropdownMenuItem>
+                        </Link>
+                    )
+                }
 
-                <DropdownMenuItem onClick={notificationAlertUpdate}>
-                    {
-                        notificationAlert ?
-                            <Icons.notificationRing fill="blue" stroke="blue" className="mr-2 h-4 w-4"/> :
-                            <Icons.notificationOff className="mr-2 h-4 w-4"/>
-                    }
-                    <Link href="/notification">Notification</Link>
-                </DropdownMenuItem>
+
+                <Link href="/notification">
+                    <DropdownMenuItem onClick={notificationAlertUpdate} className="cursor-pointer">
+                        {
+                            notificationAlert ?
+                                <Icons.notificationRing fill="blue" stroke="blue" className="mr-2 h-4 w-4"/> :
+                                <Icons.notificationOff className="mr-2 h-4 w-4"/>
+                        }
+                        Notification
+                    </DropdownMenuItem>
+                </Link>
 
                 <DropdownMenuSeparator/>
-                <DropdownMenuItem>
-                    <Icons.helpingHand className="mr-2 h-4 w-4"/>
-                    <Link href="faqs">Help</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Icons.lifeBuoy className="mr-2 h-4 w-4"/>
-                    <Link href="/contact">Support</Link>
-                </DropdownMenuItem>
+                <Link href="faqs">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <Icons.helpingHand className="mr-2 h-4 w-4"/>
+                        Help
+                    </DropdownMenuItem>
+                </Link>
+                <Link href="/contact">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <Icons.lifeBuoy className="mr-2 h-4 w-4"/>
+                        Support
+                    </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem
                     className="cursor-pointer"

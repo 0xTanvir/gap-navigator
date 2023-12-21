@@ -2,6 +2,8 @@ import React from 'react';
 import Link from "next/link";
 import { Notification } from "@/types/dto";
 import { updateNotificationById } from "@/lib/firestore/notification";
+import { dateFormat, formatDate } from "@/lib/utils";
+import { Icons } from "@/components/icons";
 
 interface NotificationItemProps {
     notification: Notification
@@ -28,7 +30,15 @@ const NotificationItem = ({notification}: NotificationItemProps) => {
                         {notification.auditName}
                     </Link>
                 </div>
+                <div>
+                    <p className="flex text-sm text-muted-foreground">
+                        {dateFormat(notification?.createdAt as any)}
+                    </p>
+                </div>
             </div>
+            {
+                !notification.isSeen && <Icons.circle fill="blue" stroke="blue" className="mr-2"/>
+            }
         </div>
     );
 };

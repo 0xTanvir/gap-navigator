@@ -15,7 +15,8 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth"
 import Link from "next/link";
-import {useAuth} from "@/components/auth/auth-provider";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useEffect } from "react";
 
 
 interface UserAuthLoginProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,7 +24,7 @@ interface UserAuthLoginProps extends React.HTMLAttributes<HTMLDivElement> {
 
 type FormData = z.infer<typeof userAuthLoginSchema>
 
-export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
+export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
     const provider = new GoogleAuthProvider()
     const auth = getAuth()
     const router = useRouter()
@@ -33,7 +34,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<FormData>({
         resolver: zodResolver(userAuthLoginSchema),
     })
@@ -83,9 +84,11 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
         setIsGoogleLoading(false)
     }
 
-    if (user) {
-        router.push("/")
-    }
+    useEffect(() => {
+        if (user) {
+            router.push("/")
+        }
+    }, [])
 
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Audit } from "@/types/dto";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ClientAuditItemProps {
     audit: Audit
@@ -22,5 +23,15 @@ const ClientAuditItem = ({audit}: ClientAuditItemProps) => {
         </div>
     );
 };
+
+ClientAuditItem.Skeleton = function clientAuditItemSkeleton() {
+    return (
+        <div className="p-4">
+            <div className="space-y-3">
+                <Skeleton className="h-5 w-full"/>
+            </div>
+        </div>
+    )
+}
 
 export default ClientAuditItem;

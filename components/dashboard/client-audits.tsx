@@ -5,6 +5,8 @@ import { Audits } from "@/types/dto";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import ClientAuditItem from "@/components/dashboard/client-audit-item";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
+import { toast } from "@/components/ui/use-toast";
 
 const ClientAudits = () => {
     const [audits, setAudits] = useState<Audits | []>([])
@@ -13,15 +15,24 @@ const ClientAudits = () => {
 
     useEffect(() => {
         async function fetchAuditsEvaluation() {
-            if (user?.invitedAuditsList) {
-                let dbAudits = await getAuditsByIds(user?.invitedAuditsList)
-                setAudits(dbAudits)
+            try {
+                if (user?.invitedAuditsList) {
+                    let dbAudits = await getAuditsByIds(user?.invitedAuditsList)
+                    setAudits(dbAudits)
+                }
+            } catch (err) {
+                toast({
+                    title: "Something went wrong.",
+                    description: "Failed to fetch audits. Please try again.",
+                    variant: "destructive",
+                })
+            } finally {
                 setIsLoading(false)
             }
         }
 
         fetchAuditsEvaluation()
-    }, [])
+    }, [user?.invitedAuditsList])
 
     if (isLoading) {
         return <>
@@ -47,7 +58,13 @@ const ClientAudits = () => {
                             </div>
                         )
                         : (
-                            <div>No audit found.</div>
+                            <EmptyPlaceholder className="mt-3">
+                                <EmptyPlaceholder.Icon name="audit"/>
+                                <EmptyPlaceholder.Title>No audit found</EmptyPlaceholder.Title>
+                                <EmptyPlaceholder.Description>
+                                    You don&apos;t have any audits yet.
+                                </EmptyPlaceholder.Description>
+                            </EmptyPlaceholder>
                         )
                 }
             </div>
