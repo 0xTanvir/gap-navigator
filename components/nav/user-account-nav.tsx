@@ -105,12 +105,17 @@ export function UserAccountNav({name, image, email, logOut}: UserAccountNavProps
                         Audits
                     </DropdownMenuItem>
                 </Link>
-                <Link href="/clients">
-                    <DropdownMenuItem className="cursor-pointer">
-                        <Icons.users className="mr-2 h-4 w-4"/>
-                        Clients
-                    </DropdownMenuItem>
-                </Link>
+                {
+                    user?.role === 'consultant' && (
+                        <Link href="/clients">
+                            <DropdownMenuItem className="cursor-pointer">
+                                <Icons.users className="mr-2 h-4 w-4"/>
+                                Clients
+                            </DropdownMenuItem>
+                        </Link>
+                    )
+                }
+
 
                 <Link href="/notification">
                     <DropdownMenuItem onClick={notificationAlertUpdate} className="cursor-pointer">

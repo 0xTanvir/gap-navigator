@@ -225,7 +225,6 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                 }
 
             } else {
-                console.log('User not found');
                 return toast({
                     title: "User not found.",
                     variant: "default"
@@ -286,7 +285,7 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                                         }}
                                     >
                                         <Icons.copy className="mr-2 h-4 w-4"/>
-                                        Share Audit
+                                        Copy Audit Link
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator/>
                                 </>
