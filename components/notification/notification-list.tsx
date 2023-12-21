@@ -29,8 +29,6 @@ const NotificationList = () => {
         }
     }, [user?.uid])
 
-    console.log(notifications)
-
     if (isLoading) {
         return <>
             <AuditEditorShell>
