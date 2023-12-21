@@ -29,6 +29,11 @@ export type DashboardConfig = {
     sidebarNav: SidebarNavItem[]
 }
 
+export type SettingsConfig = {
+    mainNav: MainNavItem[]
+    sidebarNav: SidebarNavItem[]
+}
+
 export type SidebarNavItem = {
     title: string
     disabled?: boolean

@@ -35,10 +35,8 @@ export default async function IndexPage() {
                         <Link href="/dashboard" className={cn(buttonVariants({ size: "xl" }), "text-sm font-semibold rounded-full")}>
                             Get Started
                         </Link>
-                        <Link
-                            href={siteConfig.links.github}
-                            target="_blank"
-                            rel="noreferrer"
+                        <Link 
+                            href="/audits"
                             className={cn(buttonVariants({ variant: "outline", size: "xl" }), "text-sm font-semibold rounded-full")}
                         >
                             Audits
@@ -237,7 +235,7 @@ export default async function IndexPage() {
                                     Email address
                                 </label>
                                 <Input type="email" placeholder="Email" />
-                                <Link href="/login" className={cn(buttonVariants({ size: "lg" }))}>
+                                <Link href="/login" className={cn(buttonVariants())}>
                                     Notify me
                                 </Link>
                             </form>
