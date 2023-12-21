@@ -282,8 +282,7 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
           console.error('Error sending email:', error);
         }
         return toast({
-          title: "Audit invited successfully.",
-          description: `Your audit was updated.`,
+          title: "The audit link successfully sends the user an email",
           variant: "success"
         });
       } else {
