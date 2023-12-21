@@ -1,18 +1,47 @@
-import { getDatabase, onValue, ref, set, update } from "firebase/database"
+import { getDatabase, onValue, ref, set, update, get } from "firebase/database"
 import { Notification } from "@/types/dto";
 
 const db = getDatabase();
 
 export async function setNotificationData(userId: string, notificationData: Notification) {
     try {
-        const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.uid);
+        const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.auditId);
         const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/`);
 
-        // Set the custom data using the generated UID under the user's notifications
-        await set(userNotificationsRef, notificationData);
+        const allNotification: Notification[] = [];
+        onValue(ref(db, `root/audit-notifications/${userId}/notifications/`), (snapshot) => {
+            const snapshotVal = snapshot.val();
+            if (snapshot.exists() && snapshotVal) {
+                const values = Object.values(snapshotVal);
 
-        // Update notificationAlert to true
-        await update(userNotificationsAlert, {notificationAlert: true});
+                // Filter out null entries and append them to allNotification
+                const validNotifications = values.filter((item): item is Notification => item !== null);
+                allNotification.push(...validNotifications);
+            }
+        });
+
+        // Check if the notification with the given uid already exists
+        const existingNotification = allNotification.find(notification => notification.auditId === notificationData.auditId);
+
+        if (existingNotification) {
+            // If the notification exists, update it
+            if (existingNotification.isSeen) {
+                const existingNotificationRef = ref(db, `root/audit-notifications/${userId}/notifications/` + existingNotification.auditId);
+                await update(existingNotificationRef, {isSeen: false});
+            }
+        } else {
+            // If the notification doesn't exist, add a new one
+            await set(userNotificationsRef, notificationData);
+        }
+
+        // Check if notificationAlert is currently false before updating
+        const snapshotAlert = await get(userNotificationsAlert);
+        const currentNotificationAlert = snapshotAlert.val()?.notificationAlert;
+
+        if (currentNotificationAlert === false) {
+            // Update notificationAlert to true only if it's currently false
+            await update(userNotificationsAlert, {notificationAlert: true});
+        }
 
         return true;
     } catch (error) {
@@ -22,7 +51,7 @@ export async function setNotificationData(userId: string, notificationData: Noti
 
 export async function updateNotificationById(userId: string, notification: Notification) {
     try {
-        const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.uid}`);
+        const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.auditId}`);
 
         // Update the notification with the provided data
         await update(notificationRef, {isSeen: true});
