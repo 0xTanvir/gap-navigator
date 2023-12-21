@@ -15,6 +15,8 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth"
 import Link from "next/link";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useEffect } from "react";
 
 
 interface UserAuthLoginProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -22,15 +24,17 @@ interface UserAuthLoginProps extends React.HTMLAttributes<HTMLDivElement> {
 
 type FormData = z.infer<typeof userAuthLoginSchema>
 
-export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
+export function UserAuthLogin({className, ...props}: UserAuthLoginProps) {
     const provider = new GoogleAuthProvider()
     const auth = getAuth()
     const router = useRouter()
 
+    const {user} = useAuth()
+
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<FormData>({
         resolver: zodResolver(userAuthLoginSchema),
     })
@@ -79,6 +83,12 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
         setIsLoading(false)
         setIsGoogleLoading(false)
     }
+
+    useEffect(() => {
+        if (user) {
+            router.push("/")
+        }
+    }, [])
 
     return (
         <div className={cn("mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]", className)} {...props}>
@@ -135,9 +145,9 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
 
                     <div className="flex items-center justify-end">
                         <div className="text-sm leading-6">
-                            <a href={void 0} className="font-semibold">
+                            <Link href="/reset-password" className="font-semibold">
                                 Forgot password?
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -146,7 +156,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                             className={cn(buttonVariants(), "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm")}
                             disabled={isLoading}>
                             {isLoading && (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                             )}
                             Sign In
                         </button>
@@ -155,7 +165,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                 <div>
                     <div className="relative mt-6">
                         <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
+                            <span className="w-full border-t"/>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-background px-4 text-black py-2 rounded text-muted-foreground">
@@ -166,7 +176,7 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                     <div className="mt-6 grid grid-cols-0 gap-4">
                         <button
                             type="button"
-                            className={cn(buttonVariants({ variant: "outline" }))}
+                            className={cn(buttonVariants({variant: "outline"}))}
                             onClick={() => {
                                 setIsLoading(true)
                                 setIsGoogleLoading(true)
@@ -175,9 +185,9 @@ export function UserAuthLogin({ className, ...props }: UserAuthLoginProps) {
                             disabled={isLoading || isGoogleLoading}
                         >
                             {isGoogleLoading ? (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                             ) : (
-                                <Icons.google2 className="mr-2 h-4 w-4" />
+                                <Icons.google2 className="mr-2 h-4 w-4"/>
                             )}{" "}
                             Google
                         </button>

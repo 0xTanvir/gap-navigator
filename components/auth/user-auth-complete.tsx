@@ -29,13 +29,13 @@ interface UserAuthCompleteProps {
 
 type FormData = z.infer<typeof userAccountCompleteSchema>
 
-export function UserAuthComplete({ uid, callbackUrl, firstName, lastName, email }: UserAuthCompleteProps) {
+export function UserAuthComplete({uid, callbackUrl, firstName, lastName, email}: UserAuthCompleteProps) {
     const router = useRouter()
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<FormData>({
         resolver: zodResolver(userAccountCompleteSchema),
     })
@@ -51,6 +51,8 @@ export function UserAuthComplete({ uid, callbackUrl, firstName, lastName, email 
             email: data.email,
             role: data.role,
             image: "",
+            audits: [],
+            invitedAuditsList: []
         }
         try {
             await setUser(uid, user)
@@ -159,7 +161,7 @@ export function UserAuthComplete({ uid, callbackUrl, firstName, lastName, email 
                                                 {...register("role")}
                                             />
                                             <Label htmlFor={userRole.toLowerCase()}
-                                                className="ml-2 text-sm font-medium capitalize text-muted-foreground">
+                                                   className="ml-2 text-sm font-medium capitalize text-muted-foreground">
                                                 {userRole}
                                             </Label>
                                         </div>
@@ -180,7 +182,7 @@ export function UserAuthComplete({ uid, callbackUrl, firstName, lastName, email 
                             disabled={isLoading}
                         >
                             {isLoading && (
-                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                             )}
                             Complete Profile
                         </button>

@@ -20,3 +20,7 @@ export const marketingConfig: MarketingConfig = {
         },
     ],
 }
+
+export const auditEditorConfig: MarketingConfig = {
+    mainNav: [],
+}

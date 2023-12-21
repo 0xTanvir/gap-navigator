@@ -1,4 +1,4 @@
-import { getDoc, setDoc, updateDoc } from "firebase/firestore"
+import { getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
 
@@ -22,10 +22,78 @@ export async function getUserById(id: string): Promise<User> {
             email: data.email,
             role: data.role,
             image: data.image,
+            audits: data.audits,
+            invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
         }
         return user
     } else {
         return Promise.reject(Error(`No such user: ${id}`))
+    }
+}
+
+export async function getUserByIds(usersId: string[]): Promise<User[]> {
+    if (usersId.length > 0) {
+        const usersCollectionRef = Collections.users();
+        const q = query(usersCollectionRef, where("uid", "in", usersId));
+
+        const querySnapshot = await getDocs(q);
+
+        // If no audits are found, return an empty array instead of rejecting.
+        if (querySnapshot.empty) {
+            return [];
+        }
+        return querySnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                uid: doc.id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                role: data.role,
+                image: data.image,
+                audits: data.audits,
+                invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
+            } as User;
+        })
+    } else {
+        return [];
+    }
+}
+
+export async function getUserByEmail(email: string): Promise<User> {
+    const userDocRef = Collections.users()
+    try {
+        const querySnapshot = await getDocs(userDocRef);
+
+        let user: User | null = {
+            uid: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            role: '',
+            image: '',
+            audits: [],
+            invitedAuditsList: [],
+        };
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.email === email) {
+                user = {
+                    uid: doc.id,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email,
+                    role: data.role,
+                    image: data.image,
+                    audits: data.audits,
+                    invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList,
+                };
+            }
+        });
+        return user;
+    } catch (error) {
+        throw new Error('Error getting user');
     }
 }
 
@@ -48,5 +116,15 @@ export async function updateUserProfile(id: string, formData: object) {
         return updatedDocSnapshot.data() as User
     } catch (error) {
         throw new Error("Error updating user profile")
+    }
+}
+
+export async function updateUserById(userId: string, userData: User) {
+    const userRef = Collections.user(userId)
+    try {
+        await updateDoc(userRef, {...userData})
+        return true
+    } catch (error) {
+        throw new Error("Error updating user information")
     }
 }

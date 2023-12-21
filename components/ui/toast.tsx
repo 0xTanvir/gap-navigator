@@ -30,13 +30,18 @@ const toastVariants = cva(
         default: "border bg-background text-foreground",
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
+        info: "border-blue-600 bg-background text-foreground",
+        success: "border-green-500 bg-background text-foreground",
+        warning: "border-orange-600 bg-background text-foreground",
+        error: "border-red-600 bg-background text-foreground",
+        confirmation: "border-purple-600 bg-background text-foreground",
       },
     },
     defaultVariants: {
       variant: "default",
     },
   }
-)
+);
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,

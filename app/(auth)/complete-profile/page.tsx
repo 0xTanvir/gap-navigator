@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 import {Icons} from "@/components/icons"
 import {UserAuthComplete} from "@/components/auth/user-auth-complete"
 import React from "react";

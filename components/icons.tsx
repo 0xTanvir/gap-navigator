@@ -34,7 +34,13 @@ import {
     Lock,
     Building,
     Phone,
-    Mail, XCircle,
+    XCircle,
+    Mail,
+    UserPlus,
+    ScanEye,
+    ClipboardCheck,
+    Copy,
+    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore, Circle,
 } from "lucide-react"
 
 export const Icons = {
@@ -70,10 +76,21 @@ export const Icons = {
     trash: Trash,
     fileEdit: FileEdit,
     lock: Lock,
-    building:Building,
-    phone:Phone,
+    building: Building,
+    phone: Phone,
     mail: Mail,
     cancel:XCircle,
+    userPlus: UserPlus,
+    preview: ScanEye,
+    evaluate: ClipboardCheck,
+    copy: Copy,
+    save: Save,
+    checkCircle2: CheckCircle2,
+    circle: Circle,
+    notificationOff:Bell,
+    notificationRing:BellRing,
+    archive:Archive,
+    archiveRestore:ArchiveRestore,
     x: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
             <path

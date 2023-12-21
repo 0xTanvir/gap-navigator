@@ -19,8 +19,8 @@ export default async function MarketingLayout({
                 <div className="flex items-center justify-between">
                     <MainNav items={marketingConfig.mainNav} />
                     <nav className="flex gap-2">
-                        <ModeToggle />
                         <ProfileNav />
+                        <ModeToggle />
                     </nav>
                 </div>
             </header>

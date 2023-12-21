@@ -14,6 +14,8 @@ export type SiteConfig = {
     name: string
     stitchedName: string
     description: string
+    emailFrom: string
+    url:string
     links: {
         twitter: string
         github: string
@@ -47,6 +49,11 @@ export type SidebarNavItem = {
             items: NavLink[]
         }
     )
+
+export type AuditsConfig = {
+    mainNav: MainNavItem[]
+    sidebarNav: SidebarNavItem[]
+}
 
 export type SiteFooterConfig = {
     solutions: MainNavItem[]

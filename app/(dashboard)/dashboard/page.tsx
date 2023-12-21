@@ -4,17 +4,13 @@ import { notFound } from "next/navigation"
 import { useAuth } from "@/components/auth/auth-provider"
 import ClientDashboard from "@/components/dashboard/client-dashboard"
 import ConsultantDashboard from "@/components/dashboard/consultant-dashboard"
-import { AuditsProvider } from "@/components/dashboard/AuditsContext"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 
-export default function DashboardPage() {
+export default function DashboardsPage() {
     const { user, isAuthenticated, loading } = useAuth()
     if (loading) {
         return (
-            <DashboardShell>
-                <DashboardHeader.Skeleton />
-            </DashboardShell>
+            <DashboardHeader.Skeleton />
         )
     }
     if (isAuthenticated && user && user.role === "client") {
@@ -23,7 +19,7 @@ export default function DashboardPage() {
         )
     } else if (isAuthenticated && user && user.role === "consultant") {
         return (
-            <AuditsProvider><ConsultantDashboard userId={user.uid} /></AuditsProvider>
+            <ConsultantDashboard userAuditsId={user?.audits} />
         )
     } else {
         return notFound()
