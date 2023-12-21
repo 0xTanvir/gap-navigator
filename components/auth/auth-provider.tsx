@@ -15,6 +15,7 @@ import { User } from "@/types/dto";
 
 interface AuthContextValue {
   user: User | null;
+  setUser: (user: User | null) => Promise<void>
   isAuthenticated: boolean;
   loading: boolean;
   updateUser: (user: User | null) => void;
@@ -23,6 +24,7 @@ interface AuthContextValue {
 
 export const AuthContext = createContext<AuthContextValue>({
   user: null,
+  setUser: async () => {},
   isAuthenticated: false,
   loading: true,
   updateUser: (user: User | null) => {},
@@ -92,9 +94,14 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
     return unsubscribe;
   }, []);
 
+  const setUserAsync = async (newUser: User | null) => {
+    // You can perform additional async operations if needed
+    setUser(newUser);
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, loading, updateUser, logOut }}
+      value={{ user,setUser:setUserAsync, isAuthenticated, loading, updateUser, logOut }}
     >
       {children}
     </AuthContext.Provider>
