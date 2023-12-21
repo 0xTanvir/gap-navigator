@@ -155,7 +155,6 @@ export function UserAccountNav({
           onSelect={(event) => {
             event.preventDefault();
             logOut?.();
-            router.push("/login");
           }}
         >
           <Icons.logOut className="mr-2 h-4 w-4" />
