@@ -107,6 +107,18 @@ export async function setUser(id: string, user: User) {
     }
 }
 
+export async function updateUserProfile(id: string, formData: object) {
+    const userDocRef = Collections.user(id);
+    try {
+        await updateDoc(userDocRef, formData)
+        // Retrieve the updated user data after the update
+        const updatedDocSnapshot = await getDoc(userDocRef);
+        return updatedDocSnapshot.data() as User
+    } catch (error) {
+        throw new Error("Error updating user profile")
+    }
+}
+
 export async function updateUserById(userId: string, userData: User) {
     const userRef = Collections.user(userId)
     try {

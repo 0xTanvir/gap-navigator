@@ -14,3 +14,6 @@ export const auditSchema = z.object({
 export const auditInviteSchema = z.object({
     email: z.string({required_error: 'Please enter a valid email'}).email('Please enter a valid email')
 })
+export const auditShareSchema = z.object({
+    email: z.string({required_error: 'Please enter a valid email'}).email('Please enter a valid email')
+})
