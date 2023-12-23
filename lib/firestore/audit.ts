@@ -112,7 +112,7 @@ export async function updateAuditUser(userId: string, auditId: string) {
 
 }
 
-export async function fetchAuditsWithCount(searchName: string): Promise<{ audits: Audits; totalCount: number }> {
+export async function fetchAuditsWithCount(searchName?: string): Promise<{ audits: Audits; totalCount: number }> {
   const auditsCollectionRef = Collections.audits();
   let queryRef
   if (searchName) {

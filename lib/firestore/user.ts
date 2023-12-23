@@ -151,3 +151,27 @@ export async function fetchUsersByRole(userRole: string) {
     throw new Error('Error fetching users by role: ' + err)
   }
 }
+
+export async function retrieveUserCounts(): Promise<{ totalConsultantCounts: number; totalClientCounts: number }> {
+  try {
+    const collectionRef = Collections.users()
+    let consultantQueryRef = query(collectionRef, where('role', '==', 'consultant'))
+    let clientQueryRef = query(collectionRef, where('role', '==', 'client'))
+
+    const consultantQuerySnapshot = await getDocs(consultantQueryRef);
+    const clientQuerySnapshot = await getDocs(clientQueryRef);
+
+    // If no users are found, return zero instead of rejecting.
+    if (consultantQuerySnapshot.empty && clientQuerySnapshot.empty) {
+      return {totalConsultantCounts: 0, totalClientCounts: 0};
+    }
+
+    const totalConsultantCounts = consultantQuerySnapshot.size;
+    const totalClientCounts = clientQuerySnapshot.size;
+
+    return {totalConsultantCounts, totalClientCounts}
+
+  } catch (error) {
+    throw new Error('Error fetching users count: ' + error)
+  }
+}

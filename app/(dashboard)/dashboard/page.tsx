@@ -24,7 +24,7 @@ export default function DashboardsPage() {
         )
     }else if (isAuthenticated && user && user.role === "admin") {
         return (
-            <AdminDashboard userId={user?.uid} />
+            <AdminDashboard />
         )
     } else {
         return notFound()
