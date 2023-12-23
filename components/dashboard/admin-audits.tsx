@@ -129,7 +129,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
                 <EmptyPlaceholder.Icon name="audit"/>
                 <EmptyPlaceholder.Title>No audits created</EmptyPlaceholder.Title>
                 <EmptyPlaceholder.Description>
-                  You don&apos;t have any audits yet. Start creating audit.
+                  You don&apos;t have any audits yet.
                 </EmptyPlaceholder.Description>
                 <AuditCreateButton userId={userId} variant="outline"/>
               </EmptyPlaceholder>

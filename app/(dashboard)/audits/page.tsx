@@ -9,29 +9,27 @@ import { AuditsProvider } from "@/components/dashboard/AuditsContext"
 import AdminAudits from "@/components/dashboard/admin-audits";
 
 export default function AuditsPage() {
-    const { user, isAuthenticated, loading } = useAuth()
-    if (loading) {
-        return (
-            <DashboardHeader.Skeleton />
-        )
-    }
-    if (isAuthenticated && user && user.role === "client") {
-        return (
-            <ClientAudits />
-        )
-    } else if (isAuthenticated && user && user.role === "consultant") {
-        return (
-            <AuditsProvider>
-                <ConsultantAudits userId={user?.uid} userAuditsId={user.audits} />
-            </AuditsProvider>
-        )
-    }else if (isAuthenticated && user && user.role === "admin") {
-        return (
-            <AuditsProvider>
-                <AdminAudits userId={user?.uid} />
-            </AuditsProvider>
-        )
-    } else {
-        return notFound()
-    }
+  const {user, isAuthenticated, loading} = useAuth()
+  if (loading) {
+    return (
+        <DashboardHeader.Skeleton/>
+    )
+  }
+  if (isAuthenticated && user && user.role === "client") {
+    return (
+        <ClientAudits/>
+    )
+  } else if (isAuthenticated && user && user.role === "consultant") {
+    return (
+        <AuditsProvider>
+          <ConsultantAudits userId={user?.uid} userAuditsId={user.audits}/>
+        </AuditsProvider>
+    )
+  } else if (isAuthenticated && user && user.role === "admin") {
+    return (
+        <AdminAudits userId={user?.uid}/>
+    )
+  } else {
+    return notFound()
+  }
 }
