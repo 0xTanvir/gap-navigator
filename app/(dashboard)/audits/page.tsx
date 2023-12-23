@@ -27,7 +27,9 @@ export default function AuditsPage() {
     )
   } else if (isAuthenticated && user && user.role === "admin") {
     return (
-        <AdminAudits userId={user?.uid}/>
+        <AuditsProvider>
+          <AdminAudits userId={user?.uid}/>
+        </AuditsProvider>
     )
   } else {
     return notFound()

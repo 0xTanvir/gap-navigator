@@ -5,7 +5,8 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { AuditCreateButton } from "@/components/dashboard/audit-create-button";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
-import Pagination from "@/components/admin/pagination";
+import AuditPagination from "@/components/admin/audit-pagination";
+import { toast } from "@/components/ui/use-toast";
 
 interface AdminAuditsProps {
   userId: string
@@ -52,11 +53,18 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
         setBeforeThis(records[first_index][entityObject.orderByField])
         setAudit(records)
       } else {
-        console.log("No data")
+        toast({
+          title: "No data found",
+          variant: "default",
+        })
       }
 
     } catch (err) {
-      console.log(err)
+      toast({
+        title: "Something went wrong.",
+        description: "Failed to fetch audits. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -92,11 +100,11 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
           <DashboardHeader heading="Audits" text="Manage audits.">
           </DashboardHeader>
           <div className="divide-border-200 divide-y rounded-md border">
-            <AuditItem.Skeleton/>
-            <AuditItem.Skeleton/>
-            <AuditItem.Skeleton/>
-            <AuditItem.Skeleton/>
-            <AuditItem.Skeleton/>
+            {
+              Array.from(Array(PAGE_SIZE)).map((_, index) => (
+                  <AuditItem.Skeleton key={index}/>
+              ))
+            }
           </div>
         </>
     )
@@ -115,7 +123,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
                       <AuditItem key={audit.uid} userId={userId} audit={audit}/>
                   ))}
                 </div>
-                <Pagination
+                <AuditPagination
                     totalAuditCount={totalAuditCount}
                     page={page}
                     setPage={setPage}
@@ -127,14 +135,12 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
           ) : (
               <EmptyPlaceholder>
                 <EmptyPlaceholder.Icon name="audit"/>
-                <EmptyPlaceholder.Title>No audits created</EmptyPlaceholder.Title>
+                <EmptyPlaceholder.Title>No audits</EmptyPlaceholder.Title>
                 <EmptyPlaceholder.Description>
                   You don&apos;t have any audits yet.
                 </EmptyPlaceholder.Description>
-                <AuditCreateButton userId={userId} variant="outline"/>
               </EmptyPlaceholder>
           )}
-
 
         </div>
       </>
