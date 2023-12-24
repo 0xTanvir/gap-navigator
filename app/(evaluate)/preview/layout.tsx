@@ -101,7 +101,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
                 <SiteFooter className="border-t"/>
             </div>
         )
-    } else if (isAuthenticated && user && user.role === "consultant") {
+    } else if ((isAuthenticated && user && user.role === "consultant") || isAuthenticated && user && user.role === "admin") {
         return (
             <div className="flex min-h-screen flex-col">
                 <header className="sticky top-0 z-40 w-full border-b bg-background">

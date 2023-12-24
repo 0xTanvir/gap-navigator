@@ -120,7 +120,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
               <>
                 <div className="divide-y divide-border rounded-md border">
                   {audit.map((audit) => (
-                      <AuditItem key={audit.uid} userId={userId} audit={audit}/>
+                      <AuditItem key={audit.uid} userId={userId} audit={audit} setAudits={setAudit}/>
                   ))}
                 </div>
                 <AuditPagination

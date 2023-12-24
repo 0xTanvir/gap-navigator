@@ -15,7 +15,7 @@ import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
 import { auditInviteSchema, auditSchema, auditShareSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType, Notification } from "@/types/dto";
+import { Audit, AuditActionType, Audits, Notification } from "@/types/dto";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -91,9 +91,10 @@ interface AuditOperationsProps {
   userId: string;
   audit: Audit;
   archive?: boolean
+  setAudits?: React.Dispatch<React.SetStateAction<Audits | []>>;
 }
 
-export function AuditOperations({userId, audit, archive}: AuditOperationsProps) {
+export function AuditOperations({userId, audit, archive, setAudits}: AuditOperationsProps) {
   const {dispatch} = useAudits();
   const {user, updateUser} = useAuth();
 
@@ -135,9 +136,18 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
         authorId: audit.authorId,
         createdAt: audit.createdAt,
       };
-
       await setAudit(userId, updatedAudit);
-      dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
+
+      if (user?.role === "admin" && setAudits) {
+        setAudits((audits) => {
+          // Update the specific audit in the state
+          return audits.map((audit) => (audit.uid === updatedAudit.uid ? updatedAudit : audit));
+        });
+      }
+      if (user?.role === "consultant") {
+        dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
+      }
+
       form.reset();
 
       return toast({
@@ -506,10 +516,16 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                       setIsDeleteLoading(false);
                       setShowDeleteAlert(false);
 
-                      dispatch({
-                        type: AuditActionType.DELETE_AUDIT,
-                        payload: audit.uid,
-                      });
+                      if (user?.role === 'admin' && setAudits) {
+                        // Assuming audits is a state variable in the parent component
+                        setAudits((prevAudits) => prevAudits.filter((a) => a.uid !== audit.uid));
+                      }
+                      if (user?.role === 'consultant') {
+                        dispatch({
+                          type: AuditActionType.DELETE_AUDIT,
+                          payload: audit.uid,
+                        });
+                      }
                       user?.audits.splice(user?.audits.indexOf(audit.uid), 1);
                       updateUser(user);
                     }
