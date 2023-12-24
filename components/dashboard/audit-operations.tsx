@@ -180,63 +180,70 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
     try {
       let inviteUser = await getUserByEmail(data.email)
       if (inviteUser) {
-        const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
-        if (!exclusiveExists) {
-          // Check if exclusiveList exists, if not, initialize it as an empty array
-          const exclusiveList = audit.exclusiveList || [];
+        if (audit.authorId === inviteUser.uid) {
+          return toast({
+            title: "Audit owner ID and invited user ID are the same",
+            variant: "default"
+          });
+        } else {
+          const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
+          if (!exclusiveExists) {
+            // Check if exclusiveList exists, if not, initialize it as an empty array
+            const exclusiveList = audit.exclusiveList || [];
 
-          const formattedAudit = {
-            ...audit,
-            exclusiveList: [...exclusiveList, inviteUser.uid]
-          };
-          const notificationData: Notification = {
-            uid: uuidv4(),
-            auditName: audit.name,
-            type: "AUDIT_INVITED",
-            ownerAuditUserId: audit.authorId,
-            inviteUserId: inviteUser.uid,
-            auditId: audit.uid,
-            isSeen: false,
-            createdAt: Timestamp.now(),
-          }
-          let isSuccess = await setNotificationData(inviteUser.uid, notificationData)
-          if (isSuccess) {
-            await setAudit(userId, formattedAudit);
-            inviteUser.invitedAuditsList.push(audit.uid)
-            await updateUserById(inviteUser.uid, inviteUser)
-            dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
-            let requestBody = {
-              inviterEmail: inviteUser.email,
-              inviterFirstName: inviteUser.firstName,
-              receiverEmail: inviteUser.email,
-              receiverFirstName: inviteUser.firstName,
-              auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+            const formattedAudit = {
+              ...audit,
+              exclusiveList: [...exclusiveList, inviteUser.uid]
+            };
+            const notificationData: Notification = {
+              uid: uuidv4(),
+              auditName: audit.name,
+              type: "AUDIT_INVITED",
+              ownerAuditUserId: audit.authorId,
+              inviteUserId: inviteUser.uid,
+              auditId: audit.uid,
+              isSeen: false,
+              createdAt: Timestamp.now(),
             }
-            const response = await fetch('/api/mailer', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(requestBody),
-            });
-            if (response.ok) {
-              const data = await response.json();
-            } else {
-              const error = await response.json();
-              console.error('Error sending email:', error);
+            let isSuccess = await setNotificationData(inviteUser.uid, notificationData)
+            if (isSuccess) {
+              await setAudit(userId, formattedAudit);
+              inviteUser.invitedAuditsList.push(audit.uid)
+              await updateUserById(inviteUser.uid, inviteUser)
+              dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+              let requestBody = {
+                inviterEmail: inviteUser.email,
+                inviterFirstName: inviteUser.firstName,
+                receiverEmail: inviteUser.email,
+                receiverFirstName: inviteUser.firstName,
+                auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+              }
+              const response = await fetch('/api/mailer', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+              });
+              if (response.ok) {
+                const data = await response.json();
+              } else {
+                const error = await response.json();
+                console.error('Error sending email:', error);
+              }
+              return toast({
+                title: "Audit invited successfully.",
+                description: `Your audit was updated.`,
+                variant: "success"
+              });
             }
+
+          } else {
             return toast({
-              title: "Audit invited successfully.",
-              description: `Your audit was updated.`,
+              title: "Already audit invited.",
               variant: "success"
             });
           }
-
-        } else {
-          return toast({
-            title: "Already audit invited.",
-            variant: "success"
-          });
         }
 
       } else {
@@ -271,30 +278,37 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
     try {
       let shareUser = await getUserByEmail(data.email)
       if (shareUser) {
-        let requestBody = {
-          inviterEmail: shareUser.email,
-          inviterFirstName: shareUser.firstName,
-          receiverEmail: shareUser.email,
-          receiverFirstName: shareUser.firstName,
-          auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
-        }
-        const responseData = await fetch('/api/mailer', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-        if (responseData.ok) {
-          const data = await responseData.json();
+        if (audit.authorId === shareUser.uid) {
+          return toast({
+            title: "Audit owner ID and share user ID are the same",
+            variant: "default"
+          });
         } else {
-          const error = await responseData.json();
-          console.error('Error sending email:', error);
+          let requestBody = {
+            inviterEmail: shareUser.email,
+            inviterFirstName: shareUser.firstName,
+            receiverEmail: shareUser.email,
+            receiverFirstName: shareUser.firstName,
+            auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+          }
+          const responseData = await fetch('/api/mailer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+          if (responseData.ok) {
+            const data = await responseData.json();
+          } else {
+            const error = await responseData.json();
+            console.error('Error sending email:', error);
+          }
+          return toast({
+            title: "The audit link successfully sends the user an email",
+            variant: "success"
+          });
         }
-        return toast({
-          title: "The audit link successfully sends the user an email",
-          variant: "success"
-        });
       } else {
         return toast({
           title: "User not found.",
@@ -420,14 +434,18 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator/>
-                  <DropdownMenuItem
-                      className="flex cursor-pointer items-center text-destructive focus:text-destructive"
-                      onSelect={() => setShowArchiveAlert(true)}
-                  >
-                    <Icons.archive className="mr-2 h-4 w-4"/>
-                    Archive
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator/>
+                  {user?.role !== "admin" &&
+                      <>
+                          <DropdownMenuItem
+                              className="flex cursor-pointer items-center text-destructive focus:text-destructive"
+                              onSelect={() => setShowArchiveAlert(true)}
+                          >
+                              <Icons.archive className="mr-2 h-4 w-4"/>
+                              Archive
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator/>
+                      </>
+                  }
                   <DropdownMenuItem
                       className="flex cursor-pointer items-center text-destructive focus:text-destructive"
                       onSelect={() => setShowDeleteAlert(true)}
