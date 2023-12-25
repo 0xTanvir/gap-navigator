@@ -127,7 +127,7 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
                             >
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select an audit type"/>
+                                  <SelectValue placeholder="Select an user role"/>
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
