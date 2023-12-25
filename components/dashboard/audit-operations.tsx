@@ -114,8 +114,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
   const [isShareLoading, setIsShareLoading] = React.useState<boolean>(false);
 
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
-  const [showUpdateDialog, setShowUpdateDialog] =
-      React.useState<boolean>(false);
+  const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<FormData>({

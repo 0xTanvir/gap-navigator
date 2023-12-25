@@ -52,7 +52,7 @@ const AdminConsultants = () => {
         {users?.length ? (
                 <div className="divide-y divide-border rounded-md border">
                   {users.map((user) => (
-                      <UserItem key={user.uid} user={user}/>
+                      <UserItem key={user.uid} user={user} setUser={setUser}/>
                   ))}
                 </div>
             )
