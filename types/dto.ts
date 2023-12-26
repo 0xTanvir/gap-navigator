@@ -18,11 +18,17 @@ export interface User {
   image: string,
   audits: string[],
   invitedAuditsList: string[],
+  status?: string
 }
 
 export enum UserRole {
   CLIENT = 'client',
   CONSULTANT = 'consultant'
+}
+
+export enum UserAccountStatus {
+  DISABLE = 'disable',
+  ENABLE = 'enable'
 }
 
 export interface TeamCardProps {

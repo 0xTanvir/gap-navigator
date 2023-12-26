@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   DropdownMenu, DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Icons } from "@/components/icons";
@@ -17,9 +17,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { User, UserRole } from "@/types/dto";
+import { User, UserAccountStatus, UserRole } from "@/types/dto";
 import * as z from "zod";
-import { userRoleUpdateSchema } from "@/lib/validations/auth";
+import { userRoleUpdateSchema, userStatusUpdateSchema } from "@/lib/validations/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
@@ -32,9 +32,14 @@ interface UserOperationsProps {
 
 type FormData = z.infer<typeof userRoleUpdateSchema>
 
+type formData = z.infer<typeof userStatusUpdateSchema>
+
 const UserOperations = ({user, setUser}: UserOperationsProps) => {
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false);
+
+  const [isAccountStatusUpdateLoading, setIsAccountStatusUpdateLoading] = React.useState<boolean>(false);
+  const [showAccountStatusUpdateDialog, setShowAccountStatusUpdateDialog] = React.useState<boolean>(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(userRoleUpdateSchema),
@@ -82,6 +87,55 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
     }
   }
 
+  const formUserStatus = useForm<formData>({
+    resolver: zodResolver(userStatusUpdateSchema),
+    defaultValues: {
+      status: user.status
+    }
+  })
+
+  async function onUserStatusUpdateSubmit(data: formData) {
+    setIsAccountStatusUpdateLoading(true)
+    const updateUser = {
+      ...user,
+      status: data.status === UserAccountStatus.ENABLE ? "" : data.status
+    }
+    try {
+      if (user.status !== data.status) {
+        const updated = await updateUserById(user.uid, updateUser);
+
+        if (updated) {
+          setUser((users) => {
+            return users.map((u) => (u.uid === user.uid ? {...u, status: data.status} : u));
+          });
+
+          return toast({
+            title: "User account status updated successfully.",
+            description: `User account status has been set to ${data.status}.`,
+            variant: "success",
+          });
+        }
+      } else {
+        return toast({
+          title: "User account status remains unchanged",
+          description: `The user account status is the same as before.`,
+          variant: "default"
+        });
+      }
+
+    } catch (error) {
+      return toast({
+        title: "Something went wrong.",
+        description: "Your audit was not updated. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAccountStatusUpdateLoading(false)
+      setShowAccountStatusUpdateDialog(false)
+      formUserStatus.reset()
+    }
+  }
+
   return (
       <>
         <DropdownMenu>
@@ -98,6 +152,19 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
             >
               <Icons.userPlus className="mr-2 h-4 w-4"/>
               Role change
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator/>
+
+            <DropdownMenuItem
+                className="flex cursor-pointer items-center"
+                onClick={() => {
+                  setShowAccountStatusUpdateDialog(true)
+                  formUserStatus.setValue("status", user.status ? user.status : '')
+                }}
+            >
+              <Icons.userPlus className="mr-2 h-4 w-4"/>
+              Account status change
             </DropdownMenuItem>
 
           </DropdownMenuContent>
@@ -160,6 +227,74 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
                     Save changes
                   </button>
                 </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showAccountStatusUpdateDialog} onOpenChange={setShowAccountStatusUpdateDialog}>
+          <DialogContent className="s,:max-w-[425px]">
+            <Form {...formUserStatus}>
+              <form onSubmit={formUserStatus.handleSubmit(onUserStatusUpdateSubmit)}>
+                <DialogHeader>
+                  <DialogTitle>Update user account status</DialogTitle>
+                  <DialogDescription>
+                    Make changes to your user status here. Click save when you're done.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="grid gap-4 py-4">
+                  <FormField
+                      control={formUserStatus.control}
+                      name="status"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>User account status</FormLabel>
+                            <Select
+                                onValueChange={field.onChange}
+                                defaultValue={user.status}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select an user account status"/>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value={UserAccountStatus.DISABLE} className="capitalize">
+                                  {(UserAccountStatus.DISABLE).replace(/\b\w/g, (char) => char.toUpperCase())}
+                                </SelectItem>
+                                {
+                                    user.status !== "" &&
+                                    (
+                                        <SelectItem value={UserAccountStatus.ENABLE} className="capitalize">
+                                          {(UserAccountStatus.ENABLE).replace(/\b\w/g, (char) => char.toUpperCase())}
+                                        </SelectItem>
+                                    )
+                                }
+                              </SelectContent>
+                            </Select>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
+                </div>
+                <DialogFooter>
+                  <button
+                      type="submit"
+                      className={cn(buttonVariants({variant: "default"}), {
+                        "cursor-not-allowed opacity-60": isAccountStatusUpdateLoading,
+                      })}
+                      disabled={isAccountStatusUpdateLoading || user.status === formUserStatus.getValues("status")}
+                  >
+                    {isAccountStatusUpdateLoading ? (
+                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                    ) : (
+                        <Icons.add className="mr-2 h-4 w-4"/>
+                    )}
+                    Save changes
+                  </button>
+                </DialogFooter>
+
               </form>
             </Form>
           </DialogContent>

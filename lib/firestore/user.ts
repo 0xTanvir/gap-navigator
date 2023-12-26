@@ -20,6 +20,7 @@ export async function getUserById(id: string): Promise<User> {
       email: data.email,
       role: data.role,
       image: data.image,
+      status : data.staus ? data.status : '',
       audits: data.audits,
       invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
     }
@@ -49,6 +50,7 @@ export async function getUserByIds(usersId: string[]): Promise<User[]> {
         email: data.email,
         role: data.role,
         image: data.image,
+        status : data.staus ? data.status : '',
         audits: data.audits,
         invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
       } as User;
@@ -70,6 +72,7 @@ export async function getUserByEmail(email: string): Promise<User> {
       email: '',
       role: '',
       image: '',
+      status: '',
       audits: [],
       invitedAuditsList: [],
     };
@@ -84,6 +87,7 @@ export async function getUserByEmail(email: string): Promise<User> {
           email: data.email,
           role: data.role,
           image: data.image,
+          status : data.staus ? data.status : '',
           audits: data.audits,
           invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList,
         };
@@ -143,6 +147,7 @@ export async function fetchUsersByRole(userRole: string) {
         email: data.email,
         role: data.role,
         image: data.image,
+        status : data.status ? data.status : '',
         audits: data.audits,
         invitedAuditsList: data.invitedAuditsList === undefined ? [] : data.invitedAuditsList
       } as User;

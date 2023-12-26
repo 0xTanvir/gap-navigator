@@ -72,3 +72,7 @@ export const userAuthRestPasswordSchema = z.object({
 export const userRoleUpdateSchema = z.object({
   role: z.string({required_error: 'Please select a valid account type'})
 })
+export const userStatusUpdateSchema = z.object({
+  status: z.string({required_error: 'Please select a valid user account status'})
+      .min(1,{message: 'Please select a valid user account status'})
+})
