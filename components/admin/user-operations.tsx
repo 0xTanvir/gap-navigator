@@ -24,6 +24,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/ui/use-toast";
 import { updateUserById } from "@/lib/firestore/user";
+import { useRouter } from "next/navigation";
 
 interface UserOperationsProps {
   user: User
@@ -38,9 +39,10 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false);
 
-  const [isAccountStatusUpdateLoading, setIsAccountStatusUpdateLoading] = React.useState<boolean>(false);
-  const [showAccountStatusUpdateDialog, setShowAccountStatusUpdateDialog] = React.useState<boolean>(false);
+  const [isUpdatingAccountStatusLoading, setIsUpdatingAccountStatusLoading] = React.useState<boolean>(false);
+  const [showAccountStatusDialogOpen, setShowAccountStatusDialogOpen] = React.useState<boolean>(false);
 
+  const router = useRouter()
   const form = useForm<FormData>({
     resolver: zodResolver(userRoleUpdateSchema),
     defaultValues: {
@@ -90,12 +92,12 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
   const formUserStatus = useForm<formData>({
     resolver: zodResolver(userStatusUpdateSchema),
     defaultValues: {
-      status: user.status
+      status: user.status === "" ? UserAccountStatus.ENABLE : user.status
     }
   })
 
-  async function onUserStatusUpdateSubmit(data: formData) {
-    setIsAccountStatusUpdateLoading(true)
+  async function handleUserStatusUpdate(data: formData) {
+    setIsUpdatingAccountStatusLoading(true)
     const updateUser = {
       ...user,
       status: data.status === UserAccountStatus.ENABLE ? "" : data.status
@@ -130,8 +132,8 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
         variant: "destructive",
       });
     } finally {
-      setIsAccountStatusUpdateLoading(false)
-      setShowAccountStatusUpdateDialog(false)
+      setIsUpdatingAccountStatusLoading(false)
+      setShowAccountStatusDialogOpen(false)
       formUserStatus.reset()
     }
   }
@@ -156,10 +158,27 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
 
             <DropdownMenuSeparator/>
 
+            {
+                user.role !== 'client' &&
+                <>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => {
+                          router.push(`/user/${user.uid}`)
+                        }}
+                    >
+                        <Icons.audit className="mr-2 h-4 w-4"/>
+                        Audits
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                </>
+            }
+
+
             <DropdownMenuItem
                 className="flex cursor-pointer items-center"
                 onClick={() => {
-                  setShowAccountStatusUpdateDialog(true)
+                  setShowAccountStatusDialogOpen(true)
                   formUserStatus.setValue("status", user.status ? user.status : '')
                 }}
             >
@@ -232,10 +251,10 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={showAccountStatusUpdateDialog} onOpenChange={setShowAccountStatusUpdateDialog}>
+        <Dialog open={showAccountStatusDialogOpen} onOpenChange={setShowAccountStatusDialogOpen}>
           <DialogContent className="s,:max-w-[425px]">
             <Form {...formUserStatus}>
-              <form onSubmit={formUserStatus.handleSubmit(onUserStatusUpdateSubmit)}>
+              <form onSubmit={formUserStatus.handleSubmit(handleUserStatusUpdate)}>
                 <DialogHeader>
                   <DialogTitle>Update user account status</DialogTitle>
                   <DialogDescription>
@@ -252,7 +271,7 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
                             <FormLabel>User account status</FormLabel>
                             <Select
                                 onValueChange={field.onChange}
-                                defaultValue={user.status}
+                                defaultValue={user.status === "" ? UserAccountStatus.ENABLE : user.status}
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -263,14 +282,19 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
                                 <SelectItem value={UserAccountStatus.DISABLE} className="capitalize">
                                   {(UserAccountStatus.DISABLE).replace(/\b\w/g, (char) => char.toUpperCase())}
                                 </SelectItem>
-                                {
-                                    user.status !== "" &&
-                                    (
-                                        <SelectItem value={UserAccountStatus.ENABLE} className="capitalize">
-                                          {(UserAccountStatus.ENABLE).replace(/\b\w/g, (char) => char.toUpperCase())}
-                                        </SelectItem>
-                                    )
-                                }
+
+                                <SelectItem value={UserAccountStatus.ENABLE} className="capitalize">
+                                  {(UserAccountStatus.ENABLE).replace(/\b\w/g, (char) => char.toUpperCase())}
+                                </SelectItem>
+
+                                {/*{*/}
+                                {/*    user.status !== "" &&*/}
+                                {/*    (*/}
+                                {/*        <SelectItem value={UserAccountStatus.ENABLE} className="capitalize">*/}
+                                {/*          {(UserAccountStatus.ENABLE).replace(/\b\w/g, (char) => char.toUpperCase())}*/}
+                                {/*        </SelectItem>*/}
+                                {/*    )*/}
+                                {/*}*/}
                               </SelectContent>
                             </Select>
                             <FormMessage/>
@@ -282,11 +306,11 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
                   <button
                       type="submit"
                       className={cn(buttonVariants({variant: "default"}), {
-                        "cursor-not-allowed opacity-60": isAccountStatusUpdateLoading,
+                        "cursor-not-allowed opacity-60": isUpdatingAccountStatusLoading
                       })}
-                      disabled={isAccountStatusUpdateLoading || user.status === formUserStatus.getValues("status")}
+                      disabled={isUpdatingAccountStatusLoading || user.status === formUserStatus.getValues("status")}
                   >
-                    {isAccountStatusUpdateLoading ? (
+                    {isUpdatingAccountStatusLoading ? (
                         <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                     ) : (
                         <Icons.add className="mr-2 h-4 w-4"/>

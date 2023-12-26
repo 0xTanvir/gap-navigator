@@ -142,13 +142,10 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
           // Update the specific audit in the state
           return audits.map((audit) => (audit.uid === updatedAudit.uid ? updatedAudit : audit));
         });
-      }
-      if (user?.role === "consultant") {
+      } else {
         dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
       }
-
       form.reset();
-
       return toast({
         title: "Audit updated successfully.",
         description: `Your audit was updated.`,
@@ -427,7 +424,11 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                   <DropdownMenuSeparator/>
                   <DropdownMenuItem
                       className="flex cursor-pointer items-center"
-                      onSelect={() => setShowUpdateDialog(true)}
+                      onSelect={() => {
+                        setShowUpdateDialog(true)
+                        form.setValue("auditName", audit.name)
+                        form.setValue("auditType", audit.type)
+                      }}
                   >
                     <Icons.fileEdit className="mr-2 h-4 w-4"/>
                     Edit
@@ -536,8 +537,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                       if (user?.role === 'admin' && setAudits) {
                         // Assuming audits is a state variable in the parent component
                         setAudits((prevAudits) => prevAudits.filter((a) => a.uid !== audit.uid));
-                      }
-                      if (user?.role === 'consultant') {
+                      } else {
                         dispatch({
                           type: AuditActionType.DELETE_AUDIT,
                           payload: audit.uid,

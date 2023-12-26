@@ -75,7 +75,12 @@ export function AuditItem({userId, audit, archive, setAudits}: AuditItemProps) {
             </p>
           </div>
         </div>
-        <AuditOperations archive={archive} userId={userId} audit={audit} setAudits={setAudits}/>
+        <AuditOperations
+            archive={archive}
+            userId={userId}
+            audit={audit}
+            setAudits={setAudits}
+        />
       </div>
   )
 }
