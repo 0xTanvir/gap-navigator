@@ -144,6 +144,7 @@ export interface Evaluate {
   participantLastName: string;
   participantEmail: string;
   choices?: Choice[];
+  auditName?: string
   count?: number;
   // runningStatus?: string // not-started, id, completed
 }

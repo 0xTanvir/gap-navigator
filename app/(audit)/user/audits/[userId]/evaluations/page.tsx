@@ -1,7 +1,9 @@
+import EvaluationList from "@/app/(audit)/user/audits/[userId]/evaluations/evaluation-list";
+
 export default function AuditSinglePage({params}: { params: { userId: string } }) {
   return (
       <div>
-        <h1>Evaluation {params.userId}</h1>
+        <EvaluationList userId={params.userId}/>
       </div>
   )
 }
