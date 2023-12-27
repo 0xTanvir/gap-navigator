@@ -14,6 +14,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { AuditCreateButton } from "@/components/dashboard/audit-create-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/components/auth/auth-provider";
 
 interface UserAuditsProps {
   userId: string
@@ -22,6 +23,7 @@ interface UserAuditsProps {
 const UserAudits = ({userId}: UserAuditsProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const {audits, dispatch} = useAudits()
+  const {user} = useAuth()
 
   async function fetchUserAllAudits() {
     try {
@@ -86,8 +88,11 @@ const UserAudits = ({userId}: UserAuditsProps) => {
             Back
           </Link>
 
-          <DashboardHeader heading="Audits" text="Create and manage audits.">
-            <AuditCreateButton userId={userId}/>
+          <DashboardHeader heading="Audits" text="Manage audits.">
+            {
+                user?.role === 'consultants' &&
+                <AuditCreateButton userId={userId}/>
+            }
           </DashboardHeader>
           <div>
             {audits?.length ? (

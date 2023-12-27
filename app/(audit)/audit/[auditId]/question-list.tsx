@@ -79,7 +79,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
   return (
       <AuditEditorShell>
         <Link
-            href={user?.role === 'admin' ? `/user/${audit?.authorId}` : "/audits"}
+            href={user?.role === 'admin' ? `/user/audits/${audit?.authorId}` : "/audits"}
             className={cn(
                 buttonVariants({variant: "ghost"}),
                 "absolute left-[-150px] top-4 hidden xl:inline-flex"
@@ -89,8 +89,17 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
           See all audits
         </Link>
 
-        <AuditEditorHeader heading={audit?.name as string} text="Create and manage questions.">
-          <QuestionCreateButton auditId={auditId as string}/>
+        <AuditEditorHeader
+            heading={audit?.name as string}
+            text={
+              user?.role === 'consultants' ?
+                  "Create and manage questions." : "Manage questions."
+            }
+        >
+          {
+              user?.role === 'consultants' &&
+              <QuestionCreateButton auditId={auditId as string}/>
+          }
         </AuditEditorHeader>
 
         {
@@ -117,7 +126,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
         <hr className="mt-12"/>
         <div className="flex justify-center py-6 lg:py-10">
           <Link
-              href={user?.role === 'admin' ? `/user/${audit?.authorId}` : "/audits"}
+              href={user?.role === 'admin' ? `/user/audits/${audit?.authorId}` : "/audits"}
               className={cn(buttonVariants({variant: "ghost"}))}
           >
             <Icons.chevronLeft className="mr-2 h-4 w-4"/>

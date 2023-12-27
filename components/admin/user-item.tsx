@@ -16,7 +16,7 @@ const UserItem = ({user, setUser}: userItemProps) => {
           <div className="flex gap-2 items-center">
             <Avatar className="w-10 h-10">
               <AvatarImage src={user?.image}/>
-              <AvatarFallback>{user && user?.firstName[0].toUpperCase() + user?.lastName[1].toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{user && user?.firstName[0].toUpperCase() + user?.lastName[0].toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
               <div className="flex gap-2">
