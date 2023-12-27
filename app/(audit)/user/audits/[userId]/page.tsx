@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import UserAudits from "@/app/(audit)/user/[userId]/user-audits";
+import UserAudits from "@/app/(audit)/user/audits/[userId]/user-audits";
 import { AuditsProvider } from "@/components/dashboard/AuditsContext";
 
 export default function AuditSinglePage({params}: { params: { userId: string } }) {

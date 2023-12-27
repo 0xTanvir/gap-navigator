@@ -158,13 +158,24 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
 
             <DropdownMenuSeparator/>
 
+            <DropdownMenuItem
+                className="flex cursor-pointer items-center"
+                onClick={() => {
+                  router.push(`/user/audits/${user.uid}/evaluations`)
+                }}
+            >
+              <Icons.evaluate className="mr-2 h-4 w-4"/>
+              Evaluation
+            </DropdownMenuItem>
+            <DropdownMenuSeparator/>
+
             {
                 user.role !== 'client' &&
                 <>
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center"
                         onClick={() => {
-                          router.push(`/user/${user.uid}`)
+                          router.push(`/user/audits/${user.uid}`)
                         }}
                     >
                         <Icons.audit className="mr-2 h-4 w-4"/>
