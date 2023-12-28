@@ -63,7 +63,7 @@ import { setNotificationData } from "@/lib/firestore/notification";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { siteConfig, url } from "@/config/site";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,SheetFooter } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
@@ -377,7 +377,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                         <DropdownMenuItem
                             className="flex cursor-pointer items-center"
                             onClick={() => {
-                              let shareURL = url + `/audits/${audit.uid}`
+                              let shareURL = url + `/evaluate/${audit.uid}`
                               navigator.clipboard.writeText(shareURL).then(() => {
                                     toast({
                                       title: 'Audit link copy!',
