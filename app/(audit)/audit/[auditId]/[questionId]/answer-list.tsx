@@ -65,12 +65,12 @@ export default function AnswerList({auditId, questionId}: AuditEditorProps) {
         <AuditEditorHeader
             heading={question?.name as string}
             text={
-              user?.role === 'consultants' ?
+              user?.role === 'consultant' ?
                   "Create and manage answers." : "Manage answers."
             }
         >
           {
-              user?.role === 'consultants' &&
+              user?.role === 'consultant' &&
               <AnswerCreateButton
                   auditId={auditId}
                   questionId={questionId}

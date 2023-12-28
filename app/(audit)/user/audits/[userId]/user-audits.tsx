@@ -90,7 +90,7 @@ const UserAudits = ({userId}: UserAuditsProps) => {
 
           <DashboardHeader heading="Audits" text="Manage audits.">
             {
-                user?.role === 'consultants' &&
+                user?.role === 'consultant' &&
                 <AuditCreateButton userId={userId}/>
             }
           </DashboardHeader>
