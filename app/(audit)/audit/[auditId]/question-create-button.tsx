@@ -129,7 +129,7 @@ export function QuestionCreateButton({auditId, noQuestion, variant, className, .
                                     ) : (
                                         <Icons.filePlus className="mr-2 h-4 w-4"/>
                                     )}
-                                    Add Question
+                                    Submit
                                 </button>
                             </DialogFooter>
                         </form>

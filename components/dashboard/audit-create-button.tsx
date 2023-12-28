@@ -226,7 +226,7 @@ export function AuditCreateButton({
                     ) : (
                         <Icons.filePlus className="mr-2 h-4 w-4"/>
                     )}
-                    Add audit
+                    Submit
                   </button>
                 </SheetFooter>
               </form>
