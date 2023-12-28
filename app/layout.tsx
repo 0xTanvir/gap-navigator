@@ -6,7 +6,6 @@ import { siteConfig } from "@/config/site"
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/toaster'
-import { Suspense } from "react";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -59,10 +58,8 @@ export default function RootLayout({children}: RootLayoutProps) {
         attribute: "class",
         defaultTheme: "system"
       }}>
-        <Suspense fallback={null}>
-          {children}
-          <Toaster/>
-        </Suspense>
+        {children}
+        <Toaster/>
       </Providers>
       </body>
       </html>
