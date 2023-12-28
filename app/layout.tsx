@@ -8,14 +8,14 @@ import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/toaster'
 
 const fontSans = FontSans({
-    subsets: ["latin"],
-    variable: "--font-sans",
+  subsets: ["latin"],
+  variable: "--font-sans",
 })
 
 // Font files can be collocated inside of `pages`
 const fontHeading = localFont({
-    src: "../assets/fonts/CalSans-SemiBold.woff2",
-    variable: "--font-heading",
+  src: "../assets/fonts/CalSans-SemiBold.woff2",
+  variable: "--font-heading",
 })
 
 // export const viewport = {
@@ -26,37 +26,42 @@ const fontHeading = localFont({
 // }
 
 export const metadata = {
-    title: {
-        default: siteConfig.name,
-        template: `%s - ${siteConfig.name}`,
-    },
-    description: siteConfig.description,
-    icons: {
-        icon: "/favicon.ico",
-        shortcut: "/favicon-16x16.png",
-        apple: "/apple-touch-icon.png",
-    },
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
 }
 
 interface RootLayoutProps {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-    return (
-        <html lang="en" suppressHydrationWarning>
-            <body
-                className={cn(
-                    "min-h-screen bg-background font-sans antialiased",
-                    fontSans.variable,
-                    fontHeading.variable
-                )}
-            >
-                <Providers themeProps={{ enableSystem: true, disableTransitionOnChange: true, attribute: "class", defaultTheme: "system" }} >
-                    {children}
-                    <Toaster />
-                </Providers>
-            </body>
-        </html>
-    )
+export default function RootLayout({children}: RootLayoutProps) {
+  return (
+      <html lang="en" suppressHydrationWarning>
+      <body
+          className={cn(
+              "min-h-screen bg-background font-sans antialiased",
+              fontSans.variable,
+              fontHeading.variable
+          )}
+      >
+      <Providers themeProps={{
+        enableSystem: true,
+        disableTransitionOnChange: true,
+        attribute: "class",
+        defaultTheme: "system"
+      }}>
+        {children}
+        <Toaster/>
+      </Providers>
+      </body>
+      </html>
+  )
 }

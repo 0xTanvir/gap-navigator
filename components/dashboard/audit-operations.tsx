@@ -15,7 +15,7 @@ import { setAudit } from "@/lib/firestore/audit";
 import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
 import { auditInviteSchema, auditSchema, auditShareSchema } from "@/lib/validations/audit";
-import { Audit, AuditActionType, Notification } from "@/types/dto";
+import { Audit, AuditActionType, Audits, Notification } from "@/types/dto";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -91,9 +91,10 @@ interface AuditOperationsProps {
   userId: string;
   audit: Audit;
   archive?: boolean
+  setAudits?: React.Dispatch<React.SetStateAction<Audits | []>>;
 }
 
-export function AuditOperations({userId, audit, archive}: AuditOperationsProps) {
+export function AuditOperations({userId, audit, archive, setAudits}: AuditOperationsProps) {
   const {dispatch} = useAudits();
   const {user, updateUser} = useAuth();
 
@@ -113,8 +114,7 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
   const [isShareLoading, setIsShareLoading] = React.useState<boolean>(false);
 
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
-  const [showUpdateDialog, setShowUpdateDialog] =
-      React.useState<boolean>(false);
+  const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<FormData>({
@@ -135,11 +135,17 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
         authorId: audit.authorId,
         createdAt: audit.createdAt,
       };
-
       await setAudit(userId, updatedAudit);
-      dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
-      form.reset();
 
+      if (user?.role === "admin" && setAudits) {
+        setAudits((audits) => {
+          // Update the specific audit in the state
+          return audits.map((audit) => (audit.uid === updatedAudit.uid ? updatedAudit : audit));
+        });
+      } else {
+        dispatch({type: AuditActionType.UPDATE_AUDIT, payload: updatedAudit});
+      }
+      form.reset();
       return toast({
         title: "Audit updated successfully.",
         description: `Your audit was updated.`,
@@ -170,63 +176,70 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
     try {
       let inviteUser = await getUserByEmail(data.email)
       if (inviteUser) {
-        const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
-        if (!exclusiveExists) {
-          // Check if exclusiveList exists, if not, initialize it as an empty array
-          const exclusiveList = audit.exclusiveList || [];
+        if (audit.authorId === inviteUser.uid) {
+          return toast({
+            title: "Audit owner ID and invited user ID are the same",
+            variant: "default"
+          });
+        } else {
+          const exclusiveExists = (audit.exclusiveList || []).includes(inviteUser.uid);
+          if (!exclusiveExists) {
+            // Check if exclusiveList exists, if not, initialize it as an empty array
+            const exclusiveList = audit.exclusiveList || [];
 
-          const formattedAudit = {
-            ...audit,
-            exclusiveList: [...exclusiveList, inviteUser.uid]
-          };
-          const notificationData: Notification = {
-            uid: uuidv4(),
-            auditName: audit.name,
-            type: "AUDIT_INVITED",
-            ownerAuditUserId: audit.authorId,
-            inviteUserId: inviteUser.uid,
-            auditId: audit.uid,
-            isSeen: false,
-            createdAt: Timestamp.now(),
-          }
-          let isSuccess = await setNotificationData(inviteUser.uid, notificationData)
-          if (isSuccess) {
-            await setAudit(userId, formattedAudit);
-            inviteUser.invitedAuditsList.push(audit.uid)
-            await updateUserById(inviteUser.uid, inviteUser)
-            dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
-            let requestBody = {
-              inviterEmail: inviteUser.email,
-              inviterFirstName: inviteUser.firstName,
-              receiverEmail: inviteUser.email,
-              receiverFirstName: inviteUser.firstName,
-              auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+            const formattedAudit = {
+              ...audit,
+              exclusiveList: [...exclusiveList, inviteUser.uid]
+            };
+            const notificationData: Notification = {
+              uid: uuidv4(),
+              auditName: audit.name,
+              type: "AUDIT_INVITED",
+              ownerAuditUserId: audit.authorId,
+              inviteUserId: inviteUser.uid,
+              auditId: audit.uid,
+              isSeen: false,
+              createdAt: Timestamp.now(),
             }
-            const response = await fetch('/api/mailer', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(requestBody),
-            });
-            if (response.ok) {
-              const data = await response.json();
-            } else {
-              const error = await response.json();
-              console.error('Error sending email:', error);
+            let isSuccess = await setNotificationData(inviteUser.uid, notificationData)
+            if (isSuccess) {
+              await setAudit(userId, formattedAudit);
+              inviteUser.invitedAuditsList.push(audit.uid)
+              await updateUserById(inviteUser.uid, inviteUser)
+              dispatch({type: AuditActionType.UPDATE_AUDIT, payload: formattedAudit});
+              let requestBody = {
+                inviterEmail: inviteUser.email,
+                inviterFirstName: inviteUser.firstName,
+                receiverEmail: inviteUser.email,
+                receiverFirstName: inviteUser.firstName,
+                auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+              }
+              const response = await fetch('/api/mailer', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+              });
+              if (response.ok) {
+                const data = await response.json();
+              } else {
+                const error = await response.json();
+                console.error('Error sending email:', error);
+              }
+              return toast({
+                title: "Audit invited successfully.",
+                description: `Your audit was updated.`,
+                variant: "success"
+              });
             }
+
+          } else {
             return toast({
-              title: "Audit invited successfully.",
-              description: `Your audit was updated.`,
+              title: "Already audit invited.",
               variant: "success"
             });
           }
-
-        } else {
-          return toast({
-            title: "Already audit invited.",
-            variant: "success"
-          });
         }
 
       } else {
@@ -261,30 +274,37 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
     try {
       let shareUser = await getUserByEmail(data.email)
       if (shareUser) {
-        let requestBody = {
-          inviterEmail: shareUser.email,
-          inviterFirstName: shareUser.firstName,
-          receiverEmail: shareUser.email,
-          receiverFirstName: shareUser.firstName,
-          auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
-        }
-        const responseData = await fetch('/api/mailer', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-        if (responseData.ok) {
-          const data = await responseData.json();
+        if (audit.authorId === shareUser.uid) {
+          return toast({
+            title: "Audit owner ID and share user ID are the same",
+            variant: "default"
+          });
         } else {
-          const error = await responseData.json();
-          console.error('Error sending email:', error);
+          let requestBody = {
+            inviterEmail: shareUser.email,
+            inviterFirstName: shareUser.firstName,
+            receiverEmail: shareUser.email,
+            receiverFirstName: shareUser.firstName,
+            auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
+          }
+          const responseData = await fetch('/api/mailer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+          if (responseData.ok) {
+            const data = await responseData.json();
+          } else {
+            const error = await responseData.json();
+            console.error('Error sending email:', error);
+          }
+          return toast({
+            title: "The audit link successfully sends the user an email",
+            variant: "success"
+          });
         }
-        return toast({
-          title: "The audit link successfully sends the user an email",
-          variant: "success"
-        });
       } else {
         return toast({
           title: "User not found.",
@@ -404,20 +424,28 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                   <DropdownMenuSeparator/>
                   <DropdownMenuItem
                       className="flex cursor-pointer items-center"
-                      onSelect={() => setShowUpdateDialog(true)}
+                      onSelect={() => {
+                        setShowUpdateDialog(true)
+                        form.setValue("auditName", audit.name)
+                        form.setValue("auditType", audit.type)
+                      }}
                   >
                     <Icons.fileEdit className="mr-2 h-4 w-4"/>
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator/>
-                  <DropdownMenuItem
-                      className="flex cursor-pointer items-center text-destructive focus:text-destructive"
-                      onSelect={() => setShowArchiveAlert(true)}
-                  >
-                    <Icons.archive className="mr-2 h-4 w-4"/>
-                    Archive
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator/>
+                  {user?.role !== "admin" &&
+                      <>
+                          <DropdownMenuItem
+                              className="flex cursor-pointer items-center text-destructive focus:text-destructive"
+                              onSelect={() => setShowArchiveAlert(true)}
+                          >
+                              <Icons.archive className="mr-2 h-4 w-4"/>
+                              Archive
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator/>
+                      </>
+                  }
                   <DropdownMenuItem
                       className="flex cursor-pointer items-center text-destructive focus:text-destructive"
                       onSelect={() => setShowDeleteAlert(true)}
@@ -506,10 +534,15 @@ export function AuditOperations({userId, audit, archive}: AuditOperationsProps) 
                       setIsDeleteLoading(false);
                       setShowDeleteAlert(false);
 
-                      dispatch({
-                        type: AuditActionType.DELETE_AUDIT,
-                        payload: audit.uid,
-                      });
+                      if (user?.role === 'admin' && setAudits) {
+                        // Assuming audits is a state variable in the parent component
+                        setAudits((prevAudits) => prevAudits.filter((a) => a.uid !== audit.uid));
+                      } else {
+                        dispatch({
+                          type: AuditActionType.DELETE_AUDIT,
+                          payload: audit.uid,
+                        });
+                      }
                       user?.audits.splice(user?.audits.indexOf(audit.uid), 1);
                       updateUser(user);
                     }

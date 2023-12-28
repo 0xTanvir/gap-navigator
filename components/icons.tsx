@@ -40,7 +40,7 @@ import {
     ScanEye,
     ClipboardCheck,
     Copy,
-    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore, Circle,
+    Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore, Circle, ArrowLeft,
 } from "lucide-react"
 
 export const Icons = {
@@ -71,6 +71,7 @@ export const Icons = {
     audit: FileText,
     report: FileBarChart2,
     arrowRight: ArrowRight,
+    arrowLeft: ArrowLeft,
     add: Plus,
     ellipsis: MoreVertical,
     trash: Trash,

@@ -37,7 +37,7 @@ export default function QuestionPage({params}: { params: { auditId: string, ques
                 <AuditEditorHeader.Skeleton/>
             </AuditEditorShell>
         )
-    } else if (isAuthenticated && user && user.role === "consultant") {
+    } else if ((isAuthenticated && user && user.role === "consultant") || isAuthenticated && user && user.role === "admin") {
         return (
             <>
                 <AnswerList userId={user.uid} questionId={params.questionId} auditId={params.auditId}/>
