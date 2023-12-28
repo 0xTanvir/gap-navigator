@@ -31,6 +31,7 @@ export async function getAuditsByIds(userAuditsId: string[], status: string = ""
         uid: doc.id,
         name: data.name,
         type: data.type,
+        description: data.description ? data.description : "",
         exclusiveList: data.exclusiveList ? data.exclusiveList : [],
         status: data.status ? data.status : "",
         authorId: data.authorId,

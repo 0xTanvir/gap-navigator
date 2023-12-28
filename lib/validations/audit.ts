@@ -8,7 +8,11 @@ export const auditSchema = z.object({
     auditType: z
         .string({
             required_error: "Please select an audit type.",
-        }).min(1)
+        }).min(1),
+  description: z
+      .string({
+        required_error: "Please type an audit description.",
+      }).min(1),
 })
 
 export const auditInviteSchema = z.object({
