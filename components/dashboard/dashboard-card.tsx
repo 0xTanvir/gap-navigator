@@ -7,16 +7,24 @@ interface DashboardCardProps {
   title: string
   totalNumber: number
   iconName: string
+  handleClick?: () => void
 }
 
-const DashboardCard = ({title, totalNumber, iconName}: DashboardCardProps) => {
+const DashboardCard = ({title, totalNumber, iconName, handleClick}: DashboardCardProps) => {
   const iconMap: Record<string, JSX.Element> = {
     users: <Icons.users/>,
     evaluate: <Icons.evaluate/>,
     audit: <Icons.audit/>,
   };
   return (
-      <Card>
+      <Card
+          onClick={() => {
+            if (handleClick) {
+              handleClick();
+            }
+          }}
+          className={handleClick ? "cursor-pointer" : ""}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             {title}

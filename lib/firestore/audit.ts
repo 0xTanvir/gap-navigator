@@ -198,3 +198,31 @@ export async function fetchPaginatedData(entity_object: any) {
   });
 
 }
+
+export async function getAuditsByType(userId: string, auditType: string): Promise<Audits> {
+  console.log(userId)
+  try {
+    const auditsRef = Collections.audits()
+    let queryRef = query(auditsRef,
+        where('authorId', '==', userId),
+        where('type', '==', auditType),
+    )
+    const querySnapshot = await getDocs(queryRef);
+
+    const audits = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        name: data.name,
+        type: data.type,
+        exclusiveList: data.exclusiveList ? data.exclusiveList : [],
+        status: data.status ? data.status : "",
+        authorId: data.authorId,
+        createdAt: data.createdAt,
+      } as Audit;
+    });
+    return audits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+  } catch (error) {
+    throw new Error(`Error fetching audits by type: ${error}`)
+  }
+}
