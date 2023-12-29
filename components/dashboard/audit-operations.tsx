@@ -63,6 +63,15 @@ import { setNotificationData } from "@/lib/firestore/notification";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { siteConfig, url } from "@/config/site";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { useState } from "react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@/components/editorjs/editor"),
+    {
+      ssr: false
+    }
+)
 
 async function deleteAuditFromDB(userId: string, auditId: string) {
   try {
@@ -115,6 +124,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
 
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<FormData>({
@@ -122,8 +132,24 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
     defaultValues: {
       auditName: audit.name,
       auditType: audit.type,
+      description: audit.description
     },
   });
+
+  const handleEditorSave = (data: any) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      if (!isTyping) {
+        form.trigger('description');
+      }
+    }, 100);
+
+    if (data.length > 0) {
+      form.setValue('description', JSON.stringify(data));
+    } else {
+      form.setValue('description', JSON.stringify(undefined));
+    }
+  };
 
   async function onUpdateSubmit(data: FormData) {
     setIsUpdateLoading(true);
@@ -131,6 +157,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
       const updatedAudit: Audit = {
         name: data.auditName,
         type: data.auditType,
+        description: data.description,
         uid: audit.uid,
         authorId: audit.authorId,
         createdAt: audit.createdAt,
@@ -350,7 +377,7 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                         <DropdownMenuItem
                             className="flex cursor-pointer items-center"
                             onClick={() => {
-                              let shareURL = url + `/audits/${audit.uid}`
+                              let shareURL = url + `/evaluate/${audit.uid}`
                               navigator.clipboard.writeText(shareURL).then(() => {
                                     toast({
                                       title: 'Audit link copy!',
@@ -615,16 +642,16 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
           </AlertDialogContent>
         </AlertDialog>
 
-        <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-          <DialogContent className="sm:max-w-[425px]">
+        <Sheet open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
+          <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Update audit</SheetTitle>
+              <SheetDescription>
+                Make changes to your audit here. Click save when you're done.
+              </SheetDescription>
+            </SheetHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onUpdateSubmit)}>
-                <DialogHeader>
-                  <DialogTitle>Update audit</DialogTitle>
-                  <DialogDescription>
-                    Make changes to your audit here. Click save when you're done.
-                  </DialogDescription>
-                </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <FormField
                       control={form.control}
@@ -668,11 +695,29 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                           </FormItem>
                       )}
                   />
+
+                  <FormField
+                      control={form.control}
+                      name="description"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Editor
+                                  id="description"
+                                  onSave={handleEditorSave}
+                                  initialData={audit?.description ? JSON?.parse(audit?.description) : ""}
+                                  placeHolder="Let`s write description!"
+                              />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
                 </div>
-                <DialogFooter>
+                <SheetFooter>
                   <button
                       type="submit"
-                      // onClick={onClick}
                       className={cn(buttonVariants({variant: "default"}), {
                         "cursor-not-allowed opacity-60": isUpdateLoading,
                       })}
@@ -685,11 +730,12 @@ export function AuditOperations({userId, audit, archive, setAudits}: AuditOperat
                     )}
                     Save changes
                   </button>
-                </DialogFooter>
+                </SheetFooter>
               </form>
             </Form>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
+
 
         <Dialog open={inviteAlert} onOpenChange={setInviteAlert}>
           <DialogContent className="sm:max-w-[425px]">
