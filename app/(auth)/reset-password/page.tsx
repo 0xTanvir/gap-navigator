@@ -11,7 +11,7 @@ export default function ResetPasswordPage() {
 
             <div className="flex justify-between items-center my-5">
                 <Link
-                    href="/login"
+                    href="/"
                     className={cn(
                         buttonVariants({variant: "ghost"}), "flex items-center")}
                 >
@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
                     </>
                 </Link>
                 <Link
-                    href="/"
+                    href="/signup"
                     className={cn(
                         buttonVariants({variant: "ghost"}), "flex items-center")}
                 > Sign Up
