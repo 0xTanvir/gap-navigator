@@ -13,7 +13,7 @@ import { Icons } from "@/components/icons";
 import { Audit, AuditActionType } from "@/types/dto";
 import { auditSchema } from "@/lib/validations/audit";
 import { ButtonProps, buttonVariants } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -35,15 +35,20 @@ import {
 import useAudits from "./AuditsContext";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
-const Editor = dynamic(() => import("@/components/editorjs/editor"),
-    {
-      ssr: false
-    }
-)
+const Editor = dynamic(() => import("@/components/editorjs/editor"), {
+  ssr: false,
+});
 
 type FormData = z.infer<typeof auditSchema>;
 
@@ -52,24 +57,24 @@ interface AuditCreateButtonProps extends ButtonProps {
 }
 
 export function AuditCreateButton({
-                                    userId,
-                                    className,
-                                    variant,
-                                    ...props
-                                  }: AuditCreateButtonProps) {
-  const {dispatch} = useAudits();
+  userId,
+  className,
+  variant,
+  ...props
+}: AuditCreateButtonProps) {
+  const { dispatch } = useAudits();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const {user, updateUser} = useAuth();
-  const router = useRouter()
+  const { user, updateUser } = useAuth();
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(auditSchema),
     defaultValues: {
       auditName: "",
       auditType: "",
-      description: ''
+      description: "",
     },
   });
 
@@ -77,14 +82,14 @@ export function AuditCreateButton({
     setIsTyping(true);
     setTimeout(() => {
       if (!isTyping) {
-        form.trigger('description');
+        form.trigger("description");
       }
     }, 1);
 
     if (data.length > 0) {
-      form.setValue('description', JSON.stringify(data));
+      form.setValue("description", JSON.stringify(data));
     } else {
-      form.setValue('description', JSON.stringify(undefined));
+      form.setValue("description", JSON.stringify(undefined));
     }
   };
 
@@ -101,23 +106,19 @@ export function AuditCreateButton({
       };
 
       const auditId = await setAudit(userId, audit);
-      dispatch({type: AuditActionType.ADD_AUDIT, payload: audit});
+      dispatch({ type: AuditActionType.ADD_AUDIT, payload: audit });
       user?.audits.push(audit.uid);
       updateUser(user);
       form.reset();
-      router.push(`/audit/${audit.uid}`)
+      router.push(`/audit/${audit.uid}`);
 
-      return toast({
-        title: "Audit created successfully.",
+      return toast.success("Audit created.", {
         description: `Your audit was created with id ${auditId}.`,
-        variant: "success"
       });
     } catch (error) {
       // Handle the error, which could come from the setAudit
-      return toast({
-        title: "Something went wrong.",
+      return toast.error("Something went wrong.", {
         description: "Your audit was not created. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -126,113 +127,116 @@ export function AuditCreateButton({
   }
 
   return (
-      <>
-        <Button variant={variant} onClick={() => setShowAddDialog(true)}>
-          <Icons.filePlus className="mr-2 h-4 w-4"/>
-          New audit
-        </Button>
+    <>
+      <Button variant={variant} onClick={() => setShowAddDialog(true)}>
+        <Icons.filePlus className="mr-2 h-4 w-4" />
+        New audit
+      </Button>
 
-        <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Add audit</SheetTitle>
-              <SheetDescription>
-                Type audit name, choose an audit type and type audit description.
-              </SheetDescription>
-            </SheetHeader>
+      <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Add audit</SheetTitle>
+            <SheetDescription>
+              Type audit name, choose an audit type and type audit description.
+            </SheetDescription>
+          </SheetHeader>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="grid gap-4 py-4">
-                  <FormField
-                      control={form.control}
-                      name="auditName"
-                      render={({field}) => (
-                          <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input variant="ny" placeholder="Audit Name" {...field} />
-                            </FormControl>
-                            <FormMessage/>
-                          </FormItem>
-                      )}
-                  />
-                  <FormField
-                      control={form.control}
-                      name="auditType"
-                      render={({field}) => (
-                          <FormItem>
-                            <FormLabel>Type</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select an audit type"/>
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="private">Private</SelectItem>
-                                <SelectItem value="exclusive">Exclusive</SelectItem>
-                                <SelectItem value="public">Public</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormDescription>
-                              Only public type can be sharable with client. Private
-                              type is only for consultant.
-                            </FormDescription>
-                            <FormMessage/>
-                          </FormItem>
-                      )}
-                  />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="grid gap-4 py-4">
+                <FormField
+                  control={form.control}
+                  name="auditName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          variant="ny"
+                          placeholder="Audit Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="auditType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an audit type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="private">Private</SelectItem>
+                          <SelectItem value="exclusive">Exclusive</SelectItem>
+                          <SelectItem value="public">Public</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Only public type can be sharable with client. Private
+                        type is only for consultant.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                      control={form.control}
-                      name="description"
-                      render={({field}) => (
-                          <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Editor
-                                  id="description"
-                                  onSave={handleEditorSave}
-                                  placeHolder="Let`s write description!"
-                              />
-                            </FormControl>
-                            <FormMessage/>
-                          </FormItem>
-                      )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Editor
+                          id="description"
+                          onSave={handleEditorSave}
+                          placeHolder="Let`s write description!"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                </div>
-
-                <SheetFooter>
-                  <button
-                      type="submit"
-                      // onClick={onClick}
-                      className={cn(
-                          buttonVariants({variant: "default"}),
-                          {
-                            "cursor-not-allowed opacity-60": isLoading,
-                          },
-                          className
-                      )}
-                      disabled={isLoading}
-                      {...props}
-                  >
-                    {isLoading ? (
-                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
-                    ) : (
-                        <Icons.filePlus className="mr-2 h-4 w-4"/>
-                    )}
-                    Submit
-                  </button>
-                </SheetFooter>
-              </form>
-            </Form>
-          </SheetContent>
-        </Sheet>
-      </>
+              <SheetFooter>
+                <button
+                  type="submit"
+                  // onClick={onClick}
+                  className={cn(
+                    buttonVariants({ variant: "default" }),
+                    {
+                      "cursor-not-allowed opacity-60": isLoading,
+                    },
+                    className
+                  )}
+                  disabled={isLoading}
+                  {...props}
+                >
+                  {isLoading ? (
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.filePlus className="mr-2 h-4 w-4" />
+                  )}
+                  Submit
+                </button>
+              </SheetFooter>
+            </form>
+          </Form>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }
