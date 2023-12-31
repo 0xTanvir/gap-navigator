@@ -41,7 +41,7 @@ export default function CompleteProfilePage({searchParams}: cpProps) {
                 firstName={name.firstName!}
                 lastName={name.lastName}
                 email={searchParams.email!}
-                callbackUrl="/"
+                callbackUrl="/dashboard"
             />
 
         </div>
