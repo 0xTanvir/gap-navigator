@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
                     </>
                 </Link>
                 <Link
-                    href="/signup"
+                    href="/"
                     className={cn(
                         buttonVariants({variant: "ghost"}), "flex items-center")}
                 > Sign Up
