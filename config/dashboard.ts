@@ -1,4 +1,4 @@
-import { DashboardConfig } from "@/types"
+import { DashboardConfig } from "@/types";
 
 export const dashboardConfig: DashboardConfig = {
   mainNav: [
@@ -28,7 +28,7 @@ export const dashboardConfig: DashboardConfig = {
       icon: "users",
     },
   ],
-}
+};
 
 export const consultantDashboardConfig: DashboardConfig = {
   mainNav: [],
@@ -44,17 +44,17 @@ export const consultantDashboardConfig: DashboardConfig = {
       icon: "audit",
     },
     {
-      title: "Archive",
-      href: "/archive",
-      icon: "archive",
-    },
-    {
       title: "Clients",
       href: "/clients",
       icon: "users",
     },
+    {
+      title: "Archive",
+      href: "/archive",
+      icon: "archive",
+    },
   ],
-}
+};
 
 export const clientDashboardConfig: DashboardConfig = {
   mainNav: [],
@@ -70,7 +70,7 @@ export const clientDashboardConfig: DashboardConfig = {
       icon: "audit",
     },
   ],
-}
+};
 export const adminDashboardConfig: DashboardConfig = {
   mainNav: [],
   sidebarNav: [
@@ -95,4 +95,4 @@ export const adminDashboardConfig: DashboardConfig = {
       icon: "users",
     },
   ],
-}
+};

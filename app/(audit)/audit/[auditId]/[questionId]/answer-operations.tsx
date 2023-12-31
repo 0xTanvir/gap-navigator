@@ -250,7 +250,7 @@ const AnswerOperations = ({
       </AlertDialog>
 
       <Sheet open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+        <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Update Answer</SheetTitle>
             <SheetDescription>

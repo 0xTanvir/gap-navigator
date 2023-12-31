@@ -136,7 +136,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
   }
 }
 
-export function getSidebarNav(
+function getSidebarNav(
   audit: Audit,
   questions: Questions
 ): SidebarNavItem[] {

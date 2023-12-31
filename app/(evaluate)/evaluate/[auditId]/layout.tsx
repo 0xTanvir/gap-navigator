@@ -176,10 +176,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
   );
 }
 
-export function getSidebarNav(
-  audit: Audit,
-  questions: Questions
-): SidebarNavItem[] {
+function getSidebarNav(audit: Audit, questions: Questions): SidebarNavItem[] {
   const items = questions.map((question) => ({
     title: question.name,
     href: `/evaluate/${audit.uid}/${question.uid}`,
