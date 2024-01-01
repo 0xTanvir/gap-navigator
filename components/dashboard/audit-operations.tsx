@@ -240,7 +240,7 @@ export function AuditOperations({
         name: auditFormData?.auditName as string,
         type: auditFormData?.auditType as string,
         welcome: auditFormData?.welcome as string,
-        thank_you: data.thank_you,
+        thank_you: data.thank_you as string,
         uid: audit.uid,
         authorId: audit.authorId,
         createdAt: audit.createdAt,

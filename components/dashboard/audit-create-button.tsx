@@ -157,7 +157,7 @@ export function AuditCreateButton({
         name: auditFormData?.auditName as string,
         type: auditFormData?.auditType as string,
         welcome: auditFormData?.welcome as string,
-        thank_you: data?.thank_you,
+        thank_you: data?.thank_you as string,
         uid: uuidv4(),
         authorId: userId,
         createdAt: Timestamp.now(),

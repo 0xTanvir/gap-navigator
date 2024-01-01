@@ -32,13 +32,13 @@ export const auditSchemaStep2 = z.object({
   welcome: z
       .string({
         required_error: "Please type an audit evaluation welcome page.",
-      }).min(1),
+      }).optional(),
 })
 export const auditSchemaStep3 = z.object({
   thank_you: z
       .string({
         required_error: "Please type an audit evaluation thank you page.",
-      }).min(1),
+      }).optional(),
 })
 
 export const auditInviteSchema = z.object({
