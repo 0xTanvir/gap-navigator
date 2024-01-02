@@ -10,6 +10,13 @@ import { getAllEvaluations } from "@/lib/firestore/evaluation";
 import { toast } from "sonner";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { useRouter } from "next/navigation";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious
+} from "@/components/ui/pagination";
 
 interface AuditsCounts {
   publicAuditsCount: number | undefined;
@@ -21,18 +28,19 @@ interface ConsultantDashboardProps {
   userAuditsId: string[];
 }
 
-const ConsultantDashboard = ({ userAuditsId }: ConsultantDashboardProps) => {
+const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
   const [auditsCounts, setAuditsCounts] = useState<AuditsCounts>({
     publicAuditsCount: undefined,
     privateAuditsCount: undefined,
     exclusiveAuditsCount: undefined,
   });
   const [clientsUniqueEvaluation, setClientsUniqueEvaluation] = useState<
-    Evaluate[] | []
+      Evaluate[] | []
   >([]);
   const [auditsGroupByMonth, setAuditsGroupByMonth] = useState<GroupedAudits[]>(
-    []
+      []
   );
+  const [evaluations, setEvaluations] = useState<Evaluate[] | []>([])
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
@@ -83,13 +91,13 @@ const ConsultantDashboard = ({ userAuditsId }: ConsultantDashboardProps) => {
       }
 
       const publicAuditsCount = dbAudits?.filter(
-        (audit) => audit.type === "public"
+          (audit) => audit.type === "public"
       ).length;
       const privateAuditsCount = dbAudits?.filter(
-        (audit) => audit.type === "private"
+          (audit) => audit.type === "private"
       ).length;
       const exclusiveAuditsCount = dbAudits?.filter(
-        (audit) => audit.type === "exclusive"
+          (audit) => audit.type === "exclusive"
       ).length;
 
       setAuditsCounts({
@@ -123,6 +131,7 @@ const ConsultantDashboard = ({ userAuditsId }: ConsultantDashboardProps) => {
 
       // Flatten the array of arrays into a single array
       const flattenedEvaluations = evaluationsArray.flat();
+      setEvaluations(flattenedEvaluations)
 
       // Update evaluations state
       setClientsUniqueEvaluation(flattenedEvaluations);
@@ -142,93 +151,93 @@ const ConsultantDashboard = ({ userAuditsId }: ConsultantDashboardProps) => {
 
   if (isLoading) {
     return (
-      <>
-        <div className="flex-1 space-y-4">
-          <DashboardHeader heading="Dashboard" text="Performance metrics" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <DashboardCard.Skeleton />
-            <DashboardCard.Skeleton />
-            <DashboardCard.Skeleton />
-            <DashboardCard.Skeleton />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <div className="col-span-4">
-              <Skeleton className="w-full h-96" />
+        <>
+          <div className="flex-1 space-y-4">
+            <DashboardHeader heading="Dashboard" text="Performance metrics"/>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <DashboardCard.Skeleton/>
+              <DashboardCard.Skeleton/>
+              <DashboardCard.Skeleton/>
+              <DashboardCard.Skeleton/>
             </div>
-            <div className="col-span-3">
-              <Skeleton className="w-full h-96" />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <div className="col-span-4">
+                <Skeleton className="w-full h-96"/>
+              </div>
+              <div className="col-span-3">
+                <Skeleton className="w-full h-96"/>
+              </div>
             </div>
           </div>
-        </div>
-      </>
+        </>
     );
   }
 
   return (
-    <>
-      <div className="flex-1 space-y-4">
-        <DashboardHeader heading="Dashboard" text="Performance metrics" />
+      <>
+        <div className="flex-1 space-y-4">
+          <DashboardHeader heading="Dashboard" text="Performance metrics"/>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <DashboardCard
-            title="Total Client"
-            totalNumber={clientsUniqueEvaluation?.length}
-            iconName="users"
-            handleClick={() => {
-              router.push("/clients");
-            }}
-          />
-          <DashboardCard
-            title="Public Audits"
-            totalNumber={auditsCounts?.publicAuditsCount ?? 0}
-            iconName="audit"
-            handleClick={() => {
-              router.push("/audits/public");
-            }}
-          />
-          <DashboardCard
-            title="Private Audits"
-            totalNumber={auditsCounts?.privateAuditsCount ?? 0}
-            iconName="audit"
-            handleClick={() => {
-              router.push("/audits/private");
-            }}
-          />
-          <DashboardCard
-            title="Exclusive Audits"
-            totalNumber={auditsCounts?.exclusiveAuditsCount ?? 0}
-            iconName="audit"
-            handleClick={() => {
-              router.push("/audits/exclusive");
-            }}
-          />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <DashboardCard
+                title="Total Client"
+                totalNumber={clientsUniqueEvaluation?.length}
+                iconName="users"
+                handleClick={() => {
+                  router.push("/clients");
+                }}
+            />
+            <DashboardCard
+                title="Public Audits"
+                totalNumber={auditsCounts?.publicAuditsCount ?? 0}
+                iconName="audit"
+                handleClick={() => {
+                  router.push("/audits/public");
+                }}
+            />
+            <DashboardCard
+                title="Private Audits"
+                totalNumber={auditsCounts?.privateAuditsCount ?? 0}
+                iconName="audit"
+                handleClick={() => {
+                  router.push("/audits/private");
+                }}
+            />
+            <DashboardCard
+                title="Exclusive Audits"
+                totalNumber={auditsCounts?.exclusiveAuditsCount ?? 0}
+                iconName="audit"
+                handleClick={() => {
+                  router.push("/audits/exclusive");
+                }}
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <DashboardOverviewChart auditsGroupByMonth={auditsGroupByMonth}/>
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-4 md:col-span-3">
+              <CardHeader>
+                <CardTitle>Recent Evaluation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-8">
+                  {evaluations.slice(0, 5).map((evaluation) => (
+                      <DashboardRecentEvaluation key={evaluation.uid} evaluation={evaluation}/>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4">
-            <CardHeader>
-              <CardTitle>Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <DashboardOverviewChart auditsGroupByMonth={auditsGroupByMonth} />
-            </CardContent>
-          </Card>
-
-          <Card className="col-span-3">
-            <CardHeader>
-              <CardTitle>Recent Evaluation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                {[1, 2, 3, 4, 5].map((number) => (
-                  <DashboardRecentEvaluation key={number} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </>
+      </>
   );
 };
 
