@@ -33,19 +33,26 @@ import * as z from "zod";
 import { EvaluationActionType } from "@/types/dto";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import edjsParser from "editorjs-parser";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
 export default function EvaluatePage({
-  params,
-}: {
+                                       params,
+                                     }: {
   params: { auditId: string };
 }) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const { evaluation, dispatch } = useEvaluation();
+  const {evaluation, dispatch} = useEvaluation();
   const router = useRouter();
-  const { auditId } = params;
+  const {auditId} = params;
+  const parser = new edjsParser();
+  let data = {
+    blocks: evaluation.welcome ? JSON.parse(evaluation.welcome) : []
+  };
+  const markup = parser.parse(data);
+
 
   const form = useForm<FormData>({
     resolver: zodResolver(evaluateParticipant),
@@ -65,7 +72,7 @@ export default function EvaluatePage({
     };
 
     const emailExists = evaluation.evaluations.find(
-      (item) => item.uid === data.participantEmail
+        (item) => item.uid === data.participantEmail
     );
 
     if (emailExists) {
@@ -88,150 +95,167 @@ export default function EvaluatePage({
       setShowDialog(false);
       if (evaluation.questions.length > 0) {
         router.push(
-          `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
+            `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
         );
       }
     }
   }
 
   return (
-    <div className="py-6 lg:py-10">
-      <DocsPageHeader
-        heading={evaluation.name}
-        text={"Complete this audit to generate your report."}
-      />
-      <EmptyPlaceholder>
-        <Image
-          src="/images/audit-start.svg"
-          alt="audit start image"
-          width={480}
-          height={270}
-          className="rounded-md transition-colors"
+      <div className="py-6 lg:py-10">
+        <DocsPageHeader
+            heading={evaluation.name}
+            text={"Complete this audit to generate your report."}
         />
-        <EmptyPlaceholder.Title>
-          Total {evaluation.questions.length}
-          {evaluation.questions.length >= 2 ? " Questions" : " Question"}
-        </EmptyPlaceholder.Title>
-
-        <Button
-          size="xl"
-          className="mt-8 text-sm font-semibold rounded-full"
-          onClick={() => setShowDialog(true)}
-        >
-          Lets Get Started
-        </Button>
-      </EmptyPlaceholder>
-
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <DialogHeader>
-                <DialogTitle>Add Information</DialogTitle>
-                <DialogDescription>
-                  Type Participant First Name, Last Name and Email.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <FormField
-                  control={form.control}
-                  name="participantFirstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          variant="ny"
-                          placeholder="Participant First Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="participantLastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          variant="ny"
-                          placeholder="Participant Last Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="participantEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          variant="ny"
-                          placeholder="Participant Email"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <DialogFooter>
-                <button
-                  type="submit"
-                  className={cn(buttonVariants({ variant: "default" }), {
-                    "cursor-not-allowed opacity-60": isLoading,
-                  })}
-                  disabled={isLoading}
+        {
+            evaluation.welcome !== "" &&
+            <div className="w-full text-end mb-2">
+                <Button
+                    size="lg"
+                    className="text-sm font-semibold rounded-full"
+                    onClick={() => setShowDialog(true)}
                 >
-                  {isLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Icons.filePlus className="mr-2 h-4 w-4" />
-                  )}
-                  Save
-                </button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </div>
+                    Lets Get Started
+                </Button>
+            </div>
+        }
+        {
+          evaluation.welcome ?
+              <div dangerouslySetInnerHTML={{__html: markup}}></div>
+              :
+              <EmptyPlaceholder>
+                <Image
+                    src="/images/audit-start.svg"
+                    alt="audit start image"
+                    width={480}
+                    height={270}
+                    className="rounded-md transition-colors"
+                />
+                <EmptyPlaceholder.Title>
+                  Total {evaluation.questions.length}
+                  {evaluation.questions.length >= 2 ? " Questions" : " Question"}
+                </EmptyPlaceholder.Title>
+
+                <Button
+                    size="xl"
+                    className="mt-8 text-sm font-semibold rounded-full"
+                    onClick={() => setShowDialog(true)}
+                >
+                  Lets Get Started
+                </Button>
+              </EmptyPlaceholder>
+        }
+
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <DialogHeader>
+                  <DialogTitle>Add Information</DialogTitle>
+                  <DialogDescription>
+                    Type Participant First Name, Last Name and Email.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <FormField
+                      control={form.control}
+                      name="participantFirstName"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                  type="text"
+                                  variant="ny"
+                                  placeholder="Participant First Name"
+                                  {...field}
+                              />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="participantLastName"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                  type="text"
+                                  variant="ny"
+                                  placeholder="Participant Last Name"
+                                  {...field}
+                              />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="participantEmail"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                  type="email"
+                                  variant="ny"
+                                  placeholder="Participant Email"
+                                  {...field}
+                              />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
+                </div>
+                <DialogFooter>
+                  <button
+                      type="submit"
+                      className={cn(buttonVariants({variant: "default"}), {
+                        "cursor-not-allowed opacity-60": isLoading,
+                      })}
+                      disabled={isLoading}
+                  >
+                    {isLoading ? (
+                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                    ) : (
+                        <Icons.filePlus className="mr-2 h-4 w-4"/>
+                    )}
+                    Save
+                  </button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
   );
 }
 
 EvaluatePage.Skeleton = function EvaluatePageSkeleton() {
   return (
-    <EmptyPlaceholder className="mt-4">
-      <Image
-        src="/images/audit-start.svg"
-        alt="audit start image"
-        width={480}
-        height={270}
-        className="rounded-md transition-colors"
-      />
-      <div className="mt-6 text-xl font-semibold flex">
-        Total <Skeleton className="w-28 ml-2" />
-      </div>
-      <Button
-        disabled={true}
-        size="xl"
-        className="mt-8 text-sm font-semibold rounded-full"
-      >
-        Lets Get Started
-      </Button>
-    </EmptyPlaceholder>
+      <EmptyPlaceholder className="mt-4">
+        <Image
+            src="/images/audit-start.svg"
+            alt="audit start image"
+            width={480}
+            height={270}
+            className="rounded-md transition-colors"
+        />
+        <div className="mt-6 text-xl font-semibold flex">
+          Total <Skeleton className="w-28 ml-2"/>
+        </div>
+        <Button
+            disabled={true}
+            size="xl"
+            className="mt-8 text-sm font-semibold rounded-full"
+        >
+          Lets Get Started
+        </Button>
+      </EmptyPlaceholder>
   );
 };

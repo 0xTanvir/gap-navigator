@@ -90,12 +90,14 @@ h6.ce-header {
     @apply text-[10.72px] font-bold leading-5
 }
 
-#additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content, #recommendationDocument .ce-block__content, #description .ce-block__content {
+/*#additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content, #recommendationDocument .ce-block__content, #description .ce-block__content {*/
+.editorjs .ce-block__content {
     margin: 0 70px;
     max-width: 100%;
 }
 
-#additionalNote .ce-toolbar__content, #recommendedNote .ce-toolbar__content, #internalNote .ce-toolbar__content, #recommendationDocument .ce-toolbar__content, #description .ce-toolbar__content {
+/*#additionalNote .ce-toolbar__content, #recommendedNote .ce-toolbar__content, #internalNote .ce-toolbar__content, #recommendationDocument .ce-toolbar__content, #description .ce-toolbar__content {*/
+.editorjs .ce-toolbar__content {
     margin: 0 60px;
     max-width: 100%;
 }
@@ -105,12 +107,14 @@ h6.ce-header {
 }
 
 @media (max-width: 639.98px) {
-    #additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content, #recommendationDocument .ce-block__content, #description .ce-block__content {
+    /*#additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content, #recommendationDocument .ce-block__content, #description .ce-block__content {*/
+    .editorjs .ce-block__content {
         margin: 0 30px;
         max-width: 100%;
     }
 
-    #additionalNote .ce-toolbar__content, #recommendedNote .ce-toolbar__content, #internalNote .ce-toolbar__content, #recommendationDocument .ce-toolbar__content, #description .ce-toolbar__content {
+    /*#additionalNote .ce-toolbar__content, #recommendedNote .ce-toolbar__content, #internalNote .ce-toolbar__content, #recommendationDocument .ce-toolbar__content, #description .ce-toolbar__content {*/
+    .editorjs .ce-toolbar__content {
         margin: 0 10px;
         max-width: 100%;
     }

@@ -44,7 +44,8 @@ export interface Audit {
   uid: string
   name: string
   type: string
-  description: string
+  welcome: string
+  thank_you: string
   exclusiveList?: string[];
   status?: string,
   authorId: string

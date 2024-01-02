@@ -195,7 +195,7 @@ const AnswerOperations = ({
             onSelect={() => setShowUpdateDialog(true)}
           >
             <Icons.fileEdit className="mr-2 h-4 w-4" />
-            Edit
+            Rename
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -345,7 +345,7 @@ const AnswerOperations = ({
                   ) : (
                     <Icons.add className="mr-2 h-4 w-4" />
                   )}
-                  Save changes
+                  Update Answer
                 </button>
               </SheetFooter>
             </form>
