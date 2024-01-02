@@ -25,6 +25,26 @@ export const columns: ColumnDef<Evaluate>[] = [
         }
     },
     {
+        accessorKey: "phone",
+        header: "Phone",
+        cell: ({row}) => {
+            const {participantPhone} = row.original
+            return (
+                <> {participantPhone} </>
+            )
+        }
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Evaluation Last Date",
+        cell: ({row}) => {
+            const {createdAt} = row.original
+            return (
+                <> {createdAt} </>
+            )
+        }
+    },
+    {
         accessorKey: "Evaluation count",
         header: ({column}) => {
             return (

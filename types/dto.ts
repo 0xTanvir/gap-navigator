@@ -145,6 +145,8 @@ export interface Evaluate {
   participantFirstName: string;
   participantLastName: string;
   participantEmail: string;
+  participantPhone: string;
+  createdAt: Timestamp
   choices?: Choice[];
   auditName?: string
   count?: number;

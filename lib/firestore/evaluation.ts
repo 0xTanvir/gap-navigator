@@ -76,6 +76,8 @@ export async function getAllEvaluations(auditId: string) {
           participantFirstName: data.participantFirstName,
           participantLastName: data.participantLastName,
           participantEmail: data.participantEmail,
+          participantPhone: data.participantPhone,
+          createdAt: data.createdAt,
           choices: data.choices,
         } as Evaluate
       });
@@ -103,6 +105,8 @@ export async function getEvaluationByIds(auditIds: string[], evaluationID: strin
         participantFirstName: data.participantFirstName,
         participantLastName: data.participantLastName,
         participantEmail: data.participantEmail,
+        participantPhone: data.participantPhone,
+        createdAt: data.createdAt,
         choices: data.choices,
       };
       evaluations.push(evaluation);
@@ -126,6 +130,8 @@ export async function getAllEvaluationWithAuditName(auditId: string) {
           participantFirstName: data.participantFirstName,
           participantLastName: data.participantLastName,
           participantEmail: data.participantEmail,
+          participantPhone: data.participantPhone,
+          createdAt: data.createdAt,
           choices: data.choices,
           auditName: dbAudit.name
         } as Evaluate

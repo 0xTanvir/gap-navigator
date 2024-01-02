@@ -34,6 +34,7 @@ import { EvaluationActionType } from "@/types/dto";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import edjsParser from "editorjs-parser";
+import { Timestamp } from "firebase/firestore";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -60,6 +61,7 @@ export default function EvaluatePage({
       participantFirstName: "",
       participantLastName: "",
       participantEmail: "",
+      participantPhone: "",
     },
   });
 
@@ -69,6 +71,8 @@ export default function EvaluatePage({
       participantFirstName: data.participantFirstName,
       participantLastName: data.participantLastName,
       participantEmail: data.participantEmail,
+      participantPhone: data.participantPhone ? data.participantPhone : "",
+      createdAt: Timestamp.now(),
     };
 
     const emailExists = evaluation.evaluations.find(
@@ -147,52 +151,54 @@ export default function EvaluatePage({
         }
 
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[625px]">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogHeader>
                   <DialogTitle>Add Information</DialogTitle>
                   <DialogDescription>
-                    Type Participant First Name, Last Name and Email.
+                    Type Participant First Name, Last Name Email and Phone Number.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
-                  <FormField
-                      control={form.control}
-                      name="participantFirstName"
-                      render={({field}) => (
-                          <FormItem>
-                            <FormLabel>First Name</FormLabel>
-                            <FormControl>
-                              <Input
-                                  type="text"
-                                  variant="ny"
-                                  placeholder="Participant First Name"
-                                  {...field}
-                              />
-                            </FormControl>
-                            <FormMessage/>
-                          </FormItem>
-                      )}
-                  />
-                  <FormField
-                      control={form.control}
-                      name="participantLastName"
-                      render={({field}) => (
-                          <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                              <Input
-                                  type="text"
-                                  variant="ny"
-                                  placeholder="Participant Last Name"
-                                  {...field}
-                              />
-                            </FormControl>
-                            <FormMessage/>
-                          </FormItem>
-                      )}
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <FormField
+                        control={form.control}
+                        name="participantFirstName"
+                        render={({field}) => (
+                            <FormItem>
+                              <FormLabel>First Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                    type="text"
+                                    variant="ny"
+                                    placeholder="Participant First Name"
+                                    {...field}
+                                />
+                              </FormControl>
+                              <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="participantLastName"
+                        render={({field}) => (
+                            <FormItem>
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                    type="text"
+                                    variant="ny"
+                                    placeholder="Participant Last Name"
+                                    {...field}
+                                />
+                              </FormControl>
+                              <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+                  </div>
                   <FormField
                       control={form.control}
                       name="participantEmail"
@@ -204,6 +210,24 @@ export default function EvaluatePage({
                                   type="email"
                                   variant="ny"
                                   placeholder="Participant Email"
+                                  {...field}
+                              />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="participantPhone"
+                      render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input
+                                  type="tel"
+                                  variant="ny"
+                                  placeholder="Participant Phone"
                                   {...field}
                               />
                             </FormControl>
