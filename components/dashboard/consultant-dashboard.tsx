@@ -131,7 +131,7 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
 
       // Flatten the array of arrays into a single array
       const flattenedEvaluations = evaluationsArray.flat();
-      setEvaluations(flattenedEvaluations)
+      setEvaluations(flattenedEvaluations.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds))
 
       // Update evaluations state
       setClientsUniqueEvaluation(flattenedEvaluations);

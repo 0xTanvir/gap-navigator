@@ -150,7 +150,6 @@ export interface Evaluate {
   choices?: Choice[];
   auditName?: string
   count?: number;
-  // runningStatus?: string // not-started, id, completed
 }
 
 export interface Choice {
