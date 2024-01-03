@@ -4,11 +4,11 @@ export const dashboardConfig: DashboardConfig = {
   mainNav: [
     {
       title: "Guide",
-      href: "/",
+      href: "#",
     },
     {
       title: "Support",
-      href: "/",
+      href: "#",
     },
   ],
   sidebarNav: [

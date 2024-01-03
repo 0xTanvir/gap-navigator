@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import htmlToPdfmake from "html-to-pdfmake"
 import edjsParser from "editorjs-parser";
+import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -138,6 +139,10 @@ const PdfDownload = () => {
 
   return (
       <>
+        <DocsPageHeader
+            heading={evaluation.name}
+            text={"Analyze your report."}
+        />
         <div className="w-full text-end">
           <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
         </div>

@@ -33,6 +33,8 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
       participantFirstName: '',
       participantLastName: '',
       participantEmail: '',
+      participantPhone: '',
+      createdAt: Timestamp.now(),
       choices: []
     },
     evaluations: [],
