@@ -59,7 +59,7 @@ const QuestionAnswerList = ({ questionId }: QuestionAnswerListProps) => {
                   <RadioGroup
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4"
+                    className="mt-4 grid grid-cols-1 gap-y-6 sm:gap-x-4"
                   >
                     {question.answers.map((answer, index) => (
                       <FormItem
