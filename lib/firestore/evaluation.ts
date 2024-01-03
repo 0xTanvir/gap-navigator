@@ -77,6 +77,7 @@ export async function getAllEvaluations(auditId: string) {
           participantLastName: data.participantLastName,
           participantEmail: data.participantEmail,
           participantPhone: data.participantPhone,
+          auditId: data.auditId,
           createdAt: data.createdAt,
           choices: data.choices,
         } as Evaluate
