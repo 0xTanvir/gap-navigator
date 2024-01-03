@@ -3,7 +3,6 @@
 import {ColumnDef} from "@tanstack/react-table"
 import {Evaluate} from "@/types/dto";
 import {formatDate} from "@/lib/utils";
-import {Icons} from "@/components/icons";
 import * as React from "react";
 
 export const columns: ColumnDef<Evaluate>[] = [
@@ -61,15 +60,4 @@ export const columns: ColumnDef<Evaluate>[] = [
             )
         }
     },
-    // {
-    //     id: "actions",
-    //     cell: ({row}) => {
-    //         return (
-    //             <div className="flex items-center cursor-pointer">
-    //                 <Icons.fileEdit className="mr-1 h-4 w-4"/>
-    //                 Edit
-    //             </div>
-    //         )
-    //     },
-    // },
 ]
