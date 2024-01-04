@@ -7,6 +7,8 @@ import * as React from "react";
 
 export const columns: ColumnDef<Evaluate>[] = [
     {
+        accessorFn: (row) => `${row.participantFirstName}`,
+        enableMultiSort: true,
         accessorKey: "name",
         header: "Name",
         cell: ({row}) => {
@@ -17,8 +19,10 @@ export const columns: ColumnDef<Evaluate>[] = [
         }
     },
     {
+        accessorFn: (row) => `${row.participantEmail}`,
         accessorKey: "email",
         header: "Email",
+        footer: props => props.column.id,
         cell: ({row}) => {
             const {participantEmail} = row.original
             return (

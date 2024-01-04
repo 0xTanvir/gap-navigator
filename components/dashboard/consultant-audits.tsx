@@ -56,13 +56,16 @@ export default function ConsultantAudits({
         if (data.auditName && data.auditType) {
             let filterData = audits.filter(audit => audit.type === data.auditType && audit.name === data.auditName);
             setCurrentAudits(filterData)
+            setCurrentPage(1)
         } else if (data.auditName) {
             let filterData = audits.filter(audit => audit.name === data.auditName);
             setCurrentAudits(filterData)
+            setCurrentPage(1)
         } else if (data.auditType) {
             setFilterData(true)
             let filterData = audits.filter(audit => audit.type === data.auditType);
             setCurrentAudits(filterData)
+            setCurrentPage(1)
         }
     }
 

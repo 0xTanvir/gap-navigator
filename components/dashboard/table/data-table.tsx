@@ -6,6 +6,7 @@ import {
     getCoreRowModel,
     getPaginationRowModel,
     useReactTable,
+    getFilteredRowModel
 } from "@tanstack/react-table"
 
 import {
@@ -52,16 +53,25 @@ export function DataTable<TData, TValue>({
                                              data,
                                              setEvaluations,
                                          }: DataTableProps<TData, TValue>) {
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-    })
+    const [globalFilter, setGlobalFilter] = React.useState('')
+
     const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
     const [showUpdateDialog, setShowUpdateDialog] =
         React.useState<boolean>(false);
     const [evaluationData, setEvaluationData] = useState<Evaluate | null>(null)
+
+
+    const table = useReactTable({
+        data,
+        columns,
+        state: {
+            globalFilter: globalFilter
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onGlobalFilterChange: setGlobalFilter,
+        getFilteredRowModel: getFilteredRowModel(),
+    })
 
     const form = useForm<FormData>({
         resolver: zodResolver(evaluateParticipantUpdate),
@@ -108,6 +118,16 @@ export function DataTable<TData, TValue>({
 
     return (
         <>
+            <div className="mx-1">
+                <Input
+                    type="text"
+                    variant="ny"
+                    value={globalFilter}
+                    placeholder="search ..."
+                    onChange={e => setGlobalFilter(e.target.value)}
+                />
+            </div>
+
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
