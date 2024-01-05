@@ -39,6 +39,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Evaluate} from "@/types/dto";
 import {setEvaluation} from "@/lib/firestore/evaluation";
 import {toast} from "sonner";
+import DebouncedInput from "@/components/dashboard/table/debouncedInput";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -118,13 +119,12 @@ export function DataTable<TData, TValue>({
 
     return (
         <>
-            <div className="mx-1">
-                <Input
-                    type="text"
-                    variant="ny"
-                    value={globalFilter}
-                    placeholder="search ..."
-                    onChange={e => setGlobalFilter(e.target.value)}
+            <div className="flex justify-end mr-0.5">
+                <DebouncedInput
+                    value={globalFilter ?? ""}
+                    onChange={(value) => setGlobalFilter(String(value))}
+                    className="w-1/5"
+                    placeholder="Search name and email..."
                 />
             </div>
 
@@ -133,18 +133,22 @@ export function DataTable<TData, TValue>({
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                        key={header.id}
+                                        style={{display: header.column.columnDef.header !== "Last Name" ? "table-cell" : "none"}}
+                                    >
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                    </TableHead>
+                                ))}
+                                <TableHead className="text-center">
+                                    ...
+                                </TableHead>
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -156,13 +160,16 @@ export function DataTable<TData, TValue>({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell
+                                            key={cell.id}
+                                            style={{display: cell.column.id === "lastName" ? "none" : ""}}
+                                        >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
                                     <TableCell>
                                         <div
-                                            className="flex items-center cursor-pointer"
+                                            className="flex items-center cursor-pointer justify-center"
                                             onClick={() => handleEdit(row)}
                                         >
                                             <Icons.fileEdit className="mr-1 h-4 w-4"/>

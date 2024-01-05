@@ -59,11 +59,11 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
                 const uidCountsObject = Object.fromEntries(uidCounts);
 
                 // Update each object in flattenedEvaluations with count information
-                const enrichedEvaluations = flattenedEvaluations.map((evaluation) => ({
+                let enrichedEvaluations = flattenedEvaluations.map((evaluation) => ({
                     ...evaluation,
                     count: uidCountsObject[evaluation.uid] || 0,
                 }));
-
+                enrichedEvaluations.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)
                 // Update evaluations state
                 setClientsUniqueEvaluation(enrichedEvaluations);
             } catch (error) {
