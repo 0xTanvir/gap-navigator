@@ -14,7 +14,7 @@ import QuestionItem from "@/app/(audit)/audit/[auditId]/question-item";
 import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
 import {getQuestionsById} from "@/lib/firestore/question";
 import {useAuth} from "@/components/auth/auth-provider";
-import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
+import {DragDropContext, Draggable, Droppable} from "@hello-pangea/dnd";
 
 
 interface AuditEditorProps {
