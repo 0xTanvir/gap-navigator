@@ -23,6 +23,7 @@ export async function getQuestionsById(auditId: string) {
         const questions: Question[] = snap.docs.map((doc) => {
             const data = doc.data();
             return {
+                id: data.id,
                 uid: doc.id,
                 name: data.name,
                 answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
@@ -51,6 +52,7 @@ export async function getQuestionById(auditId: string, questionId: string) {
     const doc = querySnapshot.docs[0]; // Assuming there is only one matching document
     const data = doc.data();
     const question: Question = {
+        id: data.id,
         uid: doc.id,
         name: data.name,
         answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),

@@ -77,6 +77,7 @@ const QuestionOperations = ({
   async function onUpdateSubmit(data: FormData) {
     setIsUpdateLoading(true);
     let formData: Question = {
+      id:question.id,
       uid: question?.uid || "",
       name: data.question_name,
       answers: question?.answers || [],

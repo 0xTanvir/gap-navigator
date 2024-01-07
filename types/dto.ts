@@ -77,6 +77,7 @@ export type AuditAction =
     | { type: AuditActionType.DELETE_AUDIT; payload: string }
 
 export interface Question {
+    id: number,
     uid: string
     name: string
     answers: Answer[]
@@ -99,12 +100,14 @@ export enum QuestionActionType {
     ADD_QUESTION = "ADD_QUESTION",
     ADD_MULTIPLE_QUESTIONS = "ADD_MULTIPLE_QUESTIONS",
     UPDATE_QUESTION = "UPDATE_QUESTION",
+    UPDATE_MULTIPLE_QUESTIONS = "UPDATE_MULTIPLE_QUESTIONS",
     DELETE_QUESTION = "DELETE_QUESTION",
 }
 
 export type QuestionAction =
     | { type: QuestionActionType.ADD_QUESTION; payload: Question }
     | { type: QuestionActionType.ADD_MULTIPLE_QUESTIONS; payload: Question[] }
+    | { type: QuestionActionType.UPDATE_MULTIPLE_QUESTIONS; payload: Question[] }
     | { type: QuestionActionType.UPDATE_QUESTION; payload: Question }
     | { type: QuestionActionType.DELETE_QUESTION; payload: string }
 
