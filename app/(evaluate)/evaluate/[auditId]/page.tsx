@@ -33,8 +33,8 @@ import * as z from "zod";
 import {EvaluationActionType} from "@/types/dto";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import edjsParser from "editorjs-parser";
 import {Timestamp} from "firebase/firestore";
+import Output from "editorjs-react-renderer";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -48,11 +48,9 @@ export default function EvaluatePage({
     const {evaluation, dispatch} = useEvaluation();
     const router = useRouter();
     const {auditId} = params;
-    const parser = new edjsParser();
     let data = {
         blocks: evaluation.welcome ? JSON.parse(evaluation.welcome) : []
     };
-    const markup = parser.parse(data);
 
 
     const form = useForm<FormData>({
@@ -126,7 +124,9 @@ export default function EvaluatePage({
             }
             {
                 evaluation.welcome ?
-                    <div dangerouslySetInnerHTML={{__html: markup}}></div>
+                    <div>
+                        <Output data={data}/>
+                    </div>
                     :
                     <EmptyPlaceholder>
                         <Image

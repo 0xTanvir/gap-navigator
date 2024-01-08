@@ -2,20 +2,18 @@
 import React from 'react';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts"
-import edjsParser from "editorjs-parser";
 import { Button } from "@/components/ui/button";
 import usePreview from "@/app/(evaluate)/preview-context";
 import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
+import Output from "editorjs-react-renderer";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const PreviewPdfDownload = () => {
   const {preview} = usePreview()
-  const parser = new edjsParser();
   let data = {
     blocks: preview.thank_you ? JSON.parse(preview.thank_you) : []
   };
-  const markup = parser.parse(data);
   return (
       <>
         <DocsPageHeader
@@ -25,7 +23,9 @@ const PreviewPdfDownload = () => {
         <div className="w-full text-end">
           <Button>Generate PDF</Button>
         </div>
-        <div dangerouslySetInnerHTML={{__html: markup}}></div>
+          <div>
+              <Output data={data}/>
+          </div>
       </>
   );
 };

@@ -9,15 +9,13 @@ import { DocsPageHeader } from "../page-header"
 import { Button } from "@/components/ui/button"
 import usePreview from "../../preview-context"
 import { Skeleton } from "@/components/ui/skeleton";
-import edjsParser from "editorjs-parser";
+import Output from "editorjs-react-renderer";
 
 export default function PreviewsPage({params}: { params: { auditId: string } }) {
   const {preview} = usePreview()
-  const parser = new edjsParser();
   let data = {
     blocks: preview.welcome ? JSON.parse(preview.welcome) : []
   };
-  const markup = parser.parse(data);
 
   return (
       <div className="py-6 lg:py-10">
@@ -40,7 +38,9 @@ export default function PreviewsPage({params}: { params: { auditId: string } }) 
         }
         {
           preview.welcome ?
-              <div dangerouslySetInnerHTML={{__html: markup}}/>
+              <div>
+                  <Output data={data} />
+              </div>
               :
               <EmptyPlaceholder>
                 <Image

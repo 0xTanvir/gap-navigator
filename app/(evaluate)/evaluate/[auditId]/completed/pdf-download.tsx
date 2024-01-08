@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import htmlToPdfmake from "html-to-pdfmake"
 import edjsParser from "editorjs-parser";
 import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
+import Output from "editorjs-react-renderer";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -21,7 +22,6 @@ const PdfDownload = () => {
   let data = {
     blocks: evaluation.thank_you ? JSON.parse(evaluation.thank_you) : []
   };
-  const markup = parser.parse(data);
 
   function evaluateFormat() {
     const choices = evaluation.evaluate.choices;
@@ -146,7 +146,9 @@ const PdfDownload = () => {
         <div className="w-full text-end">
           <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
         </div>
-        <div dangerouslySetInnerHTML={{__html: markup}}></div>
+        <div>
+          <Output data={data} />
+        </div>
       </>
   );
 };

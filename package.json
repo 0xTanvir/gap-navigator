@@ -45,6 +45,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "editorjs-parser": "^1.5.3",
+    "editorjs-react-renderer": "^3.5.1",
     "firebase": "^10.5.2",
     "html-to-pdfmake": "^2.5.1",
     "lucide-react": "^0.290.0",
