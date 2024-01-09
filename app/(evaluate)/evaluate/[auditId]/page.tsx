@@ -35,6 +35,8 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {Timestamp} from "firebase/firestore";
 import Output from "editorjs-react-renderer";
+import {CodeBlockRenderer, ImageBlock, style} from "@/components/editorjs/editorjs-utils";
+import "@/components/editorjs/editorjs.css"
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -49,9 +51,15 @@ export default function EvaluatePage({
     const router = useRouter();
     const {auditId} = params;
     let data = {
-        blocks: evaluation.welcome ? JSON.parse(evaluation.welcome) : []
+        time: Date.now(),
+        blocks: evaluation.welcome ? JSON.parse(evaluation.welcome) : [],
+        version: "2.0.0"
     };
 
+    const renderers = {
+        code: CodeBlockRenderer,
+        image: ImageBlock
+    };
 
     const form = useForm<FormData>({
         resolver: zodResolver(evaluateParticipant),
@@ -124,8 +132,8 @@ export default function EvaluatePage({
             }
             {
                 evaluation.welcome ?
-                    <div>
-                        <Output data={data}/>
+                    <div className="editorjs">
+                        <Output data={data} style={style} renderers={renderers}/>
                     </div>
                     :
                     <EmptyPlaceholder>

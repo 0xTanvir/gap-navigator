@@ -15,6 +15,7 @@ import LinkAutocomplete from "@editorjs/link-autocomplete"
 import Strikethrough from '@sotaproject/strikethrough';
 import ChangeCase from 'editorjs-change-case';
 import InlineCode from '@editorjs/inline-code';
+import Warning from '@editorjs/warning';
 import "@/styles/editor.css"
 
 export const EditorTools = {
@@ -107,6 +108,14 @@ export const EditorTools = {
     underline: {
         class: Underline,
         inlineToolbar: true
+    },
+    warning: {
+        class: Warning,
+        inlineToolbar: true,
+        config: {
+            titlePlaceholder: 'Title',
+            messagePlaceholder: 'Message',
+        },
     },
     strikethrough: Strikethrough,
     changeCase: ChangeCase,
