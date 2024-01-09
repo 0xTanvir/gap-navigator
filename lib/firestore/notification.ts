@@ -1,5 +1,5 @@
-import { getDatabase, onValue, ref, set, update, get } from "firebase/database"
-import { Notification } from "@/types/dto";
+import {getDatabase, onValue, ref, set, update, get, remove} from "firebase/database"
+import {Notification} from "@/types/dto";
 
 const db = getDatabase();
 
@@ -87,6 +87,25 @@ export async function getNotificationById(userId: string): Promise<Notification 
 
     } catch (err) {
         throw new Error("Error getting notifications")
+    }
+}
+
+export async function deleteNotificationsAlertById(userId: string, auditId: string): Promise<boolean> {
+    try {
+        const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
+        const snapshot = await get(notificationsRef);
+        const data: Notification[] = Object.values(snapshot.val()) || [];
+
+        const notificationToDelete = data.find(notification => notification.auditId === auditId);
+
+        if (notificationToDelete) {
+            await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationToDelete.auditId}`));
+            return true;
+        } else {
+            throw new Error(`Notification with auditId ${auditId} not found.`);
+        }
+    } catch (error) {
+        throw new Error(`Error deleting notification: ${error}`);
     }
 }
 
