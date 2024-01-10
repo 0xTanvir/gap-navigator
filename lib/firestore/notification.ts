@@ -74,13 +74,13 @@ export async function updateNotificationsAlertById(userId: string) {
     }
 }
 
-export async function getNotificationById(userId: string): Promise<Notification [] | null> {
+export async function getNotificationById(userId: string): Promise<Notification [] | []> {
     try {
         const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`)
 
         return new Promise((resolve) => {
             onValue(userNotificationsRef, (snapshot) => {
-                const notifications: Notification[] | null = (snapshot.exists() ? Object.values(snapshot.val()) : null);
+                const notifications: Notification[] | [] = (snapshot.exists() ? Object.values(snapshot.val()) : []);
                 resolve(notifications);
             });
         });

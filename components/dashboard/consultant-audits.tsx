@@ -16,6 +16,7 @@ import * as z from "zod"
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {auditFilterSchema} from "@/lib/validations/audit";
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
 
 interface ConsultantAuditsProps {
     userId: string;
@@ -30,7 +31,7 @@ export default function ConsultantAudits({
                                          }: ConsultantAuditsProps) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(1)
-    const [pageSize] = useState<number>(3)
+    const [pageSize] = useState<number>(10)
     const [totalData, setTotalData] = useState<number>(0)
     const [auditName, setAuditName] = useState<string>("")
     const [auditType, setAuditType] = useState<string>("")
@@ -39,9 +40,10 @@ export default function ConsultantAudits({
     const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
     const [filterData, setFilterData] = useState(false)
 
-    const paginate = (pageNumber: number) => {
-        setCurrentPage(pageNumber)
-    }
+
+    // const paginate = (pageNumber: number) => {
+    //     setCurrentPage(pageNumber)
+    // }
 
     const form = useForm<FormData>({
         resolver: zodResolver(auditFilterSchema),
@@ -213,13 +215,17 @@ export default function ConsultantAudits({
                                                 <AuditItem key={audit.uid} userId={userId} audit={audit}/>
                                             ))}
                                         </div>
-                                        <AuditsPagination
-                                            totalItems={totalData}
+                                        {/*<AuditsPagination*/}
+                                        {/*    totalItems={totalData}*/}
+                                        {/*    setCurrentPage={setCurrentPage}*/}
+                                        {/*    currentPage={currentPage}*/}
+                                        {/*    pageSize={pageSize}*/}
+                                        {/*    paginate={paginate}*/}
+                                        {/*    totalPage={Math.ceil(totalData / pageSize)}*/}
+                                        {/*/>*/}
+                                        <CustomPagination
+                                            totalPages={Math.ceil(totalData / pageSize)}
                                             setCurrentPage={setCurrentPage}
-                                            currentPage={currentPage}
-                                            pageSize={pageSize}
-                                            paginate={paginate}
-                                            totalPage={Math.ceil(totalData / pageSize)}
                                         />
                                     </>
                                 ) :
