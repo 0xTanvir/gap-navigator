@@ -62,9 +62,11 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
     const handleSaveQuestions = async () => {
         setLoadingSaveQuestions(true)
         try {
-            await updateQuestionsData(auditId, questions);
-
-            toast.success('Questions updated successfully');
+            let data = await updateQuestionsData(auditId, questions);
+            if (data) {
+                setUnorderQuestions(questions);
+                return toast.success('Questions updated successfully');
+            }
         } catch (error) {
             console.error('Error updating questions:', error);
 
@@ -73,7 +75,6 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
             });
         } finally {
             setLoadingSaveQuestions(false)
-            setUnorderQuestions(questions);
         }
     };
 
