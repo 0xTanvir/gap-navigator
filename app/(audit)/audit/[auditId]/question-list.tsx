@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
+import {Button, buttonVariants} from "@/components/ui/button";
 import {Icons} from "@/components/icons";
 import {AuditEditorShell} from "./audit-editor-shell";
 import {AuditEditorHeader} from "./audit-editor-header";
 import {QuestionCreateButton} from "./question-create-button";
 import {getAudit} from "@/lib/firestore/audit";
-import {Audit, QuestionActionType} from "@/types/dto";
+import {Audit, QuestionActionType, Questions} from "@/types/dto";
 import {toast} from "sonner";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import QuestionItem from "@/app/(audit)/audit/[auditId]/question-item";
 import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
-import {getQuestionsById} from "@/lib/firestore/question";
+import {getQuestionsById, updateQuestionsData} from "@/lib/firestore/question";
 import {useAuth} from "@/components/auth/auth-provider";
 import {DragDropContext, Draggable, Droppable} from "@hello-pangea/dnd";
 
@@ -26,7 +26,10 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
     const [audit, setAudit] = useState<Audit | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(true);
+    const [loadingSaveQuestions, setLoadingSaveQuestions] = useState<boolean>(false);
+    const [same, setSame] = useState<boolean>(true);
     const {questions, dispatch} = useQuestions();
+    const [unorderQuestions, setUnorderQuestions] = useState<Questions>([])
     const {user} = useAuth();
 
     const reorder = (list: any, startIndex: any, endIndex: any) => {
@@ -40,23 +43,38 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
         return updatedItems;
     };
     const handleDragAndDrop = (result: any) => {
-        // console.log(result)
         if (!result.destination) {
             return;
         }
-
         const reorderedItems: any = reorder(
             questions,
             result.source.index,
             result.destination.index
         );
 
-        // console.log({reorderedItems});
         dispatch({
             type: QuestionActionType.UPDATE_MULTIPLE_QUESTIONS,
             payload: reorderedItems,
         });
 
+    };
+
+    const handleSaveQuestions = async () => {
+        setLoadingSaveQuestions(true)
+        try {
+            await updateQuestionsData(auditId, questions);
+
+            toast.success('Questions updated successfully');
+        } catch (error) {
+            console.error('Error updating questions:', error);
+
+            toast.error("Something went wrong.", {
+                description: "Error updating questions. Please try again later.",
+            });
+        } finally {
+            setLoadingSaveQuestions(false)
+            setUnorderQuestions(questions);
+        }
     };
 
     useEffect(() => {
@@ -78,6 +96,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
         async function allQuestion() {
             try {
                 let dbQuestions = await getQuestionsById(auditId);
+                setUnorderQuestions(dbQuestions)
                 dispatch({
                     type: QuestionActionType.ADD_MULTIPLE_QUESTIONS,
                     payload: dbQuestions,
@@ -94,6 +113,15 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
 
         allQuestion();
     }, []);
+
+    const areArraysOrderedSame = (orderQuestion: Questions, unOrderedQuestion: Questions) => {
+        return JSON.stringify(orderQuestion) === JSON.stringify(unOrderedQuestion);
+    };
+
+    useEffect(() => {
+        const isOrderedSame = areArraysOrderedSame(questions, unorderQuestions);
+        setSame(isOrderedSame)
+    }, [questions, unorderQuestions]);
 
     if (loading) {
         return (
@@ -134,7 +162,29 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                 }
             >
                 {user?.role === "consultant" && (
-                    <QuestionCreateButton auditId={auditId as string}/>
+                    <>
+                        {
+                            !same ?
+                                <div className="flex items-center">
+                                    <Button
+                                        variant="secondary"
+                                        className="mr-4"
+                                        onClick={handleSaveQuestions}
+                                        disabled={loadingSaveQuestions}
+                                    >
+                                        {loadingSaveQuestions ? (
+                                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                                        ) : (
+                                            <Icons.filePlus className="mr-2 h-4 w-4"/>
+                                        )}
+                                        Save
+                                    </Button>
+                                    <QuestionCreateButton auditId={auditId as string}/>
+                                </div>
+                                :
+                                <QuestionCreateButton auditId={auditId as string}/>
+                        }
+                    </>
                 )}
             </AuditEditorHeader>
 
