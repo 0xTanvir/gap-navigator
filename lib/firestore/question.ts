@@ -1,6 +1,6 @@
-import { Question } from "@/types/dto";
-import { Collections } from "@/lib/firestore/client";
-import { deleteDoc, getDocs, query, setDoc, updateDoc, where, orderBy } from "firebase/firestore";
+import {Answer, Question} from "@/types/dto";
+import {Collections} from "@/lib/firestore/client";
+import {deleteDoc, getDocs, query, setDoc, updateDoc, where, orderBy, Timestamp} from "firebase/firestore";
 
 export async function setQuestion(auditId: string, question: Question) {
     const questionsRef = Collections.question(auditId, question.uid);
@@ -30,7 +30,7 @@ export async function getQuestionsById(auditId: string) {
                 createdAt: data.createdAt,
             } as Question;
         });
-        return questions;
+        return questions.sort((a, b) => a.id - b.id);
     } catch (error) {
         // If error is an instance of Error, rethrow it
         if (error instanceof Error) {
@@ -86,6 +86,33 @@ export async function deleteQuestionById(auditId: string, questionId: string) {
             throw error;
         }
         throw new Error("Error deleting question");
+    }
+}
+
+export async function updateQuestionsData(auditId: string, newData: Question[]) {
+    const questionsRef = Collections.questions(auditId);
+    try {
+        // Get all documents in the "questions" collection
+        const querySnapshot = await getDocs(questionsRef);
+
+        // Update each document with the new data
+        querySnapshot.docs.map(async (doc) => {
+            const questionId = doc.data().id;
+            const updatedData = newData.find(question => question.id === questionId);
+
+            if (updatedData) {
+                await updateDoc(doc.ref, {
+                    id: updatedData.id,
+                    uid: updatedData.uid,
+                    name: updatedData.name,
+                    answers: updatedData.answers,
+                    createdAt: updatedData.createdAt,
+                });
+            }
+        });
+        return true
+    } catch (error) {
+        throw new Error('Error updating documents: ' + error);
     }
 }
 

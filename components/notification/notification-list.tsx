@@ -1,33 +1,86 @@
 "use client"
-import React, { useEffect, useState } from 'react';
-import { Notification } from "@/types/dto";
+import React, {useEffect, useState} from 'react';
+import {Notification} from "@/types/dto";
 import NotificationItem from "@/components/notification/notification-item";
-import { useAuth } from "@/components/auth/auth-provider";
-import { Skeleton } from "@/components/ui/skeleton";
-import { getDatabase, onValue, ref } from "firebase/database";
-import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
-import { AuditEditorHeader } from "@/app/(audit)/audit/[auditId]/audit-editor-header";
-import { AuditEditorShell } from "@/app/(audit)/audit/[auditId]/audit-editor-shell";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
+import {useAuth} from "@/components/auth/auth-provider";
+import {Skeleton} from "@/components/ui/skeleton";
+import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
+import {AuditEditorHeader} from "@/app/(audit)/audit/[auditId]/audit-editor-header";
+import {AuditEditorShell} from "@/app/(audit)/audit/[auditId]/audit-editor-shell";
+import {cn} from "@/lib/utils";
+import {Button, buttonVariants} from "@/components/ui/button";
+import {Icons} from "@/components/icons";
 import Link from "next/link";
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
+import {toast} from "sonner";
+import {getNotificationById} from "@/lib/firestore/notification";
+import * as z from "zod";
+import {auditFilterSchema} from "@/lib/validations/audit";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Input} from "@/components/ui/input";
 
-
+type FormData = z.infer<typeof auditFilterSchema>
 const NotificationList = () => {
-    const [notifications, setNotifications] = useState<Notification[] | null>([])
+    const [notifications, setNotifications] = useState<Notification[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const [pageSize] = useState<number>(10)
+    const [totalData, setTotalData] = useState<number>(0)
+    const [currentNotifications, setCurrentNotifications] = useState<Notification[]>([]);
+    const [currentSliceNotifications, setCurrentSliceNotifications] = useState<Notification[]>([]);
+    const [filterData, setFilterData] = useState(false)
+
     const {user} = useAuth()
-    const db = getDatabase()
+
+    const form = useForm<FormData>({
+        resolver: zodResolver(auditFilterSchema),
+        defaultValues: {
+            auditName: ""
+        },
+    })
+
+    function onSubmit(data: FormData) {
+        setFilterData(true)
+        if (data.auditName) {
+            let filterData = notifications.filter(notification => notification.auditName === data.auditName);
+            setCurrentNotifications(filterData)
+            setCurrentPage(1)
+        }
+    }
+
+    async function fetchNotifications() {
+        try {
+            let dbNotifications = await getNotificationById(user?.uid as string)
+            setTotalData(dbNotifications.length)
+            setNotifications(dbNotifications)
+        } catch (e) {
+            toast.error("Something went wrong.", {
+                description: "Failed to fetch audits. Please try again.",
+            });
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const indexOfLastAudit = currentPage * pageSize
+    const indexOfFirstAudit = indexOfLastAudit - pageSize
 
     useEffect(() => {
-        if (user) {
-            onValue(ref(db, `root/audit-notifications/${user.uid}/notifications/`), (snapshot) => {
-                setNotifications((snapshot.exists() ? Object.values(snapshot.val()) : null))
-                setIsLoading(false)
-            });
+        if (filterData) {
+            setTotalData(currentNotifications.length)
+            setCurrentSliceNotifications(currentNotifications.slice(indexOfFirstAudit, indexOfLastAudit))
+        } else {
+            setTotalData(notifications.length)
+            setCurrentSliceNotifications(notifications?.slice(indexOfFirstAudit, indexOfLastAudit))
         }
+    }, [indexOfLastAudit, indexOfFirstAudit, notifications, filterData, totalData]);
+
+    useEffect(() => {
+        fetchNotifications()
     }, [user?.uid])
+
 
     if (isLoading) {
         return <>
@@ -56,13 +109,77 @@ const NotificationList = () => {
                 </Link>
 
                 <AuditEditorHeader heading="Notification List" text="Manage notification list."/>
+                <div className="px-1.5">
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className="flex flex-col sm:flex-row  sm:items-end justify-end gap-3">
+                            <FormField
+                                control={form.control}
+                                name="auditName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel className="sr-only">Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Audit Name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type="submit">
+                                Submit
+                            </Button>
+                            {form.getValues("auditName") &&
+                                <Button
+                                    variant="destructive"
+                                    type="reset"
+                                    onClick={() => {
+                                        form.reset({
+                                            auditName: "",
+                                        })
+                                        form.setValue("auditName", "")
+                                        setCurrentNotifications(notifications)
+                                        setFilterData(false)
+                                    }}
+                                >
+                                    Reset
+                                </Button>
+                            }
+
+                        </form>
+
+                    </Form>
+                </div>
                 {
                     notifications?.length ? (
-                            <div className="divide-y divide-border rounded-md border mt-3">
-                                {notifications.map((notification) => (
-                                    <NotificationItem key={notification.uid} notification={notification}/>
-                                ))}
-                            </div>
+                            <>
+                                {
+                                    currentSliceNotifications.length ? (
+                                            <>
+                                                <div className="divide-y divide-border rounded-md border mt-3">
+                                                    {currentSliceNotifications.map((notification) => (
+                                                        <NotificationItem
+                                                            key={notification.uid}
+                                                            notification={notification}
+                                                        />
+                                                    ))}
+                                                </div>
+
+                                                <CustomPagination
+                                                    totalPages={Math.ceil(totalData / pageSize)}
+                                                    setCurrentPage={setCurrentPage}
+                                                />
+                                            </>
+                                        ) :
+                                        <div className="divide-y divide-border rounded-md border mt-3">
+                                            <div className="text-center font-semibold py-10">No Data Found</div>
+                                        </div>
+                                }
+                            </>
                         )
                         : (
                             <EmptyPlaceholder className="mt-3">

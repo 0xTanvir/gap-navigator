@@ -205,7 +205,6 @@ export async function fetchPaginatedData(entity_object: any) {
 }
 
 export async function getAuditsByType(userId: string, auditType: string): Promise<Audits> {
-  console.log(userId)
   try {
     const auditsRef = Collections.audits()
     let queryRef = query(auditsRef,
