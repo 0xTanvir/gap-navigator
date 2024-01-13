@@ -99,4 +99,6 @@ declare module '@editorjs/inline-code' {
   export default InlineCode;
 }
 
+declare module '@editorjs/warning';
+
 declare module 'editorjs-parser';

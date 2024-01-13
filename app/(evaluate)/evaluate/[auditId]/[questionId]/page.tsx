@@ -181,7 +181,7 @@ export default function EvaluateQuestionPage({
                                         a defaultValue={already - answered - value} if answer already seated */}
                   <RadioGroup
                     onValueChange={field.onChange}
-                    className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4"
+                    className="mt-4 grid grid-cols-1 gap-y-6 sm:gap-x-4"
                   >
                     {question.answers.map((answer, index) => (
                       <FormItem

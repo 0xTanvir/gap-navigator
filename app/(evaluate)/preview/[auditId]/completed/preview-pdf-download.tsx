@@ -2,32 +2,40 @@
 import React from 'react';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts"
-import edjsParser from "editorjs-parser";
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import usePreview from "@/app/(evaluate)/preview-context";
-import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
+import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
+import Output from "editorjs-react-renderer";
+import {CodeBlockRenderer, ImageBlock, style} from "@/components/editorjs/editorjs-utils";
+import "@/components/editorjs/editorjs.css"
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const PreviewPdfDownload = () => {
-  const {preview} = usePreview()
-  const parser = new edjsParser();
-  let data = {
-    blocks: preview.thank_you ? JSON.parse(preview.thank_you) : []
-  };
-  const markup = parser.parse(data);
-  return (
-      <>
-        <DocsPageHeader
-            heading={preview.name}
-            text={"Analyze your report."}
-        />
-        <div className="w-full text-end">
-          <Button>Generate PDF</Button>
-        </div>
-        <div dangerouslySetInnerHTML={{__html: markup}}></div>
-      </>
-  );
+    const {preview} = usePreview()
+    let data = {
+        time: Date.now(),
+        blocks: preview.thank_you ? JSON.parse(preview.thank_you) : [],
+        version: "2.0.0"
+    };
+    const renderers = {
+        code: CodeBlockRenderer,
+        image: ImageBlock
+    };
+    return (
+        <>
+            <DocsPageHeader
+                heading={preview.name}
+                text={"Analyze your report."}
+            />
+            <div className="w-full text-end">
+                <Button>Generate PDF</Button>
+            </div>
+            <div className="editorjs">
+                <Output data={data} style={style} renderers={renderers}/>
+            </div>
+        </>
+    );
 };
 
 export default PreviewPdfDownload;

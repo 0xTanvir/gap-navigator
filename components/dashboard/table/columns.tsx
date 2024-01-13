@@ -1,62 +1,44 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
-import { Evaluate } from "@/types/dto";
-import { formatDate } from "@/lib/utils";
+import {createColumnHelper} from "@tanstack/react-table"
+import {formatDate} from "@/lib/utils";
+import * as React from "react";
+import {Evaluate} from "@/types/dto";
 
-export const columns: ColumnDef<Evaluate>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({row}) => {
-      const {participantFirstName, participantLastName} = row.original
-      return (
-          <> {participantFirstName + " " + participantLastName} </>
-      )
-    }
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({row}) => {
-      const {participantEmail} = row.original
-      return (
-          <> {participantEmail} </>
-      )
-    }
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({row}) => {
-      const {participantPhone} = row.original
-      return (
-          <> {participantPhone} </>
-      )
-    }
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Evaluation Last Date",
-    cell: ({row}) => {
-      const {createdAt} = row.original
-      return (
-          <>{formatDate(createdAt)}</>
-      )
-    }
-  },
-  {
-    accessorKey: "Evaluation count",
-    header: ({column}) => {
-      return (
-          <div className="text-center">Evaluation Count</div>
-      )
-    },
-    cell: ({row}) => {
-      const {count} = row.original
-      return (
-          <p className="text-center"> {count} </p>
-      )
-    }
-  }
-]
+const columnHelper = createColumnHelper();
+export const columns = [
+    columnHelper.accessor("", {
+        id: "S.No",
+        cell: (info) => <span>{info.row.index + 1}</span>,
+        header: "ID",
+    }),
+    columnHelper.accessor("participantFirstName", {
+        cell: (info) => {
+            const {participantFirstName, participantLastName} = info.row.original as Evaluate
+            return (
+                <>
+                    {participantFirstName}{" "}{participantLastName}
+                </>
+            )
+        },
+        header: "Name",
+    }),
+    columnHelper.accessor("participantLastName", {
+        cell: (info) => <span>{info.getValue()}</span>,
+        header: "Last Name",
+        id: "lastName",
+    }),
+    columnHelper.accessor("participantEmail", {
+        cell: (info) => <span>{info.getValue()}</span>,
+        header: "Email",
+    }),
+    columnHelper.accessor("participantPhone", {
+        cell: (info) =>
+            <span>{info.getValue() === "" || info.getValue() === undefined ? "N/A" : info.getValue()}</span>,
+        header: "Phone",
+    }),
+    columnHelper.accessor("createdAt", {
+        cell: (info) => <span>{formatDate(info.getValue())}</span>,
+        header: "Evaluation Last Date",
+    })
+];
