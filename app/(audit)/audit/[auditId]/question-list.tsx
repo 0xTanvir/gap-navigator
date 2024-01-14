@@ -116,7 +116,12 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
     }, []);
 
     const areArraysOrderedSame = (orderQuestion: Questions, unOrderedQuestion: Questions) => {
-        return JSON.stringify(orderQuestion) === JSON.stringify(unOrderedQuestion);
+        for (let i = 0; i < orderQuestion.length; i++) {
+            if (orderQuestion[i].name !== unOrderedQuestion[i].name) {
+                return false;
+            }
+        }
+        return true
     };
 
     useEffect(() => {
