@@ -28,7 +28,7 @@ export function ProfileNav() {
                 /></div>}
             {!loading && !user && <div className="flex gap-4">
                 <Link
-                    href="/login"
+                    href="/"
                     className={cn(
                         buttonVariants({ variant: "outline", size: "sm" }),
                         "px-4"

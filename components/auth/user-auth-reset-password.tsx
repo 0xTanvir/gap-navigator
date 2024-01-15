@@ -45,7 +45,7 @@ const UserAuthResetPassword = ({
         .then((result) => {
           setIsLoading(false);
           toast.success("Email has been send");
-          router.push("/login");
+          router.push("/");
         })
         .catch((error) => {
           setIsLoading(false);
