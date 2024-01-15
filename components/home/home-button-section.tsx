@@ -10,12 +10,12 @@ const HomeButtonSection = () => {
   return (
       <>
         <Link
-            href={user ? '/dashboard' : '/login'}
+            href={user ? '/dashboard' : '/'}
             className={cn(buttonVariants({size: "xl"}), "text-sm font-semibold rounded-full")}>
           Get Started
         </Link>
         <Link
-            href={user ? '/audits' : '/login'}
+            href={user ? '/audits' : '/'}
             className={cn(buttonVariants({variant: "outline", size: "xl"}), "text-sm font-semibold rounded-full")}
         >
           Audits

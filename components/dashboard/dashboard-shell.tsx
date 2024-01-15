@@ -7,6 +7,7 @@ import {adminDashboardConfig, clientDashboardConfig, consultantDashboardConfig} 
 import {useAuth} from "@/components/auth/auth-provider"
 import {Skeleton} from "@/components/ui/skeleton"
 import {DashboardHeader} from "@/components/dashboard/dashboard-header"
+import {useEffect} from "react";
 
 interface DashboardShellProps extends React.HTMLAttributes<HTMLDivElement> {
 }
@@ -17,7 +18,7 @@ export function DashboardShell({
                                    ...props
                                }: DashboardShellProps) {
     const {user, isAuthenticated, loading} = useAuth()
-    if (loading) {
+    if (loading || (isAuthenticated && !user)) {
         return (
             <>
                 <aside className="hidden w-[200px] flex-col md:flex">

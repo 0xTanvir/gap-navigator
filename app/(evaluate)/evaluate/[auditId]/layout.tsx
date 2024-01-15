@@ -97,7 +97,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
               );
             } else {
               toast.error(`You must be logged in to view this evaluation.`);
-              router.push("/login");
+              router.push("/");
               return;
             }
           }

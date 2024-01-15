@@ -118,7 +118,7 @@ export default function EvaluateQuestionPage({
               pager.next.href !==
               `/evaluate/${auditId}/${nextQuestion?.questionId}`
             ) {
-              await router.push(
+              router.push(
                 `/evaluate/${auditId}/${nextQuestion?.questionId}`
               );
               let urlParts = pager.next.href.split("/");
@@ -128,9 +128,9 @@ export default function EvaluateQuestionPage({
               });
             }
           }
-          await router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`);
+          router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`);
         } else {
-          await router.push(pager.next.href);
+          router.push(pager.next.href);
         }
       } else {
         setIsLoading(true);

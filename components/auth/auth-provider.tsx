@@ -48,7 +48,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
     await signOut(firebaseAuth);
     setUser(null);
     setIsAuthenticated(false);
-    router.push("/login");
+    router.push("/");
   };
 
   useEffect(() => {
