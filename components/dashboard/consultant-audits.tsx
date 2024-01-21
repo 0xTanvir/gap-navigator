@@ -83,7 +83,6 @@ export default function ConsultantAudits({
                 let x = audits.filter(audit => audit.type === searchParams)
                 setCurrentSliceAudits(x.slice(indexOfFirstAudit, indexOfLastAudit))
             } else {
-                console.log(searchParams)
                 setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
             }
 
