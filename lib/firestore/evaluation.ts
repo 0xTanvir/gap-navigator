@@ -1,7 +1,7 @@
-import {Choice, Evaluate} from "@/types/dto";
-import {Collections} from "@/lib/firestore/client";
-import {arrayUnion, getDoc, getDocs, query, setDoc, updateDoc} from "firebase/firestore";
-import {getAudit} from "@/lib/firestore/audit";
+import { Choice, Evaluate } from "@/types/dto";
+import { Collections } from "@/lib/firestore/client";
+import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import { getAudit } from "@/lib/firestore/audit";
 
 export async function setEvaluation(auditId: string, evaluation: Evaluate) {
     const evaluationsRef = Collections.evaluation(auditId, evaluation.uid);
@@ -16,6 +16,45 @@ export async function setEvaluation(auditId: string, evaluation: Evaluate) {
         throw new Error("Failed to add the question.");
     }
 }
+export async function updateEvaluation(
+    auditId: string,
+    evaluationId: string,
+    newChoices: Choice[]
+) {
+    const evaluationRef = Collections.evaluation(auditId, evaluationId);
+    try {
+        // Get the existing evaluation document
+        const evaluationDoc = await getDoc(evaluationRef);
+
+        if (evaluationDoc.exists()) {
+            const existingEvaluation = evaluationDoc.data() as Evaluate;
+
+            const updatedChoices = [...(existingEvaluation?.choices ?? [])];
+
+            if (newChoices && newChoices.length > 0) {
+                newChoices.forEach(newChoice => {
+                    const indexToUpdate = updatedChoices.findIndex(choice => choice.questionId === newChoice.questionId);
+
+                    if (indexToUpdate !== -1) {
+                        updatedChoices[indexToUpdate].answerId = newChoice.answerId;
+                    } else {
+                        updatedChoices.push(newChoice);
+                    }
+                });
+            }
+
+            await updateDoc(evaluationRef, {
+                choices: newChoices
+            });
+        } else {
+            throw new Error('Evaluation document not found');
+        }
+    } catch (error:any) {
+        console.error('Error updating evaluation:', error);
+        throw new Error(`Failed to update the evaluation with new answers. Details: ${error.message}`);
+    }
+}
+
 
 export async function updateEvaluationById(
     auditId: string,

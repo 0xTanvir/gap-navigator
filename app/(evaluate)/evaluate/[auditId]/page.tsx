@@ -1,11 +1,11 @@
 "use client";
-import React, {useState} from "react";
-import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
-import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
+import React, { useState } from "react";
+import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
+import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 import Image from "next/image";
-import {Button, buttonVariants} from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
-import {Skeleton} from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Dialog,
     DialogContent,
@@ -22,21 +22,22 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Input} from "@/components/ui/input";
-import {cn} from "@/lib/utils";
-import {Icons} from "@/components/icons";
-import {evaluateParticipant} from "@/lib/validations/question";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons";
+import { evaluateParticipant } from "@/lib/validations/question";
 import * as z from "zod";
 
-import {EvaluationActionType} from "@/types/dto";
-import {toast} from "sonner";
-import {useRouter} from "next/navigation";
-import {Timestamp} from "firebase/firestore";
+import { EvaluationActionType } from "@/types/dto";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Timestamp } from "firebase/firestore";
 import Output from "editorjs-react-renderer";
-import {CodeBlockRenderer, ImageBlock, style} from "@/components/editorjs/editorjs-utils";
+import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
+import { setEvaluation } from "@/lib/firestore/evaluation";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -72,6 +73,7 @@ export default function EvaluatePage({
     });
 
     async function onSubmit(data: FormData) {
+        setIsLoading(true)
         let evaluate = {
             uid: data.participantEmail,
             participantFirstName: data.participantFirstName,
@@ -87,6 +89,7 @@ export default function EvaluatePage({
         );
 
         if (emailExists) {
+            setIsLoading(false)
             dispatch({
                 type: EvaluationActionType.ADD_EVALUATE,
                 payload: emailExists,
@@ -103,7 +106,10 @@ export default function EvaluatePage({
                 payload: evaluate,
             });
             form.reset();
+            await setEvaluation(auditId, evaluate);
+            setIsLoading(false)
             setShowDialog(false);
+            toast.info("Evaluation start.");
             if (evaluation.questions.length > 0) {
                 router.push(
                     `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
