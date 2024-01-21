@@ -185,10 +185,16 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                                         )}
                                         Save
                                     </Button>
-                                    <QuestionCreateButton auditId={auditId as string}/>
+                                    <QuestionCreateButton
+                                        auditId={auditId as string}
+                                        setUnorderQuestions={setUnorderQuestions}
+                                    />
                                 </div>
                                 :
-                                <QuestionCreateButton auditId={auditId as string}/>
+                                <QuestionCreateButton
+                                    auditId={auditId as string}
+                                    setUnorderQuestions={setUnorderQuestions}
+                                />
                         }
                     </>
                 )}
@@ -217,6 +223,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                                                     <QuestionItem
                                                         question={question}
                                                         auditId={auditId}
+                                                        setUnorderQuestions={setUnorderQuestions}
                                                     />
                                                 </div>
                                             )}
@@ -236,7 +243,11 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                     <EmptyPlaceholder.Description>
                         You don&apos;t have any question yet. Start creating question.
                     </EmptyPlaceholder.Description>
-                    <QuestionCreateButton noQuestion={true} auditId={auditId as string}/>
+                    <QuestionCreateButton
+                        noQuestion={true}
+                        auditId={auditId as string}
+                        setUnorderQuestions={setUnorderQuestions}
+                    />
                 </EmptyPlaceholder>
             )}
 
