@@ -15,9 +15,47 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
                     ...state.evaluate, // Keep the existing evaluate data
                     ...action.payload, // Merge with the new evaluate data
                 },
+                evaluateFormData:{
+                    uid: action.payload.uid,
+                    participantFirstName: action.payload.participantFirstName,
+                    participantLastName: action.payload.participantLastName,
+                    participantEmail: action.payload.participantEmail,
+                    participantPhone: action.payload.participantPhone,
+                    auditId: action.payload.auditId,
+                    createdAt: action.payload.createdAt,
+                }
             };
         }
+        // case EvaluationActionType.ADD_QUESTION_ANSWER: {
+        //     // Ensure default values for evaluate and choices
+        //     const updatedEvaluate = state.evaluate || {choices: []};
+        //     const updatedChoices = updatedEvaluate?.choices ?
+        //         [
+        //             ...updatedEvaluate.choices.filter((choice) => choice.questionId !== action.payload.questionId),
+        //             {
+        //                 ...action.payload
+        //             },
+        //         ]
+        //         : [
+        //             {
+        //                 ...action.payload
+        //             },
+        //         ];
+        //     return {
+        //         ...state,
+        //         evaluate: {
+        //             ...state.evaluate,
+        //             choices: updatedChoices,
+        //         },
+        //         // evaluateFormData: {
+        //         //     ...state.evaluateFormData,
+        //         //     choices: updatedChoicesFormData
+        //         // }
+        //     };
+        // }
+
         case EvaluationActionType.ADD_QUESTION_ANSWER: {
+            // console.log(action.payload)
             // Ensure default values for evaluate and choices
             const updatedEvaluate = state.evaluate || {choices: []};
             const updatedChoices = updatedEvaluate?.choices ?
@@ -32,11 +70,29 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
                         ...action.payload
                     },
                 ];
+            // console.log(updatedChoices)
+            const updatedEvaluateFormData = state.evaluateFormData || {choices: []};
+            const updatedChoicesFormData = updatedEvaluateFormData?.choices ?
+                [
+                    ...updatedEvaluateFormData.choices.filter((choice) => choice.questionId !== action.payload.questionId),
+                    {
+                        ...action.payload
+                    },
+                ]
+                : [
+                    {
+                        ...action.payload
+                    },
+                ];
             return {
                 ...state,
                 evaluate: {
                     ...state.evaluate,
                     choices: updatedChoices
+                },
+                evaluateFormData:{
+                    ...state.evaluateFormData,
+                    choices: updatedChoicesFormData
                 }
             }
         }
@@ -52,7 +108,19 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
                     evaluate: {
                         ...state.evaluate,
                         choices: updatedChoices,
-                    },
+                    }
+                };
+            }
+            if (state.evaluateFormData && state.evaluateFormData.choices) {
+                const updatedChoices = state.evaluateFormData.choices.filter(
+                    (choice) => choice.questionId !== action.payload
+                );
+                return {
+                    ...state,
+                    evaluateFormData:{
+                        ...state.evaluateFormData,
+                        choices: updatedChoices
+                    }
                 };
             }
             return state;

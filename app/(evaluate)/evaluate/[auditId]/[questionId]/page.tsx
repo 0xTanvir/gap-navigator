@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { Choice, Evaluate, EvaluationActionType } from "@/types/dto";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { setEvaluation, updateEvaluation, updateEvaluationById } from "@/lib/firestore/evaluation";
+import { updateEvaluationById } from "@/lib/firestore/evaluation";
 import dynamic from "next/dynamic";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
@@ -81,7 +81,6 @@ export default function EvaluateQuestionPage({
     });
 
     async function onSubmit(data: FormData) {
-        setIsLoading(true);
         let newEvaluate: Choice;
         if (user) {
             newEvaluate = {
@@ -106,7 +105,17 @@ export default function EvaluateQuestionPage({
                 type: EvaluationActionType.ADD_QUESTION_ANSWER,
                 payload: newEvaluate,
             });
-            await updateEvaluation(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+
+            if (evaluation.evaluate.choices) {
+                const dbFoundObject = evaluation.evaluations.find(
+                    (item) => item.uid === evaluation.evaluate.uid
+                );
+                let isExists = dbFoundObject?.choices?.some(choice => choice.answerId === newEvaluate.answerId);
+                if (isExists === undefined || !isExists) {
+                    setIsLoading(true);
+                    await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+                }
+            }
             if (pager.next && !pager.next.disabled) {
                 let nextQuestion = question?.answers?.find(
                     (answer) => answer?.uid === data?.answerId
@@ -138,12 +147,20 @@ export default function EvaluateQuestionPage({
                 const dbFoundObject = evaluation.evaluations.find(
                     (item) => item.uid === evaluation.evaluate.uid
                 );
-                let result = dbFoundObject
-                    ? areObjectsEqual(dbFoundObject, evaluation.evaluate)
-                    : false;
+                let result
+                if (evaluation?.evaluateFormData) {
+                    result = dbFoundObject
+                        ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
+                        : false;
+                }
+                // let result = dbFoundObject
+                //     ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
+                //     : false;
                 if (result) {
                     await router.push(`/evaluate/${auditId}/completed`);
                 } else {
+                    setIsLoading(true);
+                    await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
                     // await setEvaluation(auditId, evaluation.evaluate);
                     await router.push(`/evaluate/${auditId}/completed`);
                 }

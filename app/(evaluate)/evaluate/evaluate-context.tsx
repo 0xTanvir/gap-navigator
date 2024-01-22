@@ -37,6 +37,15 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
       createdAt: Timestamp.now(),
       choices: []
     },
+    evaluateFormData:{
+      uid: '',
+      participantFirstName: '',
+      participantLastName: '',
+      participantEmail: '',
+      participantPhone: '',
+      createdAt: Timestamp.now(),
+      choices: []
+    },
     evaluations: [],
   };
 

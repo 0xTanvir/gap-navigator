@@ -127,6 +127,7 @@ export interface Evaluation extends Audit {
     questions: Question[]
     sideBarNav: SidebarNavItem[]
     evaluate: Evaluate
+    evaluateFormData: Evaluate
     evaluations: Evaluate[]
 }
 
