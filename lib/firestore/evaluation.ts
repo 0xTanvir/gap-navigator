@@ -1,6 +1,6 @@
 import { Choice, Evaluate } from "@/types/dto";
 import { Collections } from "@/lib/firestore/client";
-import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getAudit } from "@/lib/firestore/audit";
 
 export async function setEvaluation(auditId: string, evaluation: Evaluate) {
@@ -72,11 +72,21 @@ export async function updateEvaluationById(
 export async function getEvaluationById(
     auditId: string,
     evaluationID: string
-): Promise<Evaluate> {
-    const evaluationsRef = Collections.evaluation(auditId, evaluationID);
-    const querySnapshot = await getDoc(evaluationsRef);
-
-    return querySnapshot.data() as Evaluate;
+): Promise<Evaluate | null> {
+    const evaluationsRef = Collections.evaluations(auditId);
+    try {
+        const q = query(evaluationsRef, where("uid", "==", evaluationID));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        // Assuming there is only one user with a given evaluationID
+        const evaluationDoc = querySnapshot.docs[0];
+        const evaluationData = evaluationDoc.data();
+        return evaluationData as Evaluate;
+    } catch (error) {
+        throw new Error('Error getting user');
+    }
 }
 
 export async function getAllEvaluations(auditId: string) {
