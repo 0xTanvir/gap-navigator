@@ -22,7 +22,6 @@ export async function updateEvaluationById(
     evaluationId: string,
     newChoices: Choice[]
 ) {
-    console.log(newChoices)
     const evaluationRef = Collections.evaluation(auditId, evaluationId);
     try {
         await updateDoc(evaluationRef, {
