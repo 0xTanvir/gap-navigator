@@ -1,22 +1,22 @@
-import React, {useState, useEffect} from "react";
-import {AuditItem} from "@/components/dashboard/audit-item";
-import {EmptyPlaceholder} from "@/components/dashboard/empty-placeholder";
-import {DashboardHeader} from "@/components/dashboard/dashboard-header";
-import {AuditCreateButton} from "@/components/dashboard/audit-create-button";
-import {getAuditsByIds} from "@/lib/firestore/audit";
-import {AuditActionType, Audits} from "@/types/dto";
-import {toast} from "sonner";
+import React, { useState, useEffect } from "react";
+import { AuditItem } from "@/components/dashboard/audit-item";
+import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { AuditCreateButton } from "@/components/dashboard/audit-create-button";
+import { getAuditsByIds } from "@/lib/firestore/audit";
+import { AuditActionType, Audits } from "@/types/dto";
+import { toast } from "sonner";
 import useAudits from "./AuditsContext";
-import AuditsPagination from "@/components/dashboard/audits-pagination";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {auditFilterSchema} from "@/lib/validations/audit";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { auditFilterSchema } from "@/lib/validations/audit";
 import CustomPagination from "@/components/custom-pagination/custom-pagination";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface ConsultantAuditsProps {
     userId: string;
@@ -40,16 +40,15 @@ export default function ConsultantAudits({
     const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
     const [filterData, setFilterData] = useState(false)
 
-
-    // const paginate = (pageNumber: number) => {
-    //     setCurrentPage(pageNumber)
-    // }
+    const params = useSearchParams()
+    const searchParams = params.get("auditType")
+    const router = useRouter()
 
     const form = useForm<FormData>({
         resolver: zodResolver(auditFilterSchema),
         defaultValues: {
             auditName: "",
-            auditType: ""
+            auditType: searchParams ? searchParams : ""
         },
     })
 
@@ -80,10 +79,15 @@ export default function ConsultantAudits({
             setCurrentSliceAudits(currentAudits.slice(indexOfFirstAudit, indexOfLastAudit))
         } else {
             setTotalData(audits.length)
-            setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
-        }
-    }, [totalData, audits, filterData, currentAudits, indexOfLastAudit, indexOfFirstAudit]);
+            if (searchParams) {
+                let x = audits.filter(audit => audit.type === searchParams)
+                setCurrentSliceAudits(x.slice(indexOfFirstAudit, indexOfLastAudit))
+            } else {
+                setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
+            }
 
+        }
+    }, [totalData, audits, filterData, currentAudits, indexOfLastAudit, indexOfFirstAudit, searchParams]);
 
     useEffect(() => {
         async function fetchAudits() {
@@ -193,6 +197,7 @@ export default function ConsultantAudits({
                                     setAuditName("");
                                     setCurrentAudits(audits)
                                     setFilterData(false)
+                                    router.push("/audits")
                                 }}
                             >
                                 Reset
@@ -215,14 +220,6 @@ export default function ConsultantAudits({
                                                 <AuditItem key={audit.uid} userId={userId} audit={audit}/>
                                             ))}
                                         </div>
-                                        {/*<AuditsPagination*/}
-                                        {/*    totalItems={totalData}*/}
-                                        {/*    setCurrentPage={setCurrentPage}*/}
-                                        {/*    currentPage={currentPage}*/}
-                                        {/*    pageSize={pageSize}*/}
-                                        {/*    paginate={paginate}*/}
-                                        {/*    totalPage={Math.ceil(totalData / pageSize)}*/}
-                                        {/*/>*/}
                                         <CustomPagination
                                             totalPages={Math.ceil(totalData / pageSize)}
                                             setCurrentPage={setCurrentPage}

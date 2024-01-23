@@ -8,9 +8,10 @@ import QuestionOperations from "@/app/(audit)/audit/[auditId]/question-operation
 interface QuestionItemProps {
     auditId: string
     question: Question
+    setUnorderQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
-const QuestionItem = ({auditId, question}: QuestionItemProps) => {
+const QuestionItem = ({auditId, question, setUnorderQuestions}: QuestionItemProps) => {
     return (
         <div className="flex items-center justify-between p-4">
             <div className="grid gap-1">
@@ -30,7 +31,12 @@ const QuestionItem = ({auditId, question}: QuestionItemProps) => {
                 </div>
             </div>
 
-            <QuestionOperations auditId={auditId} question={question} questionId={question.uid} />
+            <QuestionOperations
+                auditId={auditId}
+                question={question}
+                questionId={question.uid}
+                setUnorderQuestions={setUnorderQuestions}
+            />
 
         </div>
     )

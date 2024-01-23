@@ -42,6 +42,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
         const questions = await getQuestionsById(auditId);
         const sideBarNav = getSidebarNav(audit, questions);
         let evaluate = {} as Evaluate;
+        let evaluateFormData = {} as Evaluate;
         if (!loading) {
           if (isAuthenticated) {
             // public, private, exclusive
@@ -108,6 +109,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
           questions,
           sideBarNav,
           evaluate,
+          evaluateFormData,
           evaluations,
         };
         dispatch({

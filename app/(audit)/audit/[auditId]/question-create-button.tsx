@@ -33,6 +33,7 @@ import {setQuestion} from "@/lib/firestore/question";
 interface QuestionCreateButtonProps extends ButtonProps {
     auditId: string;
     noQuestion?: boolean;
+    setUnorderQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
 type FormData = z.infer<typeof questionSchema>;
@@ -43,6 +44,7 @@ interface QuestionCreateButtonProps extends ButtonProps {
 export function QuestionCreateButton({
                                          auditId,
                                          noQuestion,
+                                         setUnorderQuestions,
                                          variant,
                                          className,
                                          ...props
@@ -70,6 +72,7 @@ export function QuestionCreateButton({
         try {
             await setQuestion(auditId, newQuestion);
             dispatch({type: QuestionActionType.ADD_QUESTION, payload: newQuestion});
+            setUnorderQuestions(prev => [...prev, newQuestion])
             toast.success("Question created.");
             form.reset();
             setIsLoading(false);
