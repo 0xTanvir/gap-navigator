@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -128,7 +128,7 @@ export default function ConsultantAudits({
     }
 
     return (
-        <>
+        <Suspense>
             <DashboardHeader heading="Audits" text="Create and manage audits.">
                 <AuditCreateButton userId={userId}/>
             </DashboardHeader>
@@ -243,6 +243,6 @@ export default function ConsultantAudits({
                     </EmptyPlaceholder>
                 )}
             </div>
-        </>
+        </Suspense>
     );
 }
