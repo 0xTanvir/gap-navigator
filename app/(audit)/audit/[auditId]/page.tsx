@@ -1,6 +1,6 @@
 'use client'
 
-import { notFound } from "next/navigation"
+import { notFound, useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth/auth-provider"
 import { AuditEditorShell } from "./audit-editor-shell"
 import { AuditEditorHeader } from "./audit-editor-header"
@@ -9,6 +9,7 @@ import { QuestionProvider } from "@/app/(audit)/audit/QuestionContext";
 
 export default function AuditPage({params}: { params: { auditId: string } }) {
   const {user, isAuthenticated, loading} = useAuth()
+    const router = useRouter()
   if (loading) {
     return (
         <AuditEditorShell>
@@ -21,6 +22,8 @@ export default function AuditPage({params}: { params: { auditId: string } }) {
           <QuestionList userId={user.uid} auditId={params.auditId}/>
         </QuestionProvider>
     )
+  } else if (!isAuthenticated && !user){
+      router.push("/")
   } else {
     return notFound()
   }

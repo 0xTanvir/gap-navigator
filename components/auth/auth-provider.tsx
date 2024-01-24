@@ -45,10 +45,16 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
   };
 
   const logOut = async () => {
-    await signOut(firebaseAuth);
-    setUser(null);
-    setIsAuthenticated(false);
-    router.push("/");
+    try {
+      await signOut(firebaseAuth);
+      setUser(null);
+      setIsAuthenticated(false);
+      // router.push("/")
+    } catch (e: any) {
+      toast.error("Something went wrong.", {
+        description: `Failed to fetch audits. Please try again. ${e.message}`,
+      });
+    }
   };
 
   useEffect(() => {

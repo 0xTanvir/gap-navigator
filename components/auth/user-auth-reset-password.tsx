@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-provider";
 
 interface UserAuthResetPasswordProps
-    extends React.HTMLAttributes<HTMLDivElement> {
+  extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 type FormData = z.infer<typeof userAuthRestPasswordSchema>;
@@ -42,17 +42,17 @@ const UserAuthResetPassword = ({
   async function onSubmit(data: FormData) {
     setIsLoading(true);
     await sendPasswordResetEmail(auth, data.email)
-        .then((result) => {
-          setIsLoading(false);
-          toast.success("Email has been send");
-          router.push("/");
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          return toast.error("Something went wrong.", {
-            description: error.message,
-          });
+      .then((result) => {
+        setIsLoading(false);
+        toast.success("Email has been send");
+        router.push("/");
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        return toast.error("Something went wrong.", {
+          description: error.message,
         });
+      });
   }
 
   useEffect(() => {
@@ -62,66 +62,66 @@ const UserAuthResetPassword = ({
   }, [loading]);
 
   return (
-      <div
-          className={cn(
-              "mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]",
-              className
-          )}
-          {...props}
-      >
-        <div className="px-6 py-12 shadow-xl mx-2 md:mx-0 sm:rounded-lg sm:px-12 border">
-          <div className="mb-3 space-y-3">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Forgot your password?
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Please enter your email
-            </p>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <FormField
-                  control={form.control}
-                  name={"email"}
-                  render={({field}) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                              variant="ny"
-                              placeholder="name@example.com"
-                              {...field}
-                              disabled={loading}
-                          />
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                  )}
-              />
-
-              <div>
-                <button
-                    type="submit"
-                    className={cn(
-                        buttonVariants({variant: "default"}),
-                        {
-                          "cursor-not-allowed opacity-60": isLoading,
-                        },
-                        className
-                    )}
-                    disabled={isLoading || loading}
-                >
-                  {isLoading && (
-                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
-                  )}
-                  Reset Password
-                </button>
-              </div>
-            </form>
-          </Form>
+    <div
+      className={cn(
+        "mt-6 sm:mx-auto sm:w-full sm:max-w-[480px] xl:max-w-[580px]",
+        className
+      )}
+      {...props}
+    >
+      <div className="px-6 py-12 shadow-xl mx-2 md:mx-0 sm:rounded-lg sm:px-12 border">
+        <div className="mb-3 space-y-3">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Forgot your password?
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Please enter your email
+          </p>
         </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <FormField
+              control={form.control}
+              name={"email"}
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      variant="ny"
+                      placeholder="name@example.com"
+                      {...field}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormMessage/>
+                </FormItem>
+              )}
+            />
+
+            <div>
+              <button
+                type="submit"
+                className={cn(
+                  buttonVariants({variant: "default"}),
+                  {
+                    "cursor-not-allowed opacity-60": isLoading,
+                  },
+                  className
+                )}
+                disabled={isLoading || loading}
+              >
+                {isLoading && (
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                )}
+                Reset Password
+              </button>
+            </div>
+          </form>
+        </Form>
       </div>
+    </div>
   );
 };
 
