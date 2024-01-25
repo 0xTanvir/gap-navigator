@@ -43,23 +43,16 @@ import DebouncedInput from "@/components/dashboard/table/debouncedInput";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
-    data: TData[],
-    setEvaluations: React.Dispatch<React.SetStateAction<[] | Evaluate[]>>
+    data: TData[]
 }
 
 type FormData = z.infer<typeof evaluateParticipantUpdate>
 
 export function DataTable<TData, TValue>({
                                              columns,
-                                             data,
-                                             setEvaluations,
+                                             data
                                          }: DataTableProps<TData, TValue>) {
     const [globalFilter, setGlobalFilter] = React.useState('')
-
-    const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
-    const [showUpdateDialog, setShowUpdateDialog] =
-        React.useState<boolean>(false);
-    const [evaluationData, setEvaluationData] = useState<Evaluate | null>(null)
 
 
     const table = useReactTable({
@@ -73,49 +66,6 @@ export function DataTable<TData, TValue>({
         onGlobalFilterChange: setGlobalFilter,
         getFilteredRowModel: getFilteredRowModel(),
     })
-
-    const form = useForm<FormData>({
-        resolver: zodResolver(evaluateParticipantUpdate),
-        defaultValues: {
-            participantPhone: ""
-        }
-    })
-    const handleEdit = (row: any) => {
-        setEvaluationData(row.original)
-        form.setValue("participantPhone", row.original.participantPhone || "");
-        setShowUpdateDialog(true)
-    };
-
-    async function onSubmit(data: FormData) {
-        setIsUpdateLoading(true)
-        const evaluate = {
-            ...evaluationData,
-            participantPhone: data.participantPhone
-        }
-        try {
-            await setEvaluation(evaluate.auditId as string, evaluate as Evaluate)
-
-            // Update the state based on the previous state
-            // @ts-ignore
-            setEvaluations((prevEvaluations) => {
-                return prevEvaluations.map((evaluation) =>
-                    evaluation.uid === evaluate.uid ? evaluate : evaluation
-                );
-            });
-            return toast.success("Evaluation updated successfully.", {
-                description: `Evaluation participant Phone number was updated.`,
-            });
-        } catch (error) {
-            return toast.error("Something went wrong.", {
-                description: "Your audit was not updated. Please try again.",
-            });
-        } finally {
-            setIsUpdateLoading(false)
-            setShowUpdateDialog(false)
-            setEvaluationData(null)
-            form.reset()
-        }
-    }
 
     return (
         <>
@@ -146,9 +96,6 @@ export function DataTable<TData, TValue>({
                                             )}
                                     </TableHead>
                                 ))}
-                                <TableHead className="text-center">
-                                    ...
-                                </TableHead>
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -167,15 +114,6 @@ export function DataTable<TData, TValue>({
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
-                                    <TableCell>
-                                        <div
-                                            className="flex items-center cursor-pointer justify-center"
-                                            onClick={() => handleEdit(row)}
-                                        >
-                                            <Icons.fileEdit className="mr-1 h-4 w-4"/>
-                                            Edit
-                                        </div>
-                                    </TableCell>
                                 </TableRow>
                             ))
                         ) : (
@@ -207,57 +145,6 @@ export function DataTable<TData, TValue>({
                     Next
                 </Button>
             </div>
-
-            <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <DialogHeader>
-                                <DialogTitle>Evaluation Update</DialogTitle>
-                                <DialogDescription>lorem ipsum</DialogDescription>
-                            </DialogHeader>
-
-                            <div className="grid gap-4 py-4">
-                                <FormField
-                                    control={form.control}
-                                    name="participantPhone"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Phone Number</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="tel"
-                                                    variant="ny"
-                                                    placeholder="Please enter phone number"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <DialogFooter>
-                                <button
-                                    type="submit"
-                                    className={cn(buttonVariants({variant: "default"}), {
-                                        "cursor-not-allowed opacity-60": isUpdateLoading,
-                                    })}
-                                    disabled={isUpdateLoading}
-                                >
-                                    {isUpdateLoading ? (
-                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
-                                    ) : (
-                                        <Icons.filePlus className="mr-2 h-4 w-4"/>
-                                    )}
-                                    Submit
-                                </button>
-                            </DialogFooter>
-                        </form>
-                    </Form>
-                </DialogContent>
-            </Dialog>
         </>
     )
 }
