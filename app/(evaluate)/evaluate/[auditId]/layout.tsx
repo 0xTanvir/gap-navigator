@@ -153,9 +153,13 @@ export default function DocsLayout({children}: DocsLayoutProps) {
     childrenContent = children;
   }
 
-  if (!isAuthenticated || !user) {
-    router.push("/")
-  }
+  useEffect(() => {
+    if (loading) {
+      return
+    } else if (!isAuthenticated || !user) {
+      router.push("/")
+    }
+  }, [loading]);
 
   return (
     <div className="flex min-h-screen flex-col">
