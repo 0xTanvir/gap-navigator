@@ -43,7 +43,7 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
             onClick={(e) => {
               setActiveTab("profile")
             }}
-            style={activeTab === "profile" ? {background: "hsl(210 40% 96.1%)"} : {background: "transparent"}}
+            style={activeTab === "profile" ? {background: "hsl(210 40% 96.1%)",color:"#000"} : {background: "transparent"}}
             className="w-full justify-start"
             value="profile"
           >
@@ -54,7 +54,7 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
               setActiveTab("evaluation")
             }}
             className="w-full justify-start"
-            style={activeTab === "evaluation" ? {background: "hsl(210 40% 96.1%)"} : {background: "transparent"}}
+            style={activeTab === "evaluation" ? {background: "hsl(210 40% 96.1%)",color:"#000"} : {background: "transparent"}}
             value="evaluation"
           >
             Evaluation
