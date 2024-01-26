@@ -39,6 +39,7 @@ import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/edit
 import "@/components/editorjs/editorjs.css"
 import { setEvaluation } from "@/lib/firestore/evaluation";
 import { getAudit } from "@/lib/firestore/audit";
+import { useAuth } from "@/components/auth/auth-provider";
 
 type FormData = z.infer<typeof evaluateParticipant>;
 
@@ -51,6 +52,7 @@ export default function EvaluatePage({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const {evaluation, dispatch} = useEvaluation();
+  const {user, isAuthenticated, loading} = useAuth()
   const router = useRouter();
   const {auditId} = params;
   let data = {
@@ -84,6 +86,7 @@ export default function EvaluatePage({
       participantPhone: data.participantPhone ? data.participantPhone : "",
       auditId: auditId,
       auditName: audit?.name,
+      isCompleted: false,
       createdAt: Timestamp.now(),
     };
 
@@ -108,8 +111,8 @@ export default function EvaluatePage({
         type: EvaluationActionType.ADD_EVALUATE,
         payload: evaluate,
       });
-      form.reset();
       await setEvaluation(auditId, evaluate);
+      form.reset();
       setIsLoading(false)
       setShowDialog(false);
       toast.info("Evaluation start.");
@@ -136,6 +139,14 @@ export default function EvaluatePage({
   useEffect(() => {
     fetchAuditData()
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    } else if (!isAuthenticated || !user) {
+      router.push("/")
+    }
+  }, [isAuthenticated])
 
   return (
     <div className="py-6 lg:py-10">

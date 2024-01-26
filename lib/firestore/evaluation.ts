@@ -13,7 +13,21 @@ export async function setEvaluation(auditId: string, evaluation: Evaluate) {
       throw error;
     }
     // If it's not an Error instance, throw a new Error object
-    throw new Error("Failed to add the question.");
+    throw new Error("Failed to add the evaluation.");
+  }
+}
+
+export async function updateEvaluation(auditId: string, evaluation:any) {
+  const evaluationsRef = Collections.evaluation(auditId, evaluation.uid);
+  try {
+    await updateDoc(evaluationsRef, evaluation);
+  } catch (error) {
+    // If error is an instance of Error, rethrow it
+    if (error instanceof Error) {
+      throw error;
+    }
+    // If it's not an Error instance, throw a new Error object
+    throw new Error("Failed to update the evaluation.");
   }
 }
 
@@ -106,6 +120,7 @@ export async function getAllEvaluations(auditId: string) {
           participantPhone: data.participantPhone,
           auditId: data.auditId,
           auditName: data.auditName,
+          isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
         } as Evaluate
@@ -137,6 +152,7 @@ export async function getEvaluationByIds(auditIds: string[], evaluationID: strin
         participantPhone: data.participantPhone,
         auditId: data.auditId,
         auditName: data.auditName,
+        isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
       };
@@ -164,6 +180,7 @@ export async function getAllEvaluationWithAuditName(auditId: string) {
           participantPhone: data.participantPhone,
           auditId: data.auditId,
           auditName: data.auditName,
+          isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
         } as Evaluate
@@ -196,6 +213,7 @@ export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[],
         participantPhone: data.participantPhone,
         auditId: data.auditId,
         auditName: data.auditName,
+        isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
       };

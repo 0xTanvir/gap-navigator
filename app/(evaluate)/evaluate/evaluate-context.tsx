@@ -1,5 +1,5 @@
 import React, { createContext, Dispatch, useContext, useReducer } from "react";
-import { Evaluate, Evaluation, EvaluationAction } from "@/types/dto";
+import { Evaluation, EvaluationAction } from "@/types/dto";
 import { evaluateReducer } from "./evaluate-reducer";
 import { Timestamp } from "firebase/firestore";
 
@@ -34,15 +34,17 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
       participantLastName: '',
       participantEmail: '',
       participantPhone: '',
+      isCompleted: false,
       createdAt: Timestamp.now(),
       choices: []
     },
-    evaluateFormData:{
+    evaluateFormData: {
       uid: '',
       participantFirstName: '',
       participantLastName: '',
       participantEmail: '',
       participantPhone: '',
+      isCompleted: false,
       createdAt: Timestamp.now(),
       choices: []
     },
@@ -52,9 +54,9 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
   const [evaluation, dispatch] = useReducer(evaluateReducer, initialState)
 
   return (
-      <EvaluateContext.Provider value={{evaluation, dispatch}}>
-        {children}
-      </EvaluateContext.Provider>
+    <EvaluateContext.Provider value={{evaluation, dispatch}}>
+      {children}
+    </EvaluateContext.Provider>
   )
 }
 
