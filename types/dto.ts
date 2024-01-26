@@ -174,6 +174,10 @@ export interface GroupedAudits {
     name: string;
     total: number;
 }
+export interface GroupedEvaluation {
+    name: string;
+    total: number;
+}
 
 export interface Notification {
     uid: string;
