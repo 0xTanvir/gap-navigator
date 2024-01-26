@@ -44,6 +44,7 @@ export interface Audit {
     uid: string
     name: string
     type: string
+    condition:boolean
     welcome: string
     thank_you: string
     exclusiveList?: string[];
