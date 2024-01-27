@@ -25,8 +25,13 @@ import { useRouter } from "next/navigation";
 import { Choice, Evaluate, EvaluationActionType } from "@/types/dto";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { getEvaluationById, updateEvaluation, updateEvaluationById } from "@/lib/firestore/evaluation";
+import {
+  getEvaluationById,
+  updateEvaluation,
+  updateEvaluationById
+} from "@/lib/firestore/evaluation";
 import dynamic from "next/dynamic";
+import { EvaluateControlPager } from "@/app/(evaluate)/evaluate/[auditId]/[questionId]/evaluate-control-pager";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
   ssr: false,
@@ -102,20 +107,81 @@ export default function EvaluateQuestionPage({
 
     // Move to the next page if an answer is selected
     const hasAnswerSelected = data.answerId !== undefined; // Check if an answer is selected
-    if (hasAnswerSelected) {
-      dispatch({
-        type: EvaluationActionType.ADD_QUESTION_ANSWER,
-        payload: newEvaluate,
-      });
 
-      if (evaluation.evaluate.choices) {
-        const dbFoundObject = evaluation.evaluations.find(
-          (item) => item.uid === evaluation.evaluate.uid
-        );
-        let isExists = singleEvaluation?.choices?.some(choice => choice.answerId === newEvaluate.answerId);
-        if (isExists === undefined || !isExists) {
-          setIsLoading(true);
-          if (pager.next.disabled) {
+    if (evaluation.condition) {
+      if (hasAnswerSelected) {
+        dispatch({
+          type: EvaluationActionType.ADD_QUESTION_ANSWER,
+          payload: newEvaluate,
+        });
+
+        if (evaluation.evaluate.choices) {
+          const dbFoundObject = evaluation.evaluations.find(
+            (item) => item.uid === evaluation.evaluate.uid
+          );
+          let isExists = singleEvaluation?.choices?.some(choice => choice.answerId === newEvaluate.answerId);
+          if (isExists === undefined || !isExists) {
+            setIsLoading(true);
+            if (pager.next.disabled) {
+              let evaluateData = {
+                ...evaluation.evaluateFormData,
+                isCompleted: true
+              }
+              dispatch({
+                type: EvaluationActionType.UPDATE_EVALUATE,
+                payload: evaluateData,
+              });
+              await updateEvaluation(auditId, evaluateData)
+            }
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+          }
+        }
+        if (pager.next && !pager.next.disabled) {
+          let nextQuestion = question?.answers?.find(
+            (answer) => answer?.uid === data?.answerId
+          );
+          let index = evaluation.evaluate.choices?.findIndex(
+            (choice) => choice.answerId === nextQuestion?.uid
+          );
+          if (nextQuestion?.questionId) {
+            if (index !== -1) {
+              if (
+                pager.next.href !==
+                `/evaluate/${auditId}/${nextQuestion?.questionId}`
+              ) {
+                router.push(
+                  `/evaluate/${auditId}/${nextQuestion?.questionId}`
+                );
+                let urlParts = pager.next.href.split("/");
+                dispatch({
+                  type: EvaluationActionType.REMOVE_QUESTION_ANSWER,
+                  payload: urlParts[urlParts.length - 1],
+                });
+              }
+            }
+            router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`);
+          } else {
+            router.push(pager.next.href);
+          }
+        } else {
+          const dbFoundObject = evaluation.evaluations.find(
+            (item) => item.uid === evaluation.evaluate.uid
+          );
+          let result
+          if (evaluation?.evaluateFormData) {
+            result = dbFoundObject
+              ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
+              : false;
+          }
+          // let result = dbFoundObject
+          //     ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
+          //     : false;
+          if (result) {
+            await router.push(`/evaluate/${auditId}/completed`);
+          } else {
+            setIsLoading(true);
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
+            // await setEvaluation(auditId, evaluation.evaluate);
             let evaluateData = {
               ...evaluation.evaluateFormData,
               isCompleted: true
@@ -125,70 +191,56 @@ export default function EvaluateQuestionPage({
               payload: evaluateData,
             });
             await updateEvaluation(auditId, evaluateData)
+            await router.push(`/evaluate/${auditId}/completed`);
           }
-          await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+          toast.success("Evaluation Completed!");
         }
+        setIsLoading(false);
       }
-      if (pager.next && !pager.next.disabled) {
-        let nextQuestion = question?.answers?.find(
-          (answer) => answer?.uid === data?.answerId
-        );
-        let index = evaluation.evaluate.choices?.findIndex(
-          (choice) => choice.answerId === nextQuestion?.uid
-        );
-        if (nextQuestion?.questionId) {
-          if (index !== -1) {
-            if (
-              pager.next.href !==
-              `/evaluate/${auditId}/${nextQuestion?.questionId}`
-            ) {
-              router.push(
-                `/evaluate/${auditId}/${nextQuestion?.questionId}`
-              );
-              let urlParts = pager.next.href.split("/");
+    } else {
+      if (hasAnswerSelected) {
+        dispatch({
+          type: EvaluationActionType.ADD_QUESTION_ANSWER,
+          payload: newEvaluate,
+        });
+        if (pager.next && !pager.next.disabled) {
+          let isExists = singleEvaluation?.choices?.some(choice => choice.answerId === newEvaluate.answerId);
+          if (isExists === undefined || !isExists) {
+            setIsLoading(true);
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+          }
+          router.push(pager.next.href);
+        } else {
+          if (singleEvaluation?.isCompleted) {
+            let result
+            if (evaluation?.evaluateFormData) {
+              result = singleEvaluation
+                ? areObjectsEqual(singleEvaluation, evaluation?.evaluate)
+                : false;
+            }
+            if (result) {
+              router.push(`/evaluate/${auditId}/completed`)
+            } else {
+              await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
+            }
+          } else {
+            if (pager.next.disabled) {
+              let evaluateData = {
+                ...evaluation.evaluateFormData,
+                isCompleted: true
+              }
               dispatch({
-                type: EvaluationActionType.REMOVE_QUESTION_ANSWER,
-                payload: urlParts[urlParts.length - 1],
+                type: EvaluationActionType.UPDATE_EVALUATE,
+                payload: evaluateData,
               });
+              setIsLoading(true);
+              await updateEvaluation(auditId, evaluateData)
+              router.push(`/evaluate/${auditId}/completed`)
             }
           }
-          router.push(`/evaluate/${auditId}/${nextQuestion?.questionId}`);
-        } else {
-          router.push(pager.next.href);
         }
-      } else {
-        const dbFoundObject = evaluation.evaluations.find(
-          (item) => item.uid === evaluation.evaluate.uid
-        );
-        let result
-        if (evaluation?.evaluateFormData) {
-          result = dbFoundObject
-            ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
-            : false;
-        }
-        // let result = dbFoundObject
-        //     ? areObjectsEqual(dbFoundObject, evaluation?.evaluateFormData)
-        //     : false;
-        if (result) {
-          await router.push(`/evaluate/${auditId}/completed`);
-        } else {
-          setIsLoading(true);
-          await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
-          // await setEvaluation(auditId, evaluation.evaluate);
-          let evaluateData = {
-            ...evaluation.evaluateFormData,
-            isCompleted: true
-          }
-          dispatch({
-            type: EvaluationActionType.UPDATE_EVALUATE,
-            payload: evaluateData,
-          });
-          await updateEvaluation(auditId, evaluateData)
-          await router.push(`/evaluate/${auditId}/completed`);
-        }
-        toast.success("Evaluation Completed!");
+        setIsLoading(false)
       }
-      setIsLoading(false);
     }
   }
 
@@ -481,11 +533,19 @@ export default function EvaluateQuestionPage({
               </>
             )}
 
-            <EvaluatePager
-              handleNextClick={handleNextClick}
-              isLoading={isLoading}
-              currentQuestion={questionId}
-            />
+            {
+              evaluation.condition ?
+                <EvaluatePager
+                  handleNextClick={handleNextClick}
+                  isLoading={isLoading}
+                  currentQuestion={questionId}
+                /> :
+                <EvaluateControlPager
+                  handleNextClick={handleNextClick}
+                  isLoading={isLoading}
+                  currentQuestion={questionId}
+                />
+            }
           </form>
         </Form>
       ) : (

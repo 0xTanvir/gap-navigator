@@ -87,6 +87,7 @@ export default function EvaluatePage({
       auditId: auditId,
       auditName: audit?.name,
       isCompleted: false,
+      choices:[],
       createdAt: Timestamp.now(),
     };
 
