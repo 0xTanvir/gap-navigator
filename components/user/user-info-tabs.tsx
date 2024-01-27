@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfileInfo from "@/components/user/profile-info";
 import { getEvaluationWithUseInfoAndEvaluations } from "@/lib/firestore/evaluation";
+import { AuditItem } from "@/components/dashboard/audit-item";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Evaluate } from "@/types/dto";
 import Link from "next/link";
@@ -13,7 +14,7 @@ interface UserInfoTabsProps {
 }
 
 const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
-  const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("evaluation")
   const [isLoading, setIsLoading] = useState(true)
   const {user, loading, setUser} = useAuth();
   const [userInfo, setUserInfo] = useState(null)
@@ -37,7 +38,7 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
 
   return (
     <>
-      <Tabs defaultValue="profile" className="sm:flex sm:justify-start sm:items-start gap-10">
+      <Tabs defaultValue="evaluation" className="sm:flex sm:justify-start sm:items-start gap-10">
         <TabsList className="mb-10 sm:w-[200px] sm:flex sm:flex-col h-auto sm:justify-start bg-transparent">
           <TabsTrigger
             onClick={(e) => {
@@ -69,7 +70,10 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              {isLoading && userInfo === null ? "Loading ...." : <ProfileInfo userId={userId} userInfo={userInfo}/>}
+              {isLoading && userInfo === null ?
+                <ProfileInfo.Skeleton />
+                :
+                <ProfileInfo userId={userId} userInfo={userInfo}/>}
             </CardContent>
           </Card>
         </TabsContent>
@@ -84,6 +88,13 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
             <CardContent className="space-y-2">
               <div className="divide-y divide-border rounded-md border mt-3">
                 {
+                  isLoading ?
+                    <>
+                      <AuditItem.Skeleton />
+                      <AuditItem.Skeleton />
+                      <AuditItem.Skeleton />
+                    </> :
+
                   evaluations.map(evaluation => (
                     <div key={evaluation.uid} className="flex items-center justify-between p-4">
                       <div className="grid gap-1">

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { clientFormSchema } from "@/lib/validations/profile";
 import * as z from "zod";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ClientInfoProps {
   userId: string
@@ -112,3 +113,32 @@ const ProfileInfo = ({userId, userInfo}: ClientInfoProps) => {
 };
 
 export default ProfileInfo;
+
+ProfileInfo.Skeleton = function ProfileInfoSkeleton() {
+  return (
+    <>
+
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <p>First Name</p>
+          <Skeleton className="h-9 w-full"/>
+        </div>
+        <div className="space-y-2">
+          <p>Last Name</p>
+          <Skeleton className="h-9 w-full"/>
+        </div>
+        <div className="space-y-2">
+          <p>Email</p>
+          <Skeleton className="h-9 w-full"/>
+        </div>
+        <div className="space-y-2">
+          <p>Phone</p>
+          <Skeleton className="h-9 w-full"/>
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-20"/>
+        </div>
+      </div>
+    </>
+  )
+}
