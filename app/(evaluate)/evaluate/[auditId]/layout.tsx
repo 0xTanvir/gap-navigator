@@ -50,17 +50,17 @@ export default function DocsLayout({children}: DocsLayoutProps) {
             switch (audit.type) {
               case "public":
                 toast.success(
-                    "you are authenticated and audit is public so you can do it."
+                  "you are authenticated and audit is public so you can do it."
                 );
                 break;
               case "private":
                 if (user?.role === "consultant") {
                   toast.success(
-                      `you are authenticated and audit is private so you can do it.`
+                    `you are authenticated and audit is private so you can do it.`
                   );
                 } else {
                   toast.error(
-                      `You do not have access to this evaluation. please ask your consultant to give you access.`
+                    `You do not have access to this evaluation. please ask your consultant to give you access.`
                   );
                   router.push("/");
                   return;
@@ -69,12 +69,12 @@ export default function DocsLayout({children}: DocsLayoutProps) {
               case "exclusive":
                 if (user?.role === "consultant") {
                   toast.success(
-                      `you are authenticated and audit is exclusive so you can do it.`
+                    `you are authenticated and audit is exclusive so you can do it.`
                   );
                 } else if (user?.role === "client") {
                   if (audit.exclusiveList?.includes(user?.uid)) {
                     toast.success(
-                        `you are authenticated client and audit is exclusive so you can do it.`
+                      `you are authenticated client and audit is exclusive so you can do it.`
                     );
                   } else {
                     toast.error(`You do not have access to this evaluation.`);
@@ -94,7 +94,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
               // so we can do it continue and show the popup
               // for first name, last name, and email
               toast.success(
-                  `you are unauthenticated but audit is public so you can do it.`
+                `you are unauthenticated but audit is public so you can do it.`
               );
             } else {
               toast.error(`You must be logged in to view this evaluation.`);
@@ -134,18 +134,18 @@ export default function DocsLayout({children}: DocsLayoutProps) {
   let childrenContent: any;
   if (evaluateLoading || loading) {
     content = (
-        <>
-          <DocsSidebarNavSkeleton>
-            <DocsSidebarNavItems.Skeleton/>
-          </DocsSidebarNavSkeleton>
+      <>
+        <DocsSidebarNavSkeleton>
+          <DocsSidebarNavItems.Skeleton/>
+        </DocsSidebarNavSkeleton>
 
-          <DocsSidebarNavSkeleton>
-            <DocsSidebarNavItems.Skeleton/>
-            <DocsSidebarNavItems.Skeleton/>
-            <DocsSidebarNavItems.Skeleton/>
-            <DocsSidebarNavItems.Skeleton/>
-          </DocsSidebarNavSkeleton>
-        </>
+        <DocsSidebarNavSkeleton>
+          <DocsSidebarNavItems.Skeleton/>
+          <DocsSidebarNavItems.Skeleton/>
+          <DocsSidebarNavItems.Skeleton/>
+          <DocsSidebarNavItems.Skeleton/>
+        </DocsSidebarNavSkeleton>
+      </>
     );
     childrenContent = childrenSkeleton();
   } else {
@@ -153,31 +153,39 @@ export default function DocsLayout({children}: DocsLayoutProps) {
     childrenContent = children;
   }
 
+  useEffect(() => {
+    if (loading) {
+      return
+    } else if (!isAuthenticated || !user) {
+      router.push("/")
+    }
+  }, [loading]);
+
   return (
-      <div className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-40 w-full border-b bg-background">
-          <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-            <MainNav items={dashboardConfig.mainNav}>
-              <DocsSidebarNav items={evaluation.sideBarNav}/>
-            </MainNav>
-            <nav className="flex gap-2 items-center">
-              <ProfileNav/>
-              <ModeToggle/>
-              <NotificationNav/>
-            </nav>
-          </div>
-        </header>
-        <div className="container flex-1">
-          <div className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
-            <aside
-                className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r py-6 pr-2 md:sticky md:block lg:py-10">
-              {content}
-            </aside>
-            {childrenContent}
-          </div>
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-40 w-full border-b bg-background">
+        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+          <MainNav items={dashboardConfig.mainNav}>
+            <DocsSidebarNav items={evaluation.sideBarNav}/>
+          </MainNav>
+          <nav className="flex gap-2 items-center">
+            <ProfileNav/>
+            <ModeToggle/>
+            <NotificationNav/>
+          </nav>
         </div>
-        <SiteFooter className="border-t"/>
+      </header>
+      <div className="container flex-1">
+        <div className="flex-1 md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10">
+          <aside
+            className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r py-6 pr-2 md:sticky md:block lg:py-10">
+            {content}
+          </aside>
+          {childrenContent}
+        </div>
       </div>
+      <SiteFooter className="border-t"/>
+    </div>
   );
 }
 

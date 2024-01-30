@@ -12,7 +12,7 @@ import { dashboardConfig } from "@/config/dashboard";
 import { ProfileNav } from "@/components/nav/profile-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SiteFooter } from "@/components/site-footer";
-import { redirect, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { SidebarNavItem } from "@/types";
 import usePreview from "../preview-context";
 import { getAudit } from "@/lib/firestore/audit";
@@ -30,6 +30,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
   const {loading, user, isAuthenticated} = useAuth();
   const {auditId} = useParams();
   const {preview, dispatch} = usePreview();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -135,8 +136,10 @@ export default function DocsLayout({children}: DocsLayoutProps) {
           <SiteFooter className="border-t"/>
         </div>
     );
-  } else {
-    redirect("/");
+  } else if (!isAuthenticated || !user) {
+    router.push("/")
+  }else {
+    router.push("/")
   }
 }
 

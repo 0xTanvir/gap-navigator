@@ -44,6 +44,7 @@ export interface Audit {
     uid: string
     name: string
     type: string
+    condition:boolean
     welcome: string
     thank_you: string
     exclusiveList?: string[];
@@ -134,6 +135,7 @@ export interface Evaluation extends Audit {
 export enum EvaluationActionType {
     ADD_EVALUATION = "ADD_EVALUATION",
     ADD_EVALUATE = "ADD_EVALUATE",
+    UPDATE_EVALUATE = "UPDATE_EVALUATE",
     ADD_QUESTION_ANSWER = "ADD_QUESTION_ANSWER",
     REMOVE_QUESTION_ANSWER = "REMOVE_QUESTION_ANSWER",
 }
@@ -141,6 +143,7 @@ export enum EvaluationActionType {
 export type EvaluationAction =
     | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
     | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
+    | { type: EvaluationActionType.UPDATE_EVALUATE; payload: Evaluate }
     | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
     | { type: EvaluationActionType.REMOVE_QUESTION_ANSWER; payload: string }
 
@@ -154,6 +157,7 @@ export interface Evaluate {
     choices?: Choice[];
     auditName?: string
     auditId?: string
+    isCompleted:boolean
     count?: number;
 }
 
@@ -167,6 +171,10 @@ export interface Choice {
 
 
 export interface GroupedAudits {
+    name: string;
+    total: number;
+}
+export interface GroupedEvaluation {
     name: string;
     total: number;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-provider";
 import { AuditEditorShell } from "../audit-editor-shell";
 import { AuditEditorHeader } from "../audit-editor-header";
@@ -12,12 +12,13 @@ import { QuestionActionType } from "@/types/dto";
 import { toast } from "sonner";
 
 export default function QuestionPage({
-  params,
-}: {
+                                       params,
+                                     }: {
   params: { auditId: string; questionId: string };
 }) {
-  const { user, isAuthenticated, loading } = useAuth();
-  const { dispatch } = useQuestions();
+  const {user, isAuthenticated, loading} = useAuth();
+  const {dispatch} = useQuestions();
+  const router = useRouter()
   useEffect(() => {
     async function allQuestion() {
       try {
@@ -37,7 +38,7 @@ export default function QuestionPage({
   if (loading) {
     return (
       <AuditEditorShell>
-        <AuditEditorHeader.Skeleton />
+        <AuditEditorHeader.Skeleton/>
       </AuditEditorShell>
     );
   } else if (
@@ -53,6 +54,8 @@ export default function QuestionPage({
         />
       </>
     );
+  } else if (!isAuthenticated || !user) {
+    router.push("/")
   } else {
     return notFound();
   }

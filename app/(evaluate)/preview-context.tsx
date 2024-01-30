@@ -24,6 +24,7 @@ export const PreviewProvider: React.FC<PreviewProviderProps> = ({ children, init
         uid: '',
         name: '',
         type: '',
+        condition:false,
         welcome: '',
         thank_you: '',
         authorId: '',

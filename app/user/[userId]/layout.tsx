@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import SettingsShell from "@/components/settings/settings-shell";
 
 export const metadata: Metadata = {
-  title: "Settings",
+  title: "Client Page",
   description: "Advanced form example using react-hook-form and Zod.",
 };
 
@@ -16,7 +16,7 @@ interface SettingsLayoutProps {
   children: React.ReactNode;
 }
 
-export default function SettingsLayout({children}: SettingsLayoutProps) {
+export default function UserLayout({children}: SettingsLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col space-y-6">
       <header className="sticky top-0 z-40 border-b bg-background">
@@ -29,15 +29,8 @@ export default function SettingsLayout({children}: SettingsLayoutProps) {
         </div>
       </header>
 
-      <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr]">
-        <aside className="hidden w-[200px] flex-col md:flex">
-          <SettingsNav items={settingsConfig.sidebarNav}/>
-        </aside>
-        <div className="flex w-full flex-1 flex-col">
-          <SettingsShell>
-            {children}
-          </SettingsShell>
-        </div>
+      <div className="container">
+        {children}
       </div>
       <SiteFooter className="border-t"/>
     </div>

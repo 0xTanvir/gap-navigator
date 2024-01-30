@@ -1,165 +1,350 @@
 "use client"
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 import pdfMake from "pdfmake/build/pdfmake";
-import {Content, TDocumentDefinitions} from "pdfmake/interfaces";
+import { Content, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
 import pdfFonts from "pdfmake/build/vfs_fonts"
-import {generateRandomText} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
+import { generateRandomText } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import htmlToPdfmake from "html-to-pdfmake"
 import edjsParser from "editorjs-parser";
-import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
+import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 import Output from "editorjs-react-renderer";
-import {CodeBlockRenderer, ImageBlock, style} from "@/components/editorjs/editorjs-utils";
+import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const PdfDownload = () => {
-    const {evaluation} = useEvaluation()
-    const {uid} = evaluation
-    const router = useRouter()
-    const parser = new edjsParser();
-    let data = {
-        time: Date.now(),
-        blocks: evaluation.thank_you ? JSON.parse(evaluation.thank_you) : [],
-        version: "2.0.0"
-    };
+  const {evaluation} = useEvaluation()
+  const {uid} = evaluation
+  const router = useRouter()
+  const parser = new edjsParser();
+  let data = {
+    time: Date.now(),
+    blocks: evaluation.thank_you ? JSON.parse(evaluation.thank_you) : [],
+    version: "2.0.0"
+  };
 
-    const renderers = {
-        code: CodeBlockRenderer,
-        image: ImageBlock
-    };
+  const renderers = {
+    code: CodeBlockRenderer,
+    image: ImageBlock
+  };
 
-    function evaluateFormat() {
-        const choices = evaluation.evaluate.choices;
-        let results: any[] = [];
+  function evaluateFormat() {
+    const choices = evaluation.evaluate.choices;
+    let results: any[] = [];
 
-        choices?.forEach(choice => {
-            const questionId = choice.questionId;
-            const answerId = choice.answerId;
+    choices?.forEach(choice => {
+      const questionId = choice.questionId;
+      const answerId = choice.answerId;
 
-            // Find the question with the specified questionId
-            const question = evaluation.questions.find(q => q.uid === questionId);
+      // Find the question with the specified questionId
+      const question = evaluation.questions.find(q => q.uid === questionId);
 
-            if (question) {
-                // Find the answer with the specified answerId
-                const answer = question.answers.find(a => a.uid === answerId);
+      if (question) {
+        // Find the answer with the specified answerId
+        const answer = question.answers.find(a => a.uid === answerId);
 
-                if (answer) {
-                    // Retrieve the recommendationDocument for the answer
-                    const recommendationDocument = answer.recommendationDocument;
+        if (answer) {
+          // Retrieve the recommendationDocument for the answer
+          const recommendationDocument = answer.recommendationDocument;
 
-                    // Update the choice with the recommendedNote
-                    choice.recommendedNote = recommendationDocument;
+          // Update the choice with the recommendedNote
+          choice.recommendedNote = recommendationDocument;
 
-                    // Push the result to the array
-                    results.push({
-                        questionId,
-                        answerId,
-                        questionName: question.name,
-                        recommendationDocument,
-                    });
-                }
-            }
+          // Push the result to the array
+          results.push({
+            questionId,
+            answerId,
+            questionName: question.name,
+            recommendationDocument,
+          });
+        }
+      }
+    });
+
+    return results;
+  }
+
+  // Call the function to evaluate choices and get the results array
+  const evaluationFormatData = evaluateFormat();
+
+
+  let evaluate = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+    .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'))
+
+  let evaluationData = {
+    time: Date.now(),
+    blocks: evaluate,
+    version: "2.0.1"
+  };
+
+  let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+    .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
+  if (evaluation.welcome) {
+    reportData = [...JSON.parse(evaluation.welcome), ...reportData]
+  }
+
+  let pdfData = {
+    blocks: reportData
+  };
+
+
+  const generateAndDownloadPdf = async () => {
+    try {
+      if (!evaluation || !evaluation.evaluate) {
+        throw new Error('Invalid evaluation data');
+      }
+
+      // Arrays to store indices
+      const imageIndices: number[] = [];
+      const embedIndices: number[] = [];
+      const formatDataImage: any[] = []
+      const formatDataEmbed: any[] = []
+
+      pdfData.blocks.forEach((element: any, index: number) => {
+        if (element.type === "image") {
+          imageIndices.push(index);
+          formatDataImage.push(pdfData.blocks[index])
+        } else if (element.type === "embed") {
+          embedIndices.push(index);
+          formatDataEmbed.push(pdfData.blocks[index])
+        }
+      });
+
+      let pdfMakeImageData: any
+      let pdfMakeEmbedData: any
+      if (formatDataImage) {
+        pdfMakeImageData = generatePdfDefinition(formatDataImage)
+      }
+      if (formatDataEmbed) {
+        pdfMakeEmbedData = generatePdfDefinition(formatDataEmbed)
+      }
+
+      // console.log(pdfMakeImageData, "line 122")
+      // console.log(pdfMakeEmbedData, "line 123")
+      //
+      // // console.log(formatDataImage)
+      // console.log(imageIndices)
+      // // console.log(formatDataEmbed)
+      // console.log(embedIndices)
+      // console.log(pdfData)
+      //
+      // let pdfData1 = {
+      //   blocks: []
+      // };
+      //
+      //
+      // if (imageIndices.length > 0) {
+      //   imageIndices.map((data, index) => {
+      //     // @ts-ignore
+      //     pdfData1.blocks = [
+      //       ...pdfData1.blocks.slice(0, data),
+      //       ...pdfData1.blocks.slice(data, 1),
+      //       pdfMakeImageData[index],
+      //       ...pdfData1.blocks.slice(data)
+      //     ]
+      //   })
+      // }
+      //
+      // if (embedIndices.length > 0) {
+      //   embedIndices.map((data, index) => {
+      //     // @ts-ignore
+      //     pdfData1.blocks = [
+      //       ...pdfData1.blocks.slice(0, data),
+      //       ...pdfData1.blocks.slice(data, 1),
+      //       pdfMakeEmbedData[index],
+      //       ...pdfData1.blocks.slice(data)
+      //     ]
+      //   })
+      // }
+
+      const markup = parser.parse(pdfData);
+      let html = htmlToPdfmake(markup)
+
+      // @ts-ignore
+      html = html?.filter((node) => node.nodeName !== 'FIGURE') || [];
+
+      if (imageIndices.length > 0) {
+        imageIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeImageData[index]);
         });
+      }
 
-        return results;
+      if (embedIndices.length > 0) {
+        embedIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeEmbedData[index]);
+        });
+      }
+
+      // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
+      //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
+
+      // let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+      //   .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
+      // if (evaluation.welcome) {
+      //   reportData = [...JSON.parse(evaluation.welcome), ...reportData]
+      // }
+      //
+      // // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+      //
+      // let data = {
+      //   blocks: reportData
+      // };
+
+      // const markup = parser.parse(pdfData);
+      // let html = htmlToPdfmake(markup)
+      //
+      // let datas = generatePdfDefinition(pdfData.blocks)
+      // console.log(datas)
+      // console.log(formatDataImage)
+      // console.log(formatDataEmbed)
+
+      // let docContent = await pdfGenerator(data); // Await the async function
+
+      const docDefinition: TDocumentDefinitions = {
+        header: {
+          text: 'Gap Navigator', fontSize: 14, alignment: 'center', margin: [10, 10]
+        },
+        footer: function (currentPage: number, pageCount: number) {
+          return {
+            text: currentPage.toString() + ' of ' + pageCount,
+            alignment: 'center'
+          }
+        },
+        watermark: {
+          text: 'Gap Navigator',
+          color: 'gray',
+          opacity: 0.3,
+          bold: true,
+          italics: false
+        },
+        pageSize: 'A4',
+        info: {
+          title: `${evaluation.name}`,
+          author: 'Gap Navigator',
+          subject: 'subject of document',
+          keywords: 'keywords for document',
+          creator: 'Gap Navigator',
+          producer: 'Gap Navigator',
+        },
+        content: [
+          // pdfData1.blocks,
+          html
+          // ...(docContent.content as Content []),
+        ],
+      };
+      const createPdf = () => {
+        const pdfGenerator = pdfMake.createPdf(docDefinition, {});
+        pdfGenerator.download(`${generateRandomText(6)}.pdf`);
+      };
+
+      createPdf();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
     }
+  };
 
-    // Call the function to evaluate choices and get the results array
-    const evaluationFormatData = evaluateFormat();
+  useEffect(() => {
+    // Check if evaluation is not available or is empty, then navigate
+    if (!evaluation || Object.entries(evaluation.evaluate).length === 0) {
+      router.push(`/evaluate/${uid}`);
+    }
+  }, [evaluation, uid, router]);
 
+  return (
+    <>
+      <DocsPageHeader
+        heading={evaluation.name}
+        text={"Analyze your report."}
+      />
+      <div className="w-full text-end">
+        <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
+      </div>
+      <div className="editorjs">
+        <Output data={data} style={style} renderers={renderers}/>
+        <Output data={evaluationData} style={style} renderers={renderers}/>
+      </div>
 
-    const generateAndDownloadPdf = async () => {
-        try {
-            if (!evaluation || !evaluation.evaluate) {
-                throw new Error('Invalid evaluation data');
-            }
-
-            const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
-                .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
-
-            let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
-                .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
-
-            // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
-            console.log(reportData)
-
-            let data = {
-                blocks: reportData
-            };
-            console.log(data)
-
-            const markup = parser.parse(data);
-            let html = htmlToPdfmake(markup)
-
-            // let docContent = await pdfGenerator(data); // Await the async function
-
-            const docDefinition: TDocumentDefinitions = {
-                header: {
-                    text: 'Gap Navigator', fontSize: 14, alignment: 'center', margin: [10, 10]
-                },
-                footer: function (currentPage: number, pageCount: number) {
-                    return {
-                        text: currentPage.toString() + ' of ' + pageCount,
-                        alignment: 'center'
-                    }
-                },
-                watermark: {
-                    text: 'Gap Navigator',
-                    color: 'gray',
-                    opacity: 0.3,
-                    bold: true,
-                    italics: false
-                },
-                pageSize: 'A4',
-                info: {
-                    title: `${evaluation.name}`,
-                    author: 'Gap Navigator',
-                    subject: 'subject of document',
-                    keywords: 'keywords for document',
-                    creator: 'Gap Navigator',
-                    producer: 'Gap Navigator',
-                },
-                content: [
-                    html
-                    // ...(docContent.content as Content []),
-                ],
-            };
-            const createPdf = () => {
-                const pdfGenerator = pdfMake.createPdf(docDefinition, {});
-                pdfGenerator.download(`${generateRandomText(6)}.pdf`);
-            };
-
-            createPdf();
-        } catch (error) {
-            console.error('Error generating PDF:', error);
-        }
-    };
-
-    useEffect(() => {
-        // Check if evaluation is not available or is empty, then navigate
-        if (!evaluation || Object.entries(evaluation.evaluate).length === 0) {
-            router.push(`/evaluate/${uid}`);
-        }
-    }, [evaluation, uid, router]);
-
-    return (
-        <>
-            <DocsPageHeader
-                heading={evaluation.name}
-                text={"Analyze your report."}
-            />
-            <div className="w-full text-end">
-                <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
-            </div>
-            <div className="editorjs">
-                <Output data={data} style={style} renderers={renderers}/>
-            </div>
-        </>
-    );
+    </>
+  );
 };
 
 export default PdfDownload;
+
+interface DataItem {
+  id: string;
+  type: string;
+  data: { [key: string]: any };
+}
+
+interface TextStyle {
+  bold?: boolean;
+  italics?: boolean;
+  // Add other text styles as needed
+}
+
+function generatePdfDefinition(data: DataItem[]) {
+  const content: Content[] = [];
+
+  data.forEach((item) => {
+    switch (item.type) {
+      case 'header':
+        content.push({text: item.data.text, style: `header${item.data.level}`});
+        break;
+      case 'paragraph':
+        content.push({text: item.data.text, style: 'paragraph'});
+        break;
+      case 'list':
+        const listItems = item.data.items.map((listItem: string) => ({text: listItem}));
+        content.push({ul: listItems});
+        break;
+      case 'embed':
+        let data = {
+          text: item.data.caption || "Link",
+          link: item.data.source,
+          margin: [0, 3]
+        }
+        // @ts-ignore
+        content.push(data)
+        break;
+      case 'image':
+        content.push(
+          {
+            image: item.data.url,
+            width: 500
+          }
+        );
+        break;
+      case 'code':
+        content.push({text: item.data.code, style: 'code'});
+        break;
+      case 'quote':
+        content.push({text: item.data.text, style: 'quote', alignment: item.data.alignment});
+        break;
+      case 'table':
+        console.log(item)
+        const tableContent: TableCell[][] = item.data.content.map((row: string[]) => row.map(cell => ({text: cell})));
+        content.push({table: {body: [item.data.withHeadings ? tableContent[0] : [], ...tableContent.slice(1)]}});
+        break;
+      case 'checklist':
+        const checklistItems = item.data.items.map((checklistItem: { text: string, checked: boolean }) => ({
+          text: checklistItem.text,
+          decoration: checklistItem.checked ? 'lineThrough' : undefined,  // Omit decoration property for unchecked items
+        }));
+        content.push({ul: checklistItems});
+        break;
+      // Add more cases for other supported types (image, code, quote, table, checklist, etc.)
+      // ...
+
+      default:
+        break;
+    }
+  });
+
+  return content
+}

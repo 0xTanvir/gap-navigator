@@ -116,6 +116,7 @@ interface AuditOperationsProps {
 interface AuditData {
   auditName: string;
   auditType: string;
+  condition:boolean
   welcome: string;
   thank_you: string;
 }
@@ -162,6 +163,7 @@ export function AuditOperations({
     defaultValues: {
       auditName: audit.name,
       auditType: audit.type,
+      condition: audit.condition,
       welcome: audit.welcome,
     },
   });
@@ -171,6 +173,7 @@ export function AuditOperations({
     defaultValues: {
       auditName: audit?.name || "",
       auditType: audit?.type || "",
+      condition: audit?.condition || false,
     },
   });
   const formStep2 = useForm<FormDataStep2>({
@@ -190,7 +193,7 @@ export function AuditOperations({
     setIsTyping(true);
     setTimeout(() => {
       if (!isTyping) {
-        form.trigger("welcome");
+        formStep2.trigger("welcome");
       }
     }, 100);
 
@@ -239,6 +242,7 @@ export function AuditOperations({
       const updatedAudit: Audit = {
         name: auditFormData?.auditName as string,
         type: auditFormData?.auditType as string,
+        condition: auditFormData?.condition as boolean,
         welcome: auditFormData?.welcome as string,
         thank_you: data.thank_you as string,
         uid: audit.uid,
@@ -517,7 +521,9 @@ export function AuditOperations({
                       setShowUpdateDialog(true);
                       form.setValue("auditName", audit.name);
                       form.setValue("auditType", audit.type);
+                      form.setValue("condition", audit.condition);
                       form.setValue("welcome", audit.welcome);
+                      form.setValue("thank_you", audit.thank_you);
                     }}
                 >
                   <Icons.fileEdit className="mr-2 h-4 w-4"/>
@@ -761,6 +767,31 @@ export function AuditOperations({
                                       <FormMessage/>
                                     </FormItem>
                                 )}
+                            />
+
+                            <FormField
+                              control={formStep1.control}
+                              name="condition"
+                              render={({field}) => (
+                                <FormItem>
+                                  <div className="relative flex items-start">
+                                    <div className="flex h-6 items-center">
+                                      <input
+                                        // checked={audit?.condition}
+                                        id="condition"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        {...formStep1.register("condition")}
+                                      />
+                                    </div>
+                                    <div className="ml-3 text-sm leading-6">
+                                      <label htmlFor="condition" className="font-medium">
+                                        Condition
+                                      </label>
+                                    </div>
+                                  </div>
+                                </FormItem>
+                              )}
                             />
 
 

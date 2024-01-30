@@ -90,7 +90,6 @@ const ConsultantClients = ({userAuditsId}: ConsultantClientsProps) => {
             <DataTable
                 columns={columns}
                 data={clientsUniqueEvaluation}
-                setEvaluations={setClientsUniqueEvaluation}
             />
         </>
     );

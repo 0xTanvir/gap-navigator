@@ -11,12 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {UserAvatar} from "@/components/user-avatar";
-import {useRouter} from "next/navigation";
 import {useAuth} from "@/components/auth/auth-provider";
-import {useEffect, useState} from "react";
-import {getDatabase, onValue, ref} from "firebase/database";
-import {updateNotificationsAlertById} from "@/lib/firestore/notification";
-import {toast} from "sonner";
 
 interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
     name?: string;
@@ -31,7 +26,6 @@ export function UserAccountNav({
                                    email,
                                    logOut,
                                }: UserAccountNavProps) {
-    const router = useRouter();
     const {user} = useAuth();
 
     return (
@@ -111,7 +105,6 @@ export function UserAccountNav({
                     onSelect={(event) => {
                         event.preventDefault();
                         logOut?.();
-                        router.push("/");
                     }}
                 >
                     <Icons.logOut className="mr-2 h-4 w-4"/>
