@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 import pdfMake from "pdfmake/build/pdfmake";
-import { Content, TDocumentDefinitions } from "pdfmake/interfaces";
+import { Content, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import { generateRandomText } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -81,6 +81,16 @@ const PdfDownload = () => {
     version: "2.0.1"
   };
 
+  let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+    .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
+  if (evaluation.welcome) {
+    reportData = [...JSON.parse(evaluation.welcome), ...reportData]
+  }
+
+  let pdfData = {
+    blocks: reportData
+  };
+
 
   const generateAndDownloadPdf = async () => {
     try {
@@ -88,23 +98,111 @@ const PdfDownload = () => {
         throw new Error('Invalid evaluation data');
       }
 
-      const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
-        .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
+      // Arrays to store indices
+      const imageIndices: number[] = [];
+      const embedIndices: number[] = [];
+      const formatDataImage: any[] = []
+      const formatDataEmbed: any[] = []
 
-      let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
-        .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
-      if (evaluation.welcome) {
-        reportData = [...JSON.parse(evaluation.welcome), ...reportData]
+      pdfData.blocks.forEach((element: any, index: number) => {
+        if (element.type === "image") {
+          imageIndices.push(index);
+          formatDataImage.push(pdfData.blocks[index])
+        } else if (element.type === "embed") {
+          embedIndices.push(index);
+          formatDataEmbed.push(pdfData.blocks[index])
+        }
+      });
+
+      let pdfMakeImageData: any
+      let pdfMakeEmbedData: any
+      if (formatDataImage) {
+        pdfMakeImageData = generatePdfDefinition(formatDataImage)
+      }
+      if (formatDataEmbed) {
+        pdfMakeEmbedData = generatePdfDefinition(formatDataEmbed)
       }
 
-      // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+      // console.log(pdfMakeImageData, "line 122")
+      // console.log(pdfMakeEmbedData, "line 123")
+      //
+      // // console.log(formatDataImage)
+      // console.log(imageIndices)
+      // // console.log(formatDataEmbed)
+      // console.log(embedIndices)
+      // console.log(pdfData)
+      //
+      // let pdfData1 = {
+      //   blocks: []
+      // };
+      //
+      //
+      // if (imageIndices.length > 0) {
+      //   imageIndices.map((data, index) => {
+      //     // @ts-ignore
+      //     pdfData1.blocks = [
+      //       ...pdfData1.blocks.slice(0, data),
+      //       ...pdfData1.blocks.slice(data, 1),
+      //       pdfMakeImageData[index],
+      //       ...pdfData1.blocks.slice(data)
+      //     ]
+      //   })
+      // }
+      //
+      // if (embedIndices.length > 0) {
+      //   embedIndices.map((data, index) => {
+      //     // @ts-ignore
+      //     pdfData1.blocks = [
+      //       ...pdfData1.blocks.slice(0, data),
+      //       ...pdfData1.blocks.slice(data, 1),
+      //       pdfMakeEmbedData[index],
+      //       ...pdfData1.blocks.slice(data)
+      //     ]
+      //   })
+      // }
 
-      let data = {
-        blocks: reportData
-      };
-
-      const markup = parser.parse(data);
+      const markup = parser.parse(pdfData);
       let html = htmlToPdfmake(markup)
+
+      // @ts-ignore
+      html = html?.filter((node) => node.nodeName !== 'FIGURE') || [];
+
+      if (imageIndices.length > 0) {
+        imageIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeImageData[index]);
+        });
+      }
+
+      if (embedIndices.length > 0) {
+        embedIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeEmbedData[index]);
+        });
+      }
+
+      // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
+      //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
+
+      // let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
+      //   .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
+      // if (evaluation.welcome) {
+      //   reportData = [...JSON.parse(evaluation.welcome), ...reportData]
+      // }
+      //
+      // // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
+      //
+      // let data = {
+      //   blocks: reportData
+      // };
+
+      // const markup = parser.parse(pdfData);
+      // let html = htmlToPdfmake(markup)
+      //
+      // let datas = generatePdfDefinition(pdfData.blocks)
+      // console.log(datas)
+      // console.log(formatDataImage)
+      // console.log(formatDataEmbed)
 
       // let docContent = await pdfGenerator(data); // Await the async function
 
@@ -135,6 +233,7 @@ const PdfDownload = () => {
           producer: 'Gap Navigator',
         },
         content: [
+          // pdfData1.blocks,
           html
           // ...(docContent.content as Content []),
         ],
@@ -176,3 +275,76 @@ const PdfDownload = () => {
 };
 
 export default PdfDownload;
+
+interface DataItem {
+  id: string;
+  type: string;
+  data: { [key: string]: any };
+}
+
+interface TextStyle {
+  bold?: boolean;
+  italics?: boolean;
+  // Add other text styles as needed
+}
+
+function generatePdfDefinition(data: DataItem[]) {
+  const content: Content[] = [];
+
+  data.forEach((item) => {
+    switch (item.type) {
+      case 'header':
+        content.push({text: item.data.text, style: `header${item.data.level}`});
+        break;
+      case 'paragraph':
+        content.push({text: item.data.text, style: 'paragraph'});
+        break;
+      case 'list':
+        const listItems = item.data.items.map((listItem: string) => ({text: listItem}));
+        content.push({ul: listItems});
+        break;
+      case 'embed':
+        let data = {
+          text: item.data.caption || "Link",
+          link: item.data.source,
+          margin: [0, 3]
+        }
+        // @ts-ignore
+        content.push(data)
+        break;
+      case 'image':
+        content.push(
+          {
+            image: item.data.url,
+            width: 500
+          }
+        );
+        break;
+      case 'code':
+        content.push({text: item.data.code, style: 'code'});
+        break;
+      case 'quote':
+        content.push({text: item.data.text, style: 'quote', alignment: item.data.alignment});
+        break;
+      case 'table':
+        console.log(item)
+        const tableContent: TableCell[][] = item.data.content.map((row: string[]) => row.map(cell => ({text: cell})));
+        content.push({table: {body: [item.data.withHeadings ? tableContent[0] : [], ...tableContent.slice(1)]}});
+        break;
+      case 'checklist':
+        const checklistItems = item.data.items.map((checklistItem: { text: string, checked: boolean }) => ({
+          text: checklistItem.text,
+          decoration: checklistItem.checked ? 'lineThrough' : undefined,  // Omit decoration property for unchecked items
+        }));
+        content.push({ul: checklistItems});
+        break;
+      // Add more cases for other supported types (image, code, quote, table, checklist, etc.)
+      // ...
+
+      default:
+        break;
+    }
+  });
+
+  return content
+}
