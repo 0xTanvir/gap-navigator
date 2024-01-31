@@ -90,6 +90,7 @@ const PdfDownload = () => {
   let pdfData = {
     blocks: reportData
   };
+  console.log(pdfData.blocks)
 
 
   const generateAndDownloadPdf = async () => {
@@ -101,8 +102,10 @@ const PdfDownload = () => {
       // Arrays to store indices
       const imageIndices: number[] = [];
       const embedIndices: number[] = [];
+      const checkListIndices: number[] = [];
       const formatDataImage: any[] = []
       const formatDataEmbed: any[] = []
+      const formatDataCheckList: any[] = []
 
       pdfData.blocks.forEach((element: any, index: number) => {
         if (element.type === "image") {
@@ -111,55 +114,24 @@ const PdfDownload = () => {
         } else if (element.type === "embed") {
           embedIndices.push(index);
           formatDataEmbed.push(pdfData.blocks[index])
+        } else if (element.type === "checklist") {
+          checkListIndices.push(index);
+          formatDataCheckList.push(pdfData.blocks[index])
         }
       });
 
       let pdfMakeImageData: any
       let pdfMakeEmbedData: any
+      let pdfMakeCheckListData: any
       if (formatDataImage) {
         pdfMakeImageData = generatePdfDefinition(formatDataImage)
       }
       if (formatDataEmbed) {
         pdfMakeEmbedData = generatePdfDefinition(formatDataEmbed)
       }
-
-      // console.log(pdfMakeImageData, "line 122")
-      // console.log(pdfMakeEmbedData, "line 123")
-      //
-      // // console.log(formatDataImage)
-      // console.log(imageIndices)
-      // // console.log(formatDataEmbed)
-      // console.log(embedIndices)
-      // console.log(pdfData)
-      //
-      // let pdfData1 = {
-      //   blocks: []
-      // };
-      //
-      //
-      // if (imageIndices.length > 0) {
-      //   imageIndices.map((data, index) => {
-      //     // @ts-ignore
-      //     pdfData1.blocks = [
-      //       ...pdfData1.blocks.slice(0, data),
-      //       ...pdfData1.blocks.slice(data, 1),
-      //       pdfMakeImageData[index],
-      //       ...pdfData1.blocks.slice(data)
-      //     ]
-      //   })
-      // }
-      //
-      // if (embedIndices.length > 0) {
-      //   embedIndices.map((data, index) => {
-      //     // @ts-ignore
-      //     pdfData1.blocks = [
-      //       ...pdfData1.blocks.slice(0, data),
-      //       ...pdfData1.blocks.slice(data, 1),
-      //       pdfMakeEmbedData[index],
-      //       ...pdfData1.blocks.slice(data)
-      //     ]
-      //   })
-      // }
+      if (formatDataCheckList) {
+        pdfMakeCheckListData = generatePdfDefinition(formatDataCheckList)
+      }
 
       const markup = parser.parse(pdfData);
       let html = htmlToPdfmake(markup)
@@ -180,6 +152,14 @@ const PdfDownload = () => {
           html.splice(data + index, 0, pdfMakeEmbedData[index]);
         });
       }
+
+      if (checkListIndices.length > 0) {
+        checkListIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeCheckListData[index]);
+        });
+      }
+      console.log(html)
 
       // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
       //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
@@ -220,8 +200,6 @@ const PdfDownload = () => {
           text: 'Gap Navigator',
           color: 'gray',
           opacity: 0.3,
-          bold: true,
-          italics: false
         },
         pageSize: 'A4',
         info: {
@@ -233,7 +211,6 @@ const PdfDownload = () => {
           producer: 'Gap Navigator',
         },
         content: [
-          // pdfData1.blocks,
           html
           // ...(docContent.content as Content []),
         ],
@@ -282,12 +259,6 @@ interface DataItem {
   data: { [key: string]: any };
 }
 
-interface TextStyle {
-  bold?: boolean;
-  italics?: boolean;
-  // Add other text styles as needed
-}
-
 function generatePdfDefinition(data: DataItem[]) {
   const content: Content[] = [];
 
@@ -304,12 +275,11 @@ function generatePdfDefinition(data: DataItem[]) {
         content.push({ul: listItems});
         break;
       case 'embed':
-        let data = {
+        let data: any = {
           text: item.data.caption || "Link",
           link: item.data.source,
           margin: [0, 3]
         }
-        // @ts-ignore
         content.push(data)
         break;
       case 'image':
@@ -336,10 +306,9 @@ function generatePdfDefinition(data: DataItem[]) {
           text: checklistItem.text,
           decoration: checklistItem.checked ? 'lineThrough' : undefined,  // Omit decoration property for unchecked items
         }));
-        content.push({ul: checklistItems});
+        content.push({ul: checklistItems, margin: [0, 5]});
         break;
       // Add more cases for other supported types (image, code, quote, table, checklist, etc.)
-      // ...
 
       default:
         break;
