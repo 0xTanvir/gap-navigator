@@ -90,7 +90,6 @@ const PdfDownload = () => {
   let pdfData = {
     blocks: reportData
   };
-  console.log(pdfData.blocks)
 
 
   const generateAndDownloadPdf = async () => {
@@ -103,9 +102,11 @@ const PdfDownload = () => {
       const imageIndices: number[] = [];
       const embedIndices: number[] = [];
       const checkListIndices: number[] = [];
+      const tableIndices: number[] = [];
       const formatDataImage: any[] = []
       const formatDataEmbed: any[] = []
       const formatDataCheckList: any[] = []
+      const formatDataTable: any[] = []
 
       pdfData.blocks.forEach((element: any, index: number) => {
         if (element.type === "image") {
@@ -117,12 +118,16 @@ const PdfDownload = () => {
         } else if (element.type === "checklist") {
           checkListIndices.push(index);
           formatDataCheckList.push(pdfData.blocks[index])
+        } else if (element.type === "table") {
+          tableIndices.push(index);
+          formatDataTable.push(pdfData.blocks[index])
         }
       });
 
       let pdfMakeImageData: any
       let pdfMakeEmbedData: any
       let pdfMakeCheckListData: any
+      let pdfMakeTableData: any
       if (formatDataImage) {
         pdfMakeImageData = generatePdfDefinition(formatDataImage)
       }
@@ -132,12 +137,17 @@ const PdfDownload = () => {
       if (formatDataCheckList) {
         pdfMakeCheckListData = generatePdfDefinition(formatDataCheckList)
       }
+      if (formatDataTable) {
+        pdfMakeTableData = generatePdfDefinition(formatDataTable)
+      }
 
       const markup = parser.parse(pdfData);
       let html = htmlToPdfmake(markup)
 
       // @ts-ignore
       html = html?.filter((node) => node.nodeName !== 'FIGURE') || [];
+      // @ts-ignore
+      html = html?.filter((node) => node.nodeName !== "TABLE") || [];
 
       if (imageIndices.length > 0) {
         imageIndices.forEach((data, index) => {
@@ -159,7 +169,12 @@ const PdfDownload = () => {
           html.splice(data + index, 0, pdfMakeCheckListData[index]);
         });
       }
-      console.log(html)
+      if (tableIndices.length > 0) {
+        tableIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeTableData[index]);
+        });
+      }
 
       // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
       //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
@@ -278,7 +293,9 @@ function generatePdfDefinition(data: DataItem[]) {
         let data: any = {
           text: item.data.caption || "Link",
           link: item.data.source,
-          margin: [0, 3]
+          color: "blue",
+          decoration: 'underline',
+          margin: [0, 3],
         }
         content.push(data)
         break;
@@ -297,9 +314,34 @@ function generatePdfDefinition(data: DataItem[]) {
         content.push({text: item.data.text, style: 'quote', alignment: item.data.alignment});
         break;
       case 'table':
-        console.log(item)
-        const tableContent: TableCell[][] = item.data.content.map((row: string[]) => row.map(cell => ({text: cell})));
-        content.push({table: {body: [item.data.withHeadings ? tableContent[0] : [], ...tableContent.slice(1)]}});
+        const tableContent: Content[][] = item.data.content.map((row: string[]) =>
+          row.map(cell => ({text: cell}))
+        );
+
+        // Calculate the number of header rows dynamically
+        const headerRows = tableContent.length > 0 ? 1 : 0;
+
+        // Calculate the number of columns dynamically
+        const numColumns = tableContent.length > 0 ? tableContent[0].length : 0;
+
+        // Calculate the default width for each column
+        // const defaultColumnWidth = 100 / numColumns;
+        const defaultColumnWidth = "*";
+
+        // Generate an array of default widths for each column
+        const defaultWidths = new Array(numColumns).fill(defaultColumnWidth);
+        content.push({
+          table: {
+            headerRows,
+            widths: defaultWidths,
+            body: tableContent,
+          },
+          layout: {
+            fillColor: function (rowIndex, node, columnIndex) {
+              return (rowIndex === 0) ? '#CCCCCC' : null;
+            },
+          }
+        });
         break;
       case 'checklist':
         const checklistItems = item.data.items.map((checklistItem: { text: string, checked: boolean }) => ({
