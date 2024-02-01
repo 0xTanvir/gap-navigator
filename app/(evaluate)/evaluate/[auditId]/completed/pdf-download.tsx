@@ -90,6 +90,7 @@ const PdfDownload = () => {
   let pdfData = {
     blocks: reportData
   };
+  console.log(pdfData.blocks)
 
 
   const generateAndDownloadPdf = async () => {
@@ -103,10 +104,15 @@ const PdfDownload = () => {
       const embedIndices: number[] = [];
       const checkListIndices: number[] = [];
       const tableIndices: number[] = [];
+      const delimiterIndices: number[] = [];
+      const warningIndices: number[] = [];
+
       const formatDataImage: any[] = []
       const formatDataEmbed: any[] = []
       const formatDataCheckList: any[] = []
       const formatDataTable: any[] = []
+      const formatDataDelimiter: any[] = []
+      const formatDataWarning: any[] = []
 
       pdfData.blocks.forEach((element: any, index: number) => {
         if (element.type === "image") {
@@ -121,6 +127,12 @@ const PdfDownload = () => {
         } else if (element.type === "table") {
           tableIndices.push(index);
           formatDataTable.push(pdfData.blocks[index])
+        } else if (element.type === "delimiter") {
+          delimiterIndices.push(index);
+          formatDataDelimiter.push(pdfData.blocks[index])
+        } else if (element.type === "warning") {
+          warningIndices.push(index);
+          formatDataWarning.push(pdfData.blocks[index])
         }
       });
 
@@ -128,6 +140,8 @@ const PdfDownload = () => {
       let pdfMakeEmbedData: any
       let pdfMakeCheckListData: any
       let pdfMakeTableData: any
+      let pdfMakeDelimiterData: any
+      let pdfMakeWarningData: any
       if (formatDataImage) {
         pdfMakeImageData = generatePdfDefinition(formatDataImage)
       }
@@ -139,6 +153,12 @@ const PdfDownload = () => {
       }
       if (formatDataTable) {
         pdfMakeTableData = generatePdfDefinition(formatDataTable)
+      }
+      if (formatDataDelimiter) {
+        pdfMakeDelimiterData = generatePdfDefinition(formatDataDelimiter)
+      }
+      if (formatDataWarning) {
+        pdfMakeWarningData = generatePdfDefinition(formatDataWarning)
       }
 
       const markup = parser.parse(pdfData);
@@ -175,31 +195,22 @@ const PdfDownload = () => {
           html.splice(data + index, 0, pdfMakeTableData[index]);
         });
       }
+      if (delimiterIndices.length > 0) {
+        delimiterIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeDelimiterData[index]);
+        });
+      }
+      if (warningIndices.length > 0) {
+        warningIndices.forEach((data, index) => {
+          // @ts-ignore
+          html.splice(data + index, 0, pdfMakeWarningData[index]);
+        });
+      }
+      console.log(html)
 
       // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
       //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
-
-      // let reportData = (evaluationFormatData.filter(data => data.recommendationDocument) || [])
-      //   .flatMap(item => JSON.parse(item?.recommendationDocument ?? '[]'));
-      // if (evaluation.welcome) {
-      //   reportData = [...JSON.parse(evaluation.welcome), ...reportData]
-      // }
-      //
-      // // reportData = [...reportData, ...evaluationChoiceRecommendedNote]
-      //
-      // let data = {
-      //   blocks: reportData
-      // };
-
-      // const markup = parser.parse(pdfData);
-      // let html = htmlToPdfmake(markup)
-      //
-      // let datas = generatePdfDefinition(pdfData.blocks)
-      // console.log(datas)
-      // console.log(formatDataImage)
-      // console.log(formatDataEmbed)
-
-      // let docContent = await pdfGenerator(data); // Await the async function
 
       const docDefinition: TDocumentDefinitions = {
         header: {
@@ -229,6 +240,13 @@ const PdfDownload = () => {
           html
           // ...(docContent.content as Content []),
         ],
+        styles: {
+          warningTitle: {fontSize: 14, bold: true, color: 'black', alignment: "justify"},
+          warningMessage: {fontSize: 12, color: 'black', alignment: "justify"},
+        },
+        defaultStyle: {
+          alignment: "justify"
+        }
       };
       const createPdf = () => {
         const pdfGenerator = pdfMake.createPdf(docDefinition, {});
@@ -279,16 +297,6 @@ function generatePdfDefinition(data: DataItem[]) {
 
   data.forEach((item) => {
     switch (item.type) {
-      case 'header':
-        content.push({text: item.data.text, style: `header${item.data.level}`});
-        break;
-      case 'paragraph':
-        content.push({text: item.data.text, style: 'paragraph'});
-        break;
-      case 'list':
-        const listItems = item.data.items.map((listItem: string) => ({text: listItem}));
-        content.push({ul: listItems});
-        break;
       case 'embed':
         let data: any = {
           text: item.data.caption || "Link",
@@ -303,12 +311,10 @@ function generatePdfDefinition(data: DataItem[]) {
         content.push(
           {
             image: item.data.url,
-            width: 500
+            width: 500,
+            margin: [0, 6]
           }
         );
-        break;
-      case 'code':
-        content.push({text: item.data.code, style: 'code'});
         break;
       case 'quote':
         content.push({text: item.data.text, style: 'quote', alignment: item.data.alignment});
@@ -340,7 +346,8 @@ function generatePdfDefinition(data: DataItem[]) {
             fillColor: function (rowIndex, node, columnIndex) {
               return (rowIndex === 0) ? '#CCCCCC' : null;
             },
-          }
+          },
+          margin: [0, 5]
         });
         break;
       case 'checklist':
@@ -349,6 +356,41 @@ function generatePdfDefinition(data: DataItem[]) {
           decoration: checklistItem.checked ? 'lineThrough' : undefined,  // Omit decoration property for unchecked items
         }));
         content.push({ul: checklistItems, margin: [0, 5]});
+        break;
+
+      case 'delimiter':
+        content.push({
+          canvas: [
+            {
+              type: 'line',
+              x1: 0,
+              y1: 5,
+              x2: 520,
+              y2: 5,
+              lineWidth: 1,
+              lineColor: '#000000'
+            }
+          ],
+          margin: [0, 10], // Add margin (adjust values as needed)
+        });
+        break;
+
+      case 'warning':
+        const warningContent: Content[] = [
+          {text: item.data.title, style: 'warningTitle'},
+          {text: item.data.message, style: 'warningMessage'},
+        ];
+
+        content.push({
+          table: {
+            body: [warningContent],
+            widths: [100, '*'], // Adjust the width as needed
+          },
+          fillColor: "yellow",
+          // layout: 'noBorders', // Remove cell borders
+          margin: [0, 10], // Add margin (adjust values as needed)
+
+        });
         break;
       // Add more cases for other supported types (image, code, quote, table, checklist, etc.)
 
