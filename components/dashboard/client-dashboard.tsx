@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-evaluation";
+import { useRouter } from "next/navigation";
 
 const ClientDashboard = () => {
   const [evaluationComplete, setEvaluationComplete] = useState<number>(0)
@@ -19,6 +20,7 @@ const ClientDashboard = () => {
   );
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const {user} = useAuth()
+  const router = useRouter()
 
   function countEvaluationsByMonth(evaluations: Evaluate[]): GroupedEvaluation[] {
     const groupedEvaluations: { [key: string]: number } = {};
@@ -106,16 +108,25 @@ const ClientDashboard = () => {
           <DashboardCard
             title="Complete evaluation"
             totalNumber={evaluationComplete} iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=complete");
+            }}
           />
           <DashboardCard
             title="Incomplete evaluation"
             totalNumber={evaluationIncomplete}
             iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=invited");
+            }}
           />
           <DashboardCard
-            title="Incomplete evaluation"
+            title="Draft evaluation"
             totalNumber={evaluationDraft}
             iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=draft");
+            }}
           />
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { auditFilterSchema } from "@/lib/validations/audit";
 import CustomPagination from "@/components/custom-pagination/custom-pagination";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Icons } from "@/components/icons";
 
 interface ConsultantAuditsProps {
     userId: string;
@@ -200,7 +201,7 @@ export default function ConsultantAudits({
                                     router.push("/audits")
                                 }}
                             >
-                                Reset
+                                <Icons.searchX/>
                             </Button>
                         }
 
