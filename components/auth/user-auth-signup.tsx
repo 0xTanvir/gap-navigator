@@ -325,8 +325,16 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
           </div>
         </div>
       </div>
-      <p className="my-5 px-8 text-center text-sm text-muted-foreground">
-        By clicking continue, you agree to our{" "}
+      <p className="mt-5 mb-2 text-center text-sm text-muted-foreground">
+        <Link
+          href="/"
+          className="font-semibold leading-6 hover:text-brand underline underline-offset-4"
+        >
+          Already have an account? Login
+        </Link>
+      </p>
+      <p className="my-2 px-8 text-center text-sm text-muted-foreground">
+        By clicking signup, you agree to our{" "}
         <Link
           href="/terms"
           className="hover:text-brand underline underline-offset-4"
