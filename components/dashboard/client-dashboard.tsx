@@ -148,7 +148,7 @@ const ClientDashboard = () => {
               <div className="space-y-8">
                 {evaluations.length > 0 ?
                   evaluations.slice(0, 5).map((evaluation) => (
-                    <DashboardRecentEvaluation clients key={evaluation.uid} evaluation={evaluation}/>
+                    <DashboardRecentEvaluation key={evaluation.uid} evaluation={evaluation}/>
                   )) :
                   <p className="text-center">No data found</p>
                 }
