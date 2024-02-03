@@ -37,7 +37,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { answerSchema } from "@/lib/validations/question";
 import * as z from "zod";
-import { Answer } from "@/types/dto";
+import { Answer, Audit } from "@/types/dto";
 import dynamic from "next/dynamic";
 import {
   Sheet,
@@ -70,6 +70,7 @@ interface AnswerOperationProps {
   answerId: string;
   answer: Answer;
   singleQuestionFetch: Function;
+  audit: Audit | null
 }
 
 async function deleteAuditFromDB(
@@ -90,12 +91,13 @@ async function deleteAuditFromDB(
 }
 
 const AnswerOperations = ({
-  auditId,
-  questionId,
-  answerId,
-  singleQuestionFetch,
-  answer,
-}: AnswerOperationProps) => {
+                            auditId,
+                            questionId,
+                            answerId,
+                            singleQuestionFetch,
+                            answer,
+                            audit
+                          }: AnswerOperationProps) => {
   const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false);
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
   const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false);
@@ -103,7 +105,7 @@ const AnswerOperations = ({
     React.useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
-  const { questions } = useQuestions();
+  const {questions} = useQuestions();
 
   let questionIndex = questions.findIndex(
     (question) => question.uid === questionId
@@ -185,8 +187,9 @@ const AnswerOperations = ({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
-          <Icons.ellipsis className="h-4 w-4" />
+        <DropdownMenuTrigger
+          className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
+          <Icons.ellipsis className="h-4 w-4"/>
           <span className="sr-only">Open</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -194,15 +197,15 @@ const AnswerOperations = ({
             className="flex cursor-pointer items-center"
             onSelect={() => setShowUpdateDialog(true)}
           >
-            <Icons.fileEdit className="mr-2 h-4 w-4" />
+            <Icons.fileEdit className="mr-2 h-4 w-4"/>
             Rename
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator/>
           <DropdownMenuItem
             className="flex cursor-pointer items-center text-destructive focus:text-destructive"
             onSelect={() => setShowDeleteAlert(true)}
           >
-            <Icons.trash className="mr-2 h-4 w-4" />
+            <Icons.trash className="mr-2 h-4 w-4"/>
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -239,9 +242,9 @@ const AnswerOperations = ({
               className="bg-red-600 focus:ring-red-600"
             >
               {isDeleteLoading ? (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
               ) : (
-                <Icons.trash className="mr-2 h-4 w-4" />
+                <Icons.trash className="mr-2 h-4 w-4"/>
               )}
               <span>Delete</span>
             </AlertDialogAction>
@@ -264,7 +267,7 @@ const AnswerOperations = ({
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
@@ -274,47 +277,51 @@ const AnswerOperations = ({
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="questionId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question Name</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an question Name" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Select a question Name</SelectLabel>
-                            {questionsData.map((question) => (
-                              <SelectItem
-                                key={question.uid}
-                                value={question.uid}
-                              >
-                                {question.name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {
+                  audit?.condition &&
+                    <FormField
+                        control={form.control}
+                        name="questionId"
+                        render={({field}) => (
+                          <FormItem>
+                            <FormLabel>Question Name</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select an question Name"/>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Select a question Name</SelectLabel>
+                                  {questionsData.map((question) => (
+                                    <SelectItem
+                                      key={question.uid}
+                                      value={question.uid}
+                                    >
+                                      {question.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage/>
+                          </FormItem>
+                        )}
+                    />
+                }
+
                 <FormField
                   control={form.control}
                   name="recommendationDocument"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>Recommendation Document</FormLabel>
                       <FormControl>
@@ -327,7 +334,7 @@ const AnswerOperations = ({
                           placeHolder="Let`s write recommendation document!"
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
@@ -335,15 +342,15 @@ const AnswerOperations = ({
               <SheetFooter>
                 <button
                   type="submit"
-                  className={cn(buttonVariants({ variant: "default" }), {
+                  className={cn(buttonVariants({variant: "default"}), {
                     "cursor-not-allowed opacity-60": isUpdateLoading,
                   })}
                   disabled={isUpdateLoading}
                 >
                   {isUpdateLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                   ) : (
-                    <Icons.add className="mr-2 h-4 w-4" />
+                    <Icons.add className="mr-2 h-4 w-4"/>
                   )}
                   Update Answer
                 </button>

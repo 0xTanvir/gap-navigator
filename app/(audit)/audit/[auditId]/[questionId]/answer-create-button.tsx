@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
+import { Audit } from "@/types/dto";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
   ssr: false,
@@ -48,24 +49,25 @@ interface AnswerCreateButtonProps extends ButtonProps {
   questionId: string;
   loading?: boolean;
   singleQuestionFetch: Function;
+  audit: Audit | null
 }
 
 type FormData = z.infer<typeof answerSchema>;
 
 const AnswerCreateButton = ({
-  auditId,
-  questionId,
-  singleQuestionFetch,
-  loading,
-  className,
-  variant,
-  ...props
-}: AnswerCreateButtonProps) => {
+                              auditId,
+                              questionId,
+                              singleQuestionFetch,
+                              loading, audit,
+                              className,
+                              variant,
+                              ...props
+                            }: AnswerCreateButtonProps) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
-  const { questions } = useQuestions();
+  const {questions} = useQuestions();
 
   let questionIndex = questions.findIndex(
     (question) => question.uid === questionId
@@ -142,7 +144,7 @@ const AnswerCreateButton = ({
         variant={variant}
         onClick={() => setShowAddDialog(true)}
       >
-        <Icons.filePlus className="mr-2 h-4 w-4" />
+        <Icons.filePlus className="mr-2 h-4 w-4"/>
         New Answer
       </Button>
 
@@ -161,7 +163,7 @@ const AnswerCreateButton = ({
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
@@ -171,53 +173,56 @@ const AnswerCreateButton = ({
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
               </div>
 
-              <div className="grid gap-4 py-4">
-                <FormField
-                  control={form.control}
-                  name="questionId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question Name</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an question Name" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Select a question Name</SelectLabel>
-                            {questionsData.map((question) => (
-                              <SelectItem
-                                key={question.uid}
-                                value={question.uid}
+              {
+                audit?.condition &&
+                  <div className="grid gap-4 py-4">
+                      <FormField
+                          control={form.control}
+                          name="questionId"
+                          render={({field}) => (
+                            <FormItem>
+                              <FormLabel>Question Name</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
                               >
-                                {question.name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select an question Name"/>
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a question Name</SelectLabel>
+                                    {questionsData.map((question) => (
+                                      <SelectItem
+                                        key={question.uid}
+                                        value={question.uid}
+                                      >
+                                        {question.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage/>
+                            </FormItem>
+                          )}
+                      />
+                  </div>
+              }
 
               <div className="grid gap-4 py-4">
                 <FormField
                   control={form.control}
                   name="recommendationDocument"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>Recommendation Document</FormLabel>
                       <FormControl>
@@ -227,7 +232,7 @@ const AnswerCreateButton = ({
                           placeHolder="Let`s write recommendation document!"
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
@@ -236,7 +241,7 @@ const AnswerCreateButton = ({
                 <button
                   type="submit"
                   className={cn(
-                    buttonVariants({ variant: "default" }),
+                    buttonVariants({variant: "default"}),
                     {
                       "cursor-not-allowed opacity-60": isLoading,
                     },
@@ -246,9 +251,9 @@ const AnswerCreateButton = ({
                   {...props}
                 >
                   {isLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                   ) : (
-                    <Icons.filePlus className="mr-2 h-4 w-4" />
+                    <Icons.filePlus className="mr-2 h-4 w-4"/>
                   )}
                   Submit
                 </button>

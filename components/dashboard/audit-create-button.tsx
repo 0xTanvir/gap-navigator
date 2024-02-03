@@ -144,7 +144,6 @@ export function AuditCreateButton({
   };
 
   const onFinishStep1 = (data: FormDataStep1) => {
-    console.log(data)
     setAuditFormData((prev) => ({...prev as AuditData, ...data}));
     next()
   };
