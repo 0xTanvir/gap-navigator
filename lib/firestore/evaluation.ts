@@ -1,4 +1,4 @@
-import { Choice, Evaluate } from "@/types/dto";
+import { Audit, AuditEvaluations, Choice, Evaluate } from "@/types/dto";
 import { Collections } from "@/lib/firestore/client";
 import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getAudit } from "@/lib/firestore/audit";
@@ -17,7 +17,7 @@ export async function setEvaluation(auditId: string, evaluation: Evaluate) {
   }
 }
 
-export async function updateEvaluation(auditId: string, evaluation:any) {
+export async function updateEvaluation(auditId: string, evaluation: any) {
   const evaluationsRef = Collections.evaluation(auditId, evaluation.uid);
   try {
     await updateDoc(evaluationsRef, evaluation);
@@ -193,9 +193,9 @@ export async function getAllEvaluationWithAuditName(auditId: string) {
   }
 }
 
-export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[], evaluationID: string){
+export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[], evaluationID: string) {
   const evaluations: Evaluate[] = [];
-  let userInfo:any = {};
+  let userInfo: any = {};
 
   // Iterate through each auditId
   for (const auditId of auditIds) {
@@ -228,3 +228,81 @@ export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[],
   }
   return {userInfo, evaluations};
 }
+
+
+export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID: string): Promise<AuditEvaluations[]> {
+  const auditEvaluations: AuditEvaluations[] = [];
+
+  for (const auditId of auditIds) {
+    const auditResult = Collections.audit(auditId);
+    const auditSnap = await getDoc(auditResult);
+
+    if (auditSnap.exists()) {
+      const auditData = auditSnap.data() as Audit;
+
+      const evaluationsRef = Collections.evaluation(auditData.uid, evaluationID);
+      const evalDocSnapshot = await getDoc(evaluationsRef);
+      if (evalDocSnapshot.exists()) {
+        const evalData = evalDocSnapshot.data();
+        const auditEvaluation: AuditEvaluations = {
+
+          auditUid: auditData.uid,
+          name: auditData.name,
+          type: auditData.type,
+          condition: auditData.condition,
+          welcome: auditData.welcome,
+          thank_you: auditData.thank_you,
+          exclusiveList: auditData.exclusiveList,
+          status: auditData.status,
+          authorId: auditData.authorId,
+          auditCreatedAt: auditData.createdAt,
+
+          uid: evalData.uid,
+          participantFirstName: evalData.participantFirstName,
+          participantLastName: evalData.participantLastName,
+          participantEmail: evalData.participantEmail,
+          participantPhone: evalData.participantPhone,
+          auditId: evalData.auditId,
+          auditName: evalData.auditName,
+          isCompleted: evalData.isCompleted,
+          choices: evalData.choices,
+          createdAt: evalData.createdAt,
+        };
+
+        auditEvaluations.push(auditEvaluation);
+      } else {
+        const evalData = evalDocSnapshot.data();
+        if (evalData === undefined) {
+
+          const auditEvaluation: AuditEvaluations = {
+            auditUid: auditData.uid,
+            name: auditData.name,
+            type: auditData.type,
+            condition: auditData.condition,
+            welcome: auditData.welcome,
+            thank_you: auditData.thank_you,
+            exclusiveList: auditData.exclusiveList,
+            status: auditData.status,
+            authorId: auditData.authorId,
+            auditCreatedAt: auditData.createdAt,
+
+            uid: "",
+            participantFirstName: "",
+            participantLastName: "",
+            participantEmail: "",
+            participantPhone: "",
+            auditId: "",
+            auditName: "",
+            choices: [],
+            isCompleted: "invited"
+          };
+          auditEvaluations.push(auditEvaluation);
+        }
+      }
+    }
+  }
+
+  return auditEvaluations;
+}
+
+

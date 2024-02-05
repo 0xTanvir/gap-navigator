@@ -3,11 +3,12 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import DashboardCard from "@/components/dashboard/dashboard-card";
 import { useAuth } from "@/components/auth/auth-provider";
 import { getEvaluationByIds } from "@/lib/firestore/evaluation";
-import { Evaluate, GroupedEvaluation } from "@/types/dto";
+import { Evaluate, GroupedAudits, GroupedEvaluation } from "@/types/dto";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-evaluation";
+import { useRouter } from "next/navigation";
 
 const ClientDashboard = () => {
   const [evaluationComplete, setEvaluationComplete] = useState<number>(0)
@@ -19,42 +20,28 @@ const ClientDashboard = () => {
   );
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const {user} = useAuth()
+  const router = useRouter()
 
   function countEvaluationsByMonth(evaluations: Evaluate[]): GroupedEvaluation[] {
-    const groupedEvaluations: { [key: string]: number } = {};
-
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    // Initialize counts for all months to 0
-    monthNames.forEach((month) => {
-      const year = new Date().getFullYear();
-      groupedEvaluations[`${month}`] = 0;
-    });
-
-    evaluations.forEach((evaluate) => {
+    const groupedDates: { [key: string]: Date[] } = evaluations.reduce((acc: { [key: string]: Date[] }, evaluate) => {
       const createdAt = new Date(evaluate.createdAt.seconds * 1000); // Convert seconds to milliseconds
-      const monthNameKey = `${monthNames[createdAt.getMonth()]}`;
-      groupedEvaluations[monthNameKey]++;
-    });
+      const yearMonth = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
+      if (!acc[yearMonth]) {
+        acc[yearMonth] = [];
+      }
+      acc[yearMonth].push(createdAt);
+      return acc;
+    }, {});
 
-    // Convert the groupedAudits object to an array of MonthTotal objects
-    const result: GroupedEvaluation[] = Object.keys(groupedEvaluations).map((key) => ({
-      name: key,
-      total: groupedEvaluations[key],
-    }));
-    return result;
+    const groupedEvaluation: GroupedEvaluation[] = Object.keys(groupedDates).map((yearMonth) => {
+      const monthName = groupedDates[yearMonth][0].toLocaleString('default', {month: 'short'});
+      const total = groupedDates[yearMonth].length;
+      return {
+        name: `${monthName}`,
+        total: total,
+      };
+    });
+    return groupedEvaluation.slice(-12);
   }
 
   useEffect(() => {
@@ -106,22 +93,31 @@ const ClientDashboard = () => {
           <DashboardCard
             title="Complete evaluation"
             totalNumber={evaluationComplete} iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=complete");
+            }}
           />
           <DashboardCard
             title="Incomplete evaluation"
             totalNumber={evaluationIncomplete}
             iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=invited");
+            }}
           />
           <DashboardCard
-            title="Incomplete evaluation"
+            title="Draft evaluation"
             totalNumber={evaluationDraft}
             iconName="evaluate"
+            handleClick={() => {
+              router.push("/audits?status=draft");
+            }}
           />
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle>Evaluation Per Months</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <DashboardOverviewChart auditsGroupByMonth={evaluationsGroupByMonth}/>
@@ -137,7 +133,7 @@ const ClientDashboard = () => {
               <div className="space-y-8">
                 {evaluations.length > 0 ?
                   evaluations.slice(0, 5).map((evaluation) => (
-                    <DashboardRecentEvaluation clients key={evaluation.uid} evaluation={evaluation}/>
+                    <DashboardRecentEvaluation key={evaluation.uid} evaluation={evaluation}/>
                   )) :
                   <p className="text-center">No data found</p>
                 }

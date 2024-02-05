@@ -33,7 +33,7 @@ export function AuditItem({userId, audit, archive, setAudits}: AuditItemProps) {
           </div>
 
           <div>
-            <p className="flex text-sm text-muted-foreground">
+            <div className="flex text-sm text-muted-foreground">
               {/* TODO: Use it from enums */}
               {audit.type === "public" && (
                   <TooltipProvider>
@@ -72,7 +72,7 @@ export function AuditItem({userId, audit, archive, setAudits}: AuditItemProps) {
                   </TooltipProvider>
               )}
               {formatDate(audit.createdAt)}
-            </p>
+            </div>
           </div>
         </div>
         <AuditOperations
