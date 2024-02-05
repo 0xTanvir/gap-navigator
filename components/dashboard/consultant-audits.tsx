@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useCallback } from "react";
+import React, { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -7,14 +7,9 @@ import { getAuditsByIds } from "@/lib/firestore/audit";
 import { AuditActionType, Audits } from "@/types/dto";
 import { toast } from "sonner";
 import useAudits from "./AuditsContext";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { auditFilterSchema } from "@/lib/validations/audit";
 import CustomPagination from "@/components/custom-pagination/custom-pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icons } from "@/components/icons";
@@ -24,71 +19,56 @@ interface ConsultantAuditsProps {
   userAuditsId: string[];
 }
 
-type FormData = z.infer<typeof auditFilterSchema>
-
 export default function ConsultantAudits({
                                            userId,
                                            userAuditsId,
                                          }: ConsultantAuditsProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1)
-  const [pageSize] = useState<number>(10)
+  const [pageSize] = useState<number>(4)
   const [totalData, setTotalData] = useState<number>(0)
   const [auditName, setAuditName] = useState<string>("")
-  const [auditType, setAuditType] = useState<string>("")
+  const [auditType, setAuditType] = useState<string>("all")
   const {audits, dispatch} = useAudits();
-  const [currentAudits, setCurrentAudits] = useState<Audits | []>([]);
   const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
-  const [filterData, setFilterData] = useState(false)
 
   const params = useSearchParams()
   const searchParams = params.get("auditType")
   const router = useRouter()
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(auditFilterSchema),
-    defaultValues: {
-      auditName: "",
-      auditType: searchParams ? searchParams : auditType
-    },
-  })
-
-  function onSubmit(data: FormData) {
-    setFilterData(true)
-    if (data.auditName && data.auditType) {
-      let filterData = audits.filter(audit => audit.type === data.auditType && audit.name === data.auditName);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    } else if (data.auditName) {
-      let filterData = audits.filter(audit => audit.name === data.auditName);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    } else if (data.auditType) {
-      setFilterData(true)
-      let filterData = audits.filter(audit => audit.type === data.auditType);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    }
-  }
+  const inputRef = useRef<HTMLInputElement>(null);
 
 
   const indexOfLastAudit = currentPage * pageSize
   const indexOfFirstAudit = indexOfLastAudit - pageSize
+
   useEffect(() => {
-    if (filterData) {
-      setTotalData(currentAudits.length)
-      setCurrentSliceAudits(currentAudits.slice(indexOfFirstAudit, indexOfLastAudit))
+    if (searchParams) {
+      if (searchParams && auditName) {
+        let filterData = audits.filter(audit => audit.name === auditName && audit.type === searchParams)
+        setTotalData(filterData.length)
+        setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+      } else {
+        let filterData = audits.filter(audit => audit.type === searchParams)
+        setTotalData(filterData.length)
+        setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+      }
+    } else if (auditName && auditType === "all") {
+      let filterData = audits.filter(audit => audit.name === auditName);
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else if (auditName && auditType !== "all") {
+      let filterData = audits.filter(audit => audit.name === auditName && audit.type === auditType)
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else if (auditType !== "all") {
+      let filterData = audits.filter(audit => audit.type === auditType)
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
     } else {
       setTotalData(audits.length)
-      if (searchParams) {
-        let x = audits.filter(audit => audit.type === searchParams)
-        setCurrentSliceAudits(x.slice(indexOfFirstAudit, indexOfLastAudit))
-      } else {
-        setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
-      }
-
+      setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
     }
-  }, [totalData, audits, filterData, currentAudits, indexOfLastAudit, indexOfFirstAudit, searchParams]);
+  }, [totalData, audits, indexOfLastAudit, indexOfFirstAudit, searchParams, auditType, auditName]);
 
   useEffect(() => {
     async function fetchAudits() {
@@ -125,28 +105,18 @@ export default function ConsultantAudits({
   }
   const handleChange = (e: any) => {
     setAuditName(e.target.value)
+    setCurrentPage(1)
   }
   const inputDebounce = useCallback(debounce(handleChange, 1000), [])
 
-  useEffect(() => {
-    if (auditName && auditType) {
-      let filterData = audits.filter(audit => audit.type === auditType && audit.name === auditName);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    } else if (auditName) {
-      let filterData = audits.filter(audit => audit.name === auditName);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    } else if (auditType) {
-      setFilterData(true)
-      let filterData = audits.filter(audit => audit.type === auditType);
-      setCurrentAudits(filterData)
-      setCurrentPage(1)
-    } else if (auditType === "" && auditName === "") {
-      setCurrentAudits(audits)
-      setCurrentPage(1)
-    }
-  }, [auditType, auditName]);
+  const handleReset = () => {
+    router.push("/audits")
+    setAuditType("all")
+    setCurrentPage(1)
+    setAuditName("")
+    // @ts-ignore
+    inputRef.current.value = '';
+  }
 
   if (isLoading) {
     return (
@@ -171,78 +141,54 @@ export default function ConsultantAudits({
         <AuditCreateButton userId={userId}/>
       </DashboardHeader>
 
-      <div className="px-1.5">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col sm:flex-row  sm:items-end justify-end gap-3">
-            <FormField
-              control={form.control}
-              name="auditName"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel className="sr-only">Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Audit Name"
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                        inputDebounce(e)
-                        form.setValue("auditName", e.target.value)
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
-            <div>
-              <label htmlFor="auditType" className="block sr-only text-sm font-medium leading-6 text-gray-900">
-                Location
-              </label>
-              <select
-                id="auditType"
-                className="capitalize flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                defaultValue={auditType}
-                placeholder="Select an audit type"
-                {...form.register("auditType")}
-                onChange={event => {
-                  setAuditType(event.target.value)
-                  form.setValue("auditType", event.target.value)
-                }}
-              >
-                <option value="">all</option>
-                <option value="private">Private</option>
-                <option value="exclusive">Exclusive</option>
-                <option value="public">Public</option>
-              </select>
-            </div>
+      <div className="px-1.5 flex flex-col sm:flex-row  sm:items-end justify-end gap-3 mr-1">
+        <div className="">
+          <Input
+            placeholder="Audit Name"
+            ref={inputRef}
+            type="text"
+            onChange={(e) => {
+              inputDebounce(e)
+            }}
+          />
+        </div>
+        <div className="w-full sm:w-44">
+          <Select
+            defaultValue={searchParams || auditType}
+            onValueChange={(value) => {
+              setCurrentPage(1)
+              setAuditType(value)
+              if (searchParams) {
+                if (value === "all") {
+                  router.push(`/audits`);
+                } else {
+                  router.push(`/audits?auditType=${value}`);
+                }
+              }
+            }}
+            value={searchParams || auditType}
+          >
+            <SelectTrigger id="auditType">
+              <SelectValue placeholder="Select"/>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value="exclusive">Exclusive</SelectItem>
+              <SelectItem value="public">Public</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-            {(form.getValues("auditType") || form.getValues("auditName")) &&
-                <Button
-                    variant="destructive"
-                    type="reset"
-                    onClick={() => {
-                      form.reset({
-                        auditName: "",
-                        auditType: ""
-                      })
-                      form.setValue("auditType", "")
-                      setAuditType("");
-                      setAuditName("");
-                      setCurrentAudits(audits)
-                      setFilterData(false)
-                      router.push("/audits")
-                    }}
-                >
-                    <Icons.searchX/>
-                </Button>
-            }
-
-          </form>
-
-        </Form>
+        {searchParams &&
+            <Button
+                variant="destructive"
+                type="reset"
+                onClick={handleReset}
+            >
+                <Icons.searchX/>
+            </Button>
+        }
       </div>
 
       <div>
