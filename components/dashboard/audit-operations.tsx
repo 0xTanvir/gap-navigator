@@ -16,7 +16,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import useAudits from "./AuditsContext";
 import {
   auditInviteSchema,
-  auditSchema, auditSchemaStep1, auditSchemaStep2, auditSchemaStep3,
+  auditSchemaStep1, auditSchemaStep2, auditSchemaStep3,
   auditShareSchema,
 } from "@/lib/validations/audit";
 import { Audit, AuditActionType, Audits, Notification } from "@/types/dto";
@@ -97,7 +97,6 @@ async function deleteAuditFromDB(userId: string, auditId: string) {
   }
 }
 
-type FormData = z.infer<typeof auditSchema>;
 type FormDataStep1 = z.infer<typeof auditSchemaStep1>;
 type FormDataStep2 = z.infer<typeof auditSchemaStep2>;
 type FormDataStep3 = z.infer<typeof auditSchemaStep3>;
@@ -157,16 +156,6 @@ export function AuditOperations({
   const [current, setCurrent] = useState<number>(0);
   const [auditFormData, setAuditFormData] = useState<AuditData | null>(null)
   const router = useRouter();
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(auditSchema),
-    defaultValues: {
-      auditName: audit.name,
-      auditType: audit.type,
-      condition: audit.condition,
-      welcome: audit.welcome,
-    },
-  });
 
   const formStep1 = useForm<FormDataStep1>({
     resolver: zodResolver(auditSchemaStep1),
@@ -519,11 +508,11 @@ export function AuditOperations({
                     className="flex cursor-pointer items-center"
                     onSelect={() => {
                       setShowUpdateDialog(true);
-                      form.setValue("auditName", audit.name);
-                      form.setValue("auditType", audit.type);
-                      form.setValue("condition", audit.condition);
-                      form.setValue("welcome", audit.welcome);
-                      form.setValue("thank_you", audit.thank_you);
+                      formStep1.setValue("auditName",audit.name)
+                      formStep1.setValue("auditType", audit.type);
+                      formStep1.setValue("condition", audit.condition);
+                      formStep2.setValue("welcome", audit.welcome);
+                      formStep3.setValue("thank_you", audit.thank_you);
                     }}
                 >
                   <Icons.fileEdit className="mr-2 h-4 w-4"/>
