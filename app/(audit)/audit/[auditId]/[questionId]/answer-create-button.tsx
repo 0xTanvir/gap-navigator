@@ -149,7 +149,7 @@ const AnswerCreateButton = ({
       </Button>
 
       <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <SheetContent className="sm:max-w-[50vw] overflow-y-auto">
+        <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Add Answer</SheetTitle>
             <SheetDescription>

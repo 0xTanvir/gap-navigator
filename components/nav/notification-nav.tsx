@@ -65,7 +65,7 @@ const NotificationNav = () => {
   );
 };
 
-function NotificationNavSkeleton() {
+export function NotificationNavSkeleton() {
   return (
       <div className="flex items-center space-x-4">
         <Skeleton className="h-6 w-6 rounded-full"/>
