@@ -3,7 +3,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import DashboardCard from "@/components/dashboard/dashboard-card";
 import { useAuth } from "@/components/auth/auth-provider";
 import { getEvaluationByIds } from "@/lib/firestore/evaluation";
-import { Evaluate, GroupedEvaluation } from "@/types/dto";
+import { Evaluate, GroupedAudits, GroupedEvaluation } from "@/types/dto";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,40 +23,25 @@ const ClientDashboard = () => {
   const router = useRouter()
 
   function countEvaluationsByMonth(evaluations: Evaluate[]): GroupedEvaluation[] {
-    const groupedEvaluations: { [key: string]: number } = {};
-
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    // Initialize counts for all months to 0
-    monthNames.forEach((month) => {
-      const year = new Date().getFullYear();
-      groupedEvaluations[`${month}`] = 0;
-    });
-
-    evaluations.forEach((evaluate) => {
+    const groupedDates: { [key: string]: Date[] } = evaluations.reduce((acc: { [key: string]: Date[] }, evaluate) => {
       const createdAt = new Date(evaluate.createdAt.seconds * 1000); // Convert seconds to milliseconds
-      const monthNameKey = `${monthNames[createdAt.getMonth()]}`;
-      groupedEvaluations[monthNameKey]++;
-    });
+      const yearMonth = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
+      if (!acc[yearMonth]) {
+        acc[yearMonth] = [];
+      }
+      acc[yearMonth].push(createdAt);
+      return acc;
+    }, {});
 
-    // Convert the groupedAudits object to an array of MonthTotal objects
-    const result: GroupedEvaluation[] = Object.keys(groupedEvaluations).map((key) => ({
-      name: key,
-      total: groupedEvaluations[key],
-    }));
-    return result;
+    const groupedEvaluation: GroupedEvaluation[] = Object.keys(groupedDates).map((yearMonth) => {
+      const monthName = groupedDates[yearMonth][0].toLocaleString('default', {month: 'short'});
+      const total = groupedDates[yearMonth].length;
+      return {
+        name: `${monthName}`,
+        total: total,
+      };
+    });
+    return groupedEvaluation.slice(-12);
   }
 
   useEffect(() => {
