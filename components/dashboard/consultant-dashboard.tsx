@@ -196,7 +196,7 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Audits per months</CardTitle>
+              <CardTitle>Audits Per Months</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               <DashboardOverviewChart auditsGroupByMonth={auditsGroupByMonth}/>
