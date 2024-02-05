@@ -25,7 +25,7 @@ export default function ConsultantAudits({
                                          }: ConsultantAuditsProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1)
-  const [pageSize] = useState<number>(4)
+  const [pageSize] = useState<number>(10)
   const [totalData, setTotalData] = useState<number>(0)
   const [auditName, setAuditName] = useState<string>("")
   const [auditType, setAuditType] = useState<string>("all")
