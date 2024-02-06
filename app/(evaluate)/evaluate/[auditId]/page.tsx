@@ -69,9 +69,9 @@ export default function EvaluatePage({
   const form = useForm<FormData>({
     resolver: zodResolver(evaluateParticipant),
     defaultValues: {
-      participantFirstName: "",
-      participantLastName: "",
-      participantEmail: "",
+      participantFirstName: user?.firstName || "",
+      participantLastName: user?.lastName || "",
+      participantEmail: user?.email || "",
       participantPhone: "",
     },
   });
@@ -87,7 +87,7 @@ export default function EvaluatePage({
       auditId: auditId,
       auditName: audit?.name,
       isCompleted: false,
-      choices:[],
+      choices: [],
       createdAt: Timestamp.now(),
     };
 
