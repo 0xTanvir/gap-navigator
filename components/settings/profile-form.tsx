@@ -23,6 +23,7 @@ import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getDownloadURL, ref, uploadBytesResumable } from "@firebase/storage";
 import { storage } from "@/firebase";
+import { Timestamp } from "firebase/firestore";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
@@ -46,7 +47,7 @@ export function ProfileForm() {
   async function onSubmit(data: ProfileFormValues) {
     setLoader(true);
     try {
-      const url: any | string = await userImageUpload(fileName, file as File)
+      const url: any | string = await userImageUpload(fileName, file as File, user?.uid)
         .then((url) => {
           return url;
         })
@@ -219,10 +220,10 @@ function getImageData(event: ChangeEvent<HTMLInputElement>) {
   return { files, displayUrl };
 }
 
-export async function userImageUpload(imageName: string, imageFile: File) {
+export async function userImageUpload(imageName: string, imageFile: File, userId: string | undefined) {
   return new Promise((resolve, reject) => {
     // Create a reference to the storage location with the image name
-    const imageRef = ref(storage, `images/${imageName}`);
+    const imageRef = ref(storage, `gn/${userId}/${Timestamp.now()}_${imageName}`);
 
     const imageTask = uploadBytesResumable(imageRef, imageFile);
 
