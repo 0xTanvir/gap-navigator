@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Icons } from "@/components/icons";
 import { AccountType } from "@/config/site";
 import Link from "next/link";
+import { Timestamp } from "firebase/firestore";
 
 interface UserAuthCompleteProps {
   callbackUrl: string;
@@ -58,6 +59,7 @@ export function UserAuthComplete({
       image: "",
       audits: [],
       invitedAuditsList: [],
+      createdAt:Timestamp.now()
     };
     try {
       await setUser(uid, user);

@@ -2,15 +2,13 @@ import React, { useEffect, useState } from "react";
 import { fetchAuditsWithCount } from "@/lib/firestore/audit";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import DashboardCard from "@/components/dashboard/dashboard-card";
-import { retrieveUserCounts } from "@/lib/firestore/user";
+import { getAllUsers, retrieveUserCounts } from "@/lib/firestore/user";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
-import DashboardRecentEvaluation from "@/components/dashboard/dashboard-recent-evaluation";
-import { Audit, GroupedAudits } from "@/types/dto";
-import { log } from "node:util";
+import { Audit, GroupedAudits, User } from "@/types/dto";
 
 interface DashboardCounts {
   auditsCounts: number | 0;
@@ -28,6 +26,8 @@ const AdminDashboard = () => {
   const [auditsGroupByMonths, setAuditsGroupByMonths] = useState<GroupedAudits[]>(
     []
   );
+  const [users, setUsers] = useState<User[] | []>([])
+
   const router = useRouter()
 
   function countAuditsByMonths(audits: Audit[]): GroupedAudits[] {
@@ -71,8 +71,9 @@ const AdminDashboard = () => {
   async function fetchDashboardData() {
     try {
       const {totalCount, audits} = await fetchAuditsWithCount();
-      const {totalConsultantCounts, totalClientCounts} =
-        await retrieveUserCounts();
+      const dbUsers = await getAllUsers()
+      setUsers(dbUsers)
+      const {totalConsultantCounts, totalClientCounts} = await retrieveUserCounts();
       const newData = {
         auditsCounts: totalCount,
         consultantCounts: totalConsultantCounts,
@@ -167,6 +168,23 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
+                {
+                  users.length > 0 ?
+                    users.slice(0, 5).map(user => (
+                      <div className="flex items-center" key={user.uid}>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {user.firstName + " " + user.lastName}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                    :
+                    <div className="text-center font-semibold py-10">No Data Found</div>
+                }
               </div>
             </CardContent>
           </Card>

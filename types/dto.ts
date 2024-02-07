@@ -19,6 +19,7 @@ export interface User {
   audits: string[],
   invitedAuditsList: string[],
   status?: string
+  createdAt: Timestamp
 }
 
 export enum UserRole {
