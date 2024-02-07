@@ -25,7 +25,7 @@ const ClientDashboard = () => {
   function countEvaluationsByMonth(evaluations: Evaluate[]): GroupedEvaluation[] {
     const groupedDates: { [key: string]: Date[] } = evaluations.reduce((acc: { [key: string]: Date[] }, evaluate) => {
       const createdAt = new Date(evaluate.createdAt.seconds * 1000); // Convert seconds to milliseconds
-      const yearMonth = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
+      const yearMonth = `${createdAt.toLocaleString('default', {month: 'short'})} ${createdAt.getFullYear()}`;
       if (!acc[yearMonth]) {
         acc[yearMonth] = [];
       }
@@ -33,15 +33,28 @@ const ClientDashboard = () => {
       return acc;
     }, {});
 
+    const comparator = (a: GroupedAudits, b: GroupedAudits) => {
+      const aDate = new Date(a.name);
+      const bDate = new Date(b.name);
+      return aDate.getTime() - bDate.getTime();
+    };
+
     const groupedEvaluation: GroupedEvaluation[] = Object.keys(groupedDates).map((yearMonth) => {
-      const monthName = groupedDates[yearMonth][0].toLocaleString('default', {month: 'short'});
       const total = groupedDates[yearMonth].length;
       return {
-        name: `${monthName}`,
+        name: `${yearMonth}`,
         total: total,
       };
-    });
-    return groupedEvaluation.slice(-12);
+    }).sort(comparator);
+
+    let result = groupedEvaluation.map(evaluate => {
+      return {
+        name: evaluate.name.split(" ")[0] + " " + evaluate.name.split(" ")[1].slice(-2),
+        total: evaluate.total
+      }
+    })
+
+    return result.slice(-12);
   }
 
   useEffect(() => {
