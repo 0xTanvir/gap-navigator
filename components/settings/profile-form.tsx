@@ -223,7 +223,7 @@ function getImageData(event: ChangeEvent<HTMLInputElement>) {
 export async function userImageUpload(imageName: string, imageFile: File, userId: string | undefined) {
   return new Promise((resolve, reject) => {
     // Create a reference to the storage location with the image name
-    const imageRef = ref(storage, `gn/${userId}/${Timestamp.now()}_${imageName}`);
+    const imageRef = ref(storage, `gn/users/${userId}/${Timestamp.now()}_${imageName}`);
 
     const imageTask = uploadBytesResumable(imageRef, imageFile);
 
