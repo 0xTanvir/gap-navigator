@@ -53,7 +53,7 @@ type FormData = z.infer<typeof userRoleUpdateSchema>;
 
 type formData = z.infer<typeof userStatusUpdateSchema>;
 
-const UserOperations = ({ user, setUser }: UserOperationsProps) => {
+const UserOperations = ({user, setUser}: UserOperationsProps) => {
   const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
   const [showUpdateDialog, setShowUpdateDialog] =
     React.useState<boolean>(false);
@@ -122,7 +122,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
         if (updated) {
           setUser((users) => {
             return users.map((u) =>
-              u.uid === user.uid ? { ...u, status: data.status } : u
+              u.uid === user.uid ? {...u, status: data.status} : u
             );
           });
 
@@ -147,8 +147,9 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
-          <Icons.ellipsis className="h-4 w-4" />
+        <DropdownMenuTrigger
+          className="flex h-8 w-8 items-center justify-center rounded-md border transition-colors hover:bg-muted">
+          <Icons.ellipsis className="h-4 w-4"/>
           <span className="sr-only">Open</span>
         </DropdownMenuTrigger>
 
@@ -157,11 +158,21 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
             className="flex cursor-pointer items-center"
             onClick={() => setShowUpdateDialog(true)}
           >
-            <Icons.userPlus className="mr-2 h-4 w-4" />
+            <Icons.userPlus className="mr-2 h-4 w-4"/>
             Role change
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator/>
+
+          <DropdownMenuItem
+            className="flex cursor-pointer items-center"
+            // onClick={() =>}
+          >
+            <Icons.fileEdit className="mr-2 h-4 w-4"/>
+            Edit
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator/>
 
           <DropdownMenuItem
             className="flex cursor-pointer items-center"
@@ -169,10 +180,10 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
               router.push(`/user/audits/${user.uid}/evaluations`);
             }}
           >
-            <Icons.evaluate className="mr-2 h-4 w-4" />
+            <Icons.evaluate className="mr-2 h-4 w-4"/>
             Evaluation
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator/>
 
           {user.role !== "client" && (
             <>
@@ -182,10 +193,10 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                   router.push(`/user/audits/${user.uid}`);
                 }}
               >
-                <Icons.audit className="mr-2 h-4 w-4" />
+                <Icons.audit className="mr-2 h-4 w-4"/>
                 Audits
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator/>
             </>
           )}
 
@@ -196,7 +207,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
               formUserStatus.setValue("status", user.status ? user.status : "");
             }}
           >
-            <Icons.userPlus className="mr-2 h-4 w-4" />
+            <Icons.userPlus className="mr-2 h-4 w-4"/>
             Account status change
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -217,7 +228,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                 <FormField
                   control={form.control}
                   name="role"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>Role</FormLabel>
                       <Select
@@ -226,7 +237,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select an user role" />
+                            <SelectValue placeholder="Select an user role"/>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -248,7 +259,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
@@ -256,7 +267,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
               <DialogFooter>
                 <button
                   type="submit"
-                  className={cn(buttonVariants({ variant: "default" }), {
+                  className={cn(buttonVariants({variant: "default"}), {
                     "cursor-not-allowed opacity-60": isUpdateLoading,
                   })}
                   disabled={
@@ -264,9 +275,9 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                   }
                 >
                   {isUpdateLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                   ) : (
-                    <Icons.add className="mr-2 h-4 w-4" />
+                    <Icons.add className="mr-2 h-4 w-4"/>
                   )}
                   Save changes
                 </button>
@@ -297,7 +308,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                 <FormField
                   control={formUserStatus.control}
                   name="status"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <FormItem>
                       <FormLabel>User account status</FormLabel>
                       <Select
@@ -310,7 +321,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select an user account status" />
+                            <SelectValue placeholder="Select an user account status"/>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -343,7 +354,7 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                           {/*}*/}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
@@ -351,9 +362,9 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
               <DialogFooter>
                 <button
                   type="submit"
-                  className={cn(buttonVariants({ variant: "default" }), {
+                  className={cn(buttonVariants({variant: "default"}), {
                     "cursor-not-allowed opacity-60":
-                      isUpdatingAccountStatusLoading,
+                    isUpdatingAccountStatusLoading,
                   })}
                   disabled={
                     isUpdatingAccountStatusLoading ||
@@ -361,9 +372,9 @@ const UserOperations = ({ user, setUser }: UserOperationsProps) => {
                   }
                 >
                   {isUpdatingAccountStatusLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
                   ) : (
-                    <Icons.add className="mr-2 h-4 w-4" />
+                    <Icons.add className="mr-2 h-4 w-4"/>
                   )}
                   Save changes
                 </button>

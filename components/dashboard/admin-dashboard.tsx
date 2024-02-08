@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardOverviewChart from "@/components/dashboard/dashboard-overview-chart";
 import { Audit, GroupedAudits, User } from "@/types/dto";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface DashboardCounts {
   auditsCounts: number | 0;
@@ -50,7 +51,6 @@ const AdminDashboard = () => {
     const groupedAudits: GroupedAudits[] = Object.keys(groupedDates)
       .map((yearMonth) => {
         const total = groupedDates[yearMonth].length;
-        // console.log(yearMonth.split(" ")[0] + " " + yearMonth.split(" ")[1].slice(-2))
         return {
           name: `${yearMonth}`,
           total: total,
@@ -171,19 +171,34 @@ const AdminDashboard = () => {
                 {
                   users.length > 0 ?
                     users.slice(0, 5).map(user => (
-                      <div className="flex items-center" key={user.uid}>
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium leading-none">
-                            {user.firstName + " " + user.lastName}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {user.email}
-                          </p>
+                      <div className="flex items-center justify-between" key={user.uid}>
+                        <div className="grid gap-1">
+                          <div className="flex gap-2 items-center">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage src={user?.image}/>
+                              <AvatarFallback>{user && user?.firstName[0].toUpperCase() + user?.lastName[0].toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="flex gap-2">
+                                <p className="font-semibold">
+                                  {(user.firstName + " " + user.lastName).replace(/\b\w/g, (char) => char.toUpperCase())}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="flex text-sm text-muted-foreground">
+                                  {user.email}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))
                     :
-                    <div className="text-center font-semibold py-10">No Data Found</div>
+                    <div className="text-center font-semibold py-10">
+                      No Data Found
+                    </div>
                 }
               </div>
             </CardContent>
