@@ -701,7 +701,7 @@ export function AuditOperations({
       </AlertDialog>
 
       <Sheet open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <SheetContent className="sm:max-w-[75vw] overflow-y-auto">
+        <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Update audit</SheetTitle>
             <SheetDescription>

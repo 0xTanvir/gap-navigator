@@ -32,7 +32,7 @@ export function ProfileForm() {
   const [fileName, setFileName] = useState<string>("");
   const [preview, setPreview] = useState<string>("");
   const [loader, setLoader] = useState<boolean>(false);
-  const { user, loading, setUser } = useAuth();
+  const {user, loading, setUser} = useAuth();
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -47,22 +47,26 @@ export function ProfileForm() {
   async function onSubmit(data: ProfileFormValues) {
     setLoader(true);
     try {
-      const url: any | string = await userImageUpload(fileName, file as File, user?.uid)
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.error("Error uploading image:", error);
-        });
+      let url: any | string
+      if (fileName) {
+        url = await userImageUpload(fileName, file as File, user?.uid)
+          .then((url) => {
+            return url;
+          })
+          .catch((error) => {
+            console.error("Error uploading image:", error);
+          });
+      }
       let dbUser = await updateUserProfile(user?.uid as string, {
         firstName: data.firstName,
         lastName: data.lastName,
-        image: url,
+        image: fileName ? url : user?.image,
       });
       setUser(dbUser);
       toast.success("Profile Updated.");
       setLoader(false);
       setPreview("");
+      setFileName("")
     } catch (error) {
       console.error("Error updating user profile:", error);
       toast.error("failed to update profile, please try again.");
@@ -88,13 +92,13 @@ export function ProfileForm() {
           control={form.control}
           name="firstName"
           disabled={loader || loading}
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
               <FormControl>
                 <Input variant="ny" placeholder="First Name" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -102,13 +106,13 @@ export function ProfileForm() {
           control={form.control}
           name="lastName"
           disabled={loader || loading}
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
               <FormControl>
                 <Input variant="ny" placeholder="Last Name" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -116,11 +120,11 @@ export function ProfileForm() {
           control={form.control}
           name="email"
           disabled={true}
-          render={({ field }) => (
+          render={({field}) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <Input variant="ny" placeholder="Please enter email" {...field} />
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -128,15 +132,15 @@ export function ProfileForm() {
         <FormField
           control={form.control}
           name="image"
-          render={({ field: { value, onChange, ...rest } }) => (
+          render={({field: {value, onChange, ...rest}}) => (
             <div className="relative w-40 h-40">
               <div className="space-y-2">
                 <Avatar className="w-40 h-40">
-                  <AvatarImage src={preview ? preview : user?.image} />
+                  <AvatarImage src={preview ? preview : user?.image}/>
                   <AvatarFallback>
                     {user &&
                       user?.firstName[0].toUpperCase() +
-                        user?.lastName[0].toUpperCase()}
+                      user?.lastName[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -167,7 +171,7 @@ export function ProfileForm() {
                         htmlFor="thumbnail"
                         className="cursor-pointer w-8 h-8 rounded-2xl grid place-items-center"
                       >
-                        <Icons.fileEdit className="h-5 w-5" />
+                        <Icons.fileEdit className="h-5 w-5"/>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -177,14 +181,14 @@ export function ProfileForm() {
                           accept=".png, .jpg, .jpeg"
                           {...rest}
                           onChange={async (event) => {
-                            const { files, displayUrl } = getImageData(event);
+                            const {files, displayUrl} = getImageData(event);
                             setFile(files);
                             setFileName(files.name);
                             setPreview(displayUrl);
                           }}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage/>
                     </FormItem>
                   )}
                 </>
@@ -194,11 +198,11 @@ export function ProfileForm() {
         />
 
         <Button
-          className={cn(buttonVariants({ variant: "default" }))}
+          className={cn(buttonVariants({variant: "default"}))}
           disabled={loader || loading}
           type="submit"
         >
-          {loader && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+          {loader && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
           Update Profile
         </Button>
       </form>
@@ -206,7 +210,7 @@ export function ProfileForm() {
   );
 }
 
-function getImageData(event: ChangeEvent<HTMLInputElement>) {
+export function getImageData(event: ChangeEvent<HTMLInputElement>) {
   // FileList is immutable, so we need to create a new one
   const dataTransfer = new DataTransfer();
   // Add newly uploaded images
@@ -217,7 +221,7 @@ function getImageData(event: ChangeEvent<HTMLInputElement>) {
   const files = dataTransfer.files[0];
   const displayUrl = URL.createObjectURL(event.target.files![0]);
 
-  return { files, displayUrl };
+  return {files, displayUrl};
 }
 
 export async function userImageUpload(imageName: string, imageFile: File, userId: string | undefined) {

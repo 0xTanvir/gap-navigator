@@ -1,11 +1,9 @@
 import { Metadata } from "next";
-import SettingsNav from "@/components/settings/settings-nav";
 import { settingsConfig } from "@/config/settings";
 import { MainNav } from "@/components/nav/main-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ProfileNav } from "@/components/nav/profile-nav";
 import { SiteFooter } from "@/components/site-footer";
-import SettingsShell from "@/components/settings/settings-shell";
 
 export const metadata: Metadata = {
   title: "Client Page",
