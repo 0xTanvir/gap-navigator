@@ -87,7 +87,7 @@ const NotificationNav = () => {
           )}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="rounded-2xl">
         <Card className="border-0 shadow-none">
           <CardHeader>
             {notifications.length > 0 && <CardTitle>Notifications</CardTitle>}
@@ -102,7 +102,12 @@ const NotificationNav = () => {
                       key={index}
                       className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
                     >
-                      <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"/>
+                      {
+                        notification.isSeen ?
+                          <span className="flex h-2 w-2 translate-y-1 rounded-full bg-gray-500"/> :
+
+                          <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"/>
+                      }
                       <div className="space-y-1">
                         <p
                           onClick={() => router.push(`/evaluate/${notification.auditId}`)}
