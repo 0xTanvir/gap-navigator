@@ -22,7 +22,7 @@ import {
 import { useAuth } from "@/components/auth/auth-provider";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
-import { Choice, Evaluate, EvaluationActionType } from "@/types/dto";
+import { Choice, Complex, Evaluate, EvaluationActionType } from "@/types/dto";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -110,9 +110,14 @@ export default function EvaluateQuestionPage({
 
     if (evaluation.condition) {
       if (hasAnswerSelected) {
+        let questionId = pager.next.href.split("/")
+        let newData: Complex = {
+          nextQuestionId: questionId[questionId.length - 1],
+          choices: newEvaluate
+        }
         dispatch({
           type: EvaluationActionType.ADD_QUESTION_ANSWER,
-          payload: newEvaluate,
+          payload: newData,
         });
 
         if (evaluation.evaluate.choices) {
@@ -125,6 +130,7 @@ export default function EvaluateQuestionPage({
             if (pager.next.disabled) {
               let evaluateData = {
                 ...evaluation.evaluateFormData,
+                nextQuestionId: "",
                 isCompleted: true
               }
               dispatch({
@@ -133,7 +139,7 @@ export default function EvaluateQuestionPage({
               });
               await updateEvaluation(auditId, evaluateData)
             }
-            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[], newData.nextQuestionId);
           }
         }
         if (pager.next && !pager.next.disabled) {
@@ -180,10 +186,11 @@ export default function EvaluateQuestionPage({
             await router.push(`/evaluate/${auditId}/completed`);
           } else {
             setIsLoading(true);
-            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[], newData.nextQuestionId);
             // await setEvaluation(auditId, evaluation.evaluate);
             let evaluateData = {
               ...evaluation.evaluateFormData,
+              nextQuestionId:evaluation.evaluateFormData.nextQuestionId,
               isCompleted: true
             }
             dispatch({
@@ -199,15 +206,20 @@ export default function EvaluateQuestionPage({
       }
     } else {
       if (hasAnswerSelected) {
+        let questionId = pager.next.href.split("/")
+        let newData: Complex = {
+          nextQuestionId: questionId[questionId.length - 1],
+          choices: newEvaluate
+        }
         dispatch({
           type: EvaluationActionType.ADD_QUESTION_ANSWER,
-          payload: newEvaluate,
+          payload: newData,
         });
         if (pager.next && !pager.next.disabled) {
           let isExists = singleEvaluation?.choices?.some(choice => choice.answerId === newEvaluate.answerId);
           if (isExists === undefined || !isExists) {
             setIsLoading(true);
-            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[]);
+            await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluate.choices as Choice[], newData.nextQuestionId);
           }
           router.push(pager.next.href);
         } else {
@@ -221,12 +233,13 @@ export default function EvaluateQuestionPage({
             if (result) {
               router.push(`/evaluate/${auditId}/completed`)
             } else {
-              await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[]);
+              await updateEvaluationById(auditId, evaluation.evaluate.uid, evaluation.evaluateFormData.choices as Choice[], newData.nextQuestionId);
             }
           } else {
             if (pager.next.disabled) {
               let evaluateData = {
                 ...evaluation.evaluateFormData,
+                nextQuestionId: "",
                 isCompleted: true
               }
               dispatch({

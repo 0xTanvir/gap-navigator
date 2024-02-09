@@ -141,11 +141,16 @@ export enum EvaluationActionType {
   REMOVE_QUESTION_ANSWER = "REMOVE_QUESTION_ANSWER",
 }
 
+export interface Complex {
+  nextQuestionId?: string
+  choices: Choice
+}
+
 export type EvaluationAction =
   | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
   | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
   | { type: EvaluationActionType.UPDATE_EVALUATE; payload: Evaluate }
-  | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
+  | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Complex }
   | { type: EvaluationActionType.REMOVE_QUESTION_ANSWER; payload: string }
 
 export interface Evaluate {
@@ -160,6 +165,7 @@ export interface Evaluate {
   auditId?: string
   isCompleted: boolean
   count?: number;
+  nextQuestionId?: string
 }
 
 export interface AuditEvaluations {

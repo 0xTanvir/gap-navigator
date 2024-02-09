@@ -88,6 +88,7 @@ export default function EvaluatePage({
       auditName: audit?.name,
       isCompleted: false,
       choices: [],
+      nextQuestionId: "",
       createdAt: Timestamp.now(),
     };
 
@@ -103,11 +104,20 @@ export default function EvaluatePage({
       });
       form.reset();
       setShowDialog(false);
-      if (evaluation.questions.length > 0) {
+      if (emailExists.nextQuestionId) {
+        router.push(`/evaluate/${auditId}/${emailExists.nextQuestionId}`);
+      } else if (evaluation.questions.length > 0) {
         router.push(`/evaluate/${auditId}/${evaluation.questions[0]?.uid}`);
       }
       toast.info("This email evaluation already created.");
     } else {
+      toast.info("Evaluation start.");
+      if (evaluation.questions.length > 0) {
+        evaluate.nextQuestionId = evaluation.questions[0]?.uid
+        router.push(
+          `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
+        );
+      }
       dispatch({
         type: EvaluationActionType.ADD_EVALUATE,
         payload: evaluate,
@@ -116,12 +126,6 @@ export default function EvaluatePage({
       form.reset();
       setIsLoading(false)
       setShowDialog(false);
-      toast.info("Evaluation start.");
-      if (evaluation.questions.length > 0) {
-        router.push(
-          `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
-        );
-      }
     }
   }
 

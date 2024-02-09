@@ -34,11 +34,13 @@ export async function updateEvaluation(auditId: string, evaluation: any) {
 export async function updateEvaluationById(
   auditId: string,
   evaluationId: string,
-  newChoices: Choice[]
+  newChoices: Choice[],
+  nextQuestionId?: string
 ) {
   const evaluationRef = Collections.evaluation(auditId, evaluationId);
   try {
     await updateDoc(evaluationRef, {
+      nextQuestionId: nextQuestionId,
       choices: newChoices
     });
   } catch (error: any) {
@@ -123,6 +125,7 @@ export async function getAllEvaluations(auditId: string) {
           isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
+          nextQuestionId: data.nextQuestionId
         } as Evaluate
       });
     } else {
@@ -155,6 +158,7 @@ export async function getEvaluationByIds(auditIds: string[], evaluationID: strin
         isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
+        nextQuestionId: data.nextQuestionId
       };
       evaluations.push(evaluation);
     }
@@ -183,6 +187,7 @@ export async function getAllEvaluationWithAuditName(auditId: string) {
           isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
+          nextQuestionId: data.nextQuestionId
         } as Evaluate
       });
     } else {
@@ -216,6 +221,7 @@ export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[],
         isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
+        nextQuestionId: data.nextQuestionId
       };
       userInfo = {
         participantFirstName: data.participantFirstName,

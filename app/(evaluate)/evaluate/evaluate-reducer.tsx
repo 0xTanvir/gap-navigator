@@ -24,6 +24,7 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
           auditId: action.payload.auditId,
           isCompleted: action.payload.isCompleted,
           createdAt: action.payload.createdAt,
+          nextQuestionId: action.payload.nextQuestionId
         }
       };
     }
@@ -32,10 +33,12 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
         ...state,
         evaluate: {
           ...state.evaluate,
+          nextQuestionId: action.payload.nextQuestionId,
           isCompleted: action.payload.isCompleted,
         },
         evaluateFormData: {
           ...state.evaluateFormData,
+          nextQuestionId: action.payload.nextQuestionId,
           isCompleted: action.payload.isCompleted,
         }
       };
@@ -74,38 +77,41 @@ export const evaluateReducer = (state: Evaluation, action: EvaluationAction): Ev
       const updatedEvaluate = state.evaluate || {choices: []};
       const updatedChoices = updatedEvaluate?.choices ?
         [
-          ...updatedEvaluate.choices.filter((choice) => choice.questionId !== action.payload.questionId),
+          ...updatedEvaluate.choices.filter((choice) => choice.questionId !== action.payload.choices?.questionId),
           {
-            ...action.payload
+            ...action.payload.choices
           },
         ]
         : [
           {
-            ...action.payload
+            ...action.payload.choices
           },
         ];
       // console.log(updatedChoices)
       const updatedEvaluateFormData = state.evaluateFormData || {choices: []};
       const updatedChoicesFormData = updatedEvaluateFormData?.choices ?
         [
-          ...updatedEvaluateFormData.choices.filter((choice) => choice.questionId !== action.payload.questionId),
+          ...updatedEvaluateFormData.choices.filter((choice) => choice.questionId !== action.payload.choices?.questionId),
           {
-            ...action.payload
+            ...action.payload.choices
           },
         ]
         : [
           {
-            ...action.payload
+            ...action.payload.choices
           },
         ];
+
       return {
         ...state,
         evaluate: {
           ...state.evaluate,
+          nextQuestionId: action.payload.nextQuestionId,
           choices: updatedChoices
         },
         evaluateFormData: {
           ...state.evaluateFormData,
+          nextQuestionId: action.payload.nextQuestionId,
           choices: updatedChoicesFormData
         }
       }
