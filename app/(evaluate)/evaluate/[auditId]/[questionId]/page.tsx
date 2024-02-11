@@ -123,13 +123,27 @@ export default function EvaluateQuestionPage({
 
         if (!questionId) {
           let isExists = _.find(evaluation.evaluate?.choices, function (o: Choice) {
-            return o.answerId === newEvaluate.answerId &&
-              o.questionId === newEvaluate.questionId;
+            return o.questionId === newEvaluate.questionId;
           });
           if (isExists === undefined) {
             let choices = evaluation.evaluate.choices || [];
-            choices.push(newEvaluate)
+            let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
+            if (index !== -1) {
+              choices[index] = newEvaluate
+            } else {
+              choices.push(newEvaluate)
+            }
+            let evaluateData = {
+              ...evaluation.evaluateFormData,
+              choices: choices,
+              isCompleted: true
+            }
+            dispatch({
+              type: EvaluationActionType.UPDATE_EVALUATE,
+              payload: evaluateData,
+            });
             setIsLoading(true)
+            await updateEvaluation(auditId, evaluateData)
             await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
             router.push(`/evaluate/${auditId}/completed`)
           } else {
@@ -141,6 +155,16 @@ export default function EvaluateQuestionPage({
               let index = _.findIndex(choices, {answerId: newEvaluate.answerId});
               choices[index] = newEvaluate;
               setIsLoading(true)
+              let evaluateData = {
+                ...evaluation.evaluate,
+                choices: choices,
+                isCompleted: true
+              }
+              dispatch({
+                type: EvaluationActionType.UPDATE_EVALUATE,
+                payload: evaluateData,
+              });
+              await updateEvaluation(auditId, evaluateData)
               await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
               router.push(`/evaluate/${auditId}/completed`)
             }
@@ -173,7 +197,12 @@ export default function EvaluateQuestionPage({
                 }
               } else {
                 // No object with the same answerId exists, add newEvaluate to the array
-                choices.push(newEvaluate);
+                let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
+                if (index !== -1) {
+                  choices[index] = newEvaluate
+                  console.log(choices, "202")
+                }
+                // choices.push(newEvaluate);
               }
               setIsLoading(true)
               await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
@@ -182,8 +211,7 @@ export default function EvaluateQuestionPage({
           }
         } else if (pager.next.disabled) {
           let isExists = _.find(evaluation.evaluate?.choices, function (o: Choice) {
-            return o.answerId === newEvaluate.answerId &&
-              o.questionId === newEvaluate.questionId;
+            return o.questionId === newEvaluate.questionId;
           });
           if (isExists) {
             let choices = evaluation.evaluate.choices || [];
@@ -202,8 +230,10 @@ export default function EvaluateQuestionPage({
               }
             } else {
               // No object with the same answerId exists, add newEvaluate to the array
-              choices.push(newEvaluate);
-              // console.log("No")
+              let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
+              if (index !== -1) {
+                choices[index] = newEvaluate
+              }
             }
           } else {
             const choices = evaluation.evaluate.choices || []
@@ -237,9 +267,7 @@ export default function EvaluateQuestionPage({
           if (singleEvaluation?.isCompleted) {
             let result
             if (evaluation?.evaluateFormData) {
-              result = singleEvaluation
-                ? areObjectsEqual(singleEvaluation, evaluation?.evaluate)
-                : false;
+              result = singleEvaluation ? _.isEqual(singleEvaluation, evaluation?.evaluate) : false;
             }
             if (result) {
               router.push(`/evaluate/${auditId}/completed`)
@@ -295,6 +323,7 @@ export default function EvaluateQuestionPage({
   useEffect(() => {
     fetchEvaluation()
   }, []);
+
   if (pageLoader) {
     return (
       <div className="py-6 lg:py-10">
@@ -367,7 +396,6 @@ export default function EvaluateQuestionPage({
                         placeholder="Share your thoughts and additional details..."
                         className="resize-none"
                         {...field}
-                        disabled={true}
                       />
                     </FormControl>
                     <FormMessage/>
@@ -392,7 +420,6 @@ export default function EvaluateQuestionPage({
                             }
                             id="recommendedNote"
                             placeHolder="Provide your recommended insights and suggestions..."
-                            disable={true}
                           />
                         </FormControl>
                         <FormMessage/>
@@ -411,7 +438,6 @@ export default function EvaluateQuestionPage({
                             placeholder="Add internal notes or confidential information..."
                             className="resize-none"
                             {...field}
-                            disabled={true}
                           />
                         </FormControl>
                         <FormMessage/>
@@ -577,46 +603,4 @@ export default function EvaluateQuestionPage({
       )}
     </div>
   );
-}
-
-function areObjectsEqual(dbFoundObject: Evaluate, evaluate: Evaluate) {
-  let allMatching = true;
-
-  const participantEqual =
-    dbFoundObject.uid === evaluate.uid &&
-    dbFoundObject.participantFirstName === evaluate.participantFirstName &&
-    dbFoundObject.participantLastName === evaluate.participantLastName &&
-    dbFoundObject.participantEmail === evaluate.participantEmail;
-
-  if (!participantEqual) {
-    return false;
-  }
-
-  dbFoundObject.choices?.forEach((choices, i) => {
-    const evaluateIndexFound =
-      evaluate?.choices?.findIndex(
-        (choice2) => choice2.questionId === choices.questionId
-      ) ?? -1;
-
-    if (evaluateIndexFound !== -1) {
-      let evaluateChoice: any;
-      if (evaluate?.choices) {
-        evaluateChoice = evaluate?.choices[evaluateIndexFound];
-      }
-      if (
-        choices.answerId === evaluateChoice.answerId &&
-        choices.additionalNote === evaluateChoice.additionalNote &&
-        choices.internalNote === evaluateChoice.internalNote &&
-        choices.recommendedNote === evaluateChoice.recommendedNote
-      ) {
-        // Keep allMatching as is, no need to change to true
-      } else {
-        allMatching = false;
-      }
-    } else {
-      allMatching = false;
-    }
-  });
-
-  return allMatching;
 }
