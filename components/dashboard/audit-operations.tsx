@@ -912,7 +912,6 @@ export function AuditOperations({
             <form onSubmit={inviteForm.handleSubmit(onInviteSubmit)}>
               <DialogHeader>
                 <DialogTitle>Audit invite</DialogTitle>
-                <DialogDescription>lorem ipsum</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
@@ -962,7 +961,6 @@ export function AuditOperations({
             <form onSubmit={shareForm.handleSubmit(onShareSubmit)}>
               <DialogHeader>
                 <DialogTitle>Share audit</DialogTitle>
-                <DialogDescription>lorem ipsum</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">

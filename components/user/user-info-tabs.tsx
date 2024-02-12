@@ -87,9 +87,6 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
           <Card>
             <CardHeader>
               <CardTitle>All Evaluations</CardTitle>
-              <CardDescription>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestiae, perspiciatis?
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {
