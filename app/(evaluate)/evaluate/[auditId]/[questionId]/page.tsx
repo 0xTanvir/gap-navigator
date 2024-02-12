@@ -122,10 +122,10 @@ export default function EvaluateQuestionPage({
         });
 
         if (!questionId) {
-          let isExists = _.find(evaluation.evaluate?.choices, function (o: Choice) {
+          let isExist = _.find(evaluation.evaluate?.choices, function (o: Choice) {
             return o.questionId === newEvaluate.questionId;
           });
-          if (isExists === undefined) {
+          if (isExist === undefined) {
             let choices = evaluation.evaluate.choices || [];
             let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
             if (index !== -1) {
@@ -147,8 +147,8 @@ export default function EvaluateQuestionPage({
             await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
             router.push(`/evaluate/${auditId}/completed`)
           } else {
-            let equal = _.isEqual(isExists, newEvaluate);
-            if (equal) {
+            let isEqual = _.isEqual(isExist, newEvaluate);
+            if (isEqual) {
               router.push(`/evaluate/${auditId}/completed`)
             } else {
               let choices = evaluation.evaluate.choices || []
@@ -190,8 +190,8 @@ export default function EvaluateQuestionPage({
               let index = _.findIndex(choices, {answerId: newEvaluate.answerId});
               if (index !== -1) {
                 // Object with the same answerId exists, check if all properties match
-                let isExists = _.isEqual(choices[index], newEvaluate);
-                if (!isExists) {
+                let isSame = _.isEqual(choices[index], newEvaluate);
+                if (!isSame) {
                   // Properties do not match, update the object at this index
                   choices[index] = newEvaluate;
                 }
@@ -200,9 +200,17 @@ export default function EvaluateQuestionPage({
                 let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
                 if (index !== -1) {
                   choices[index] = newEvaluate
-                  console.log(choices, "202")
+                  let urlParts = pager.next.href.split("/")
+                  let urlId = urlParts[urlParts.length - 1]
+                  const exists = _.some(choices, {questionId: urlId});
+                  if (exists) {
+                    if (urlId !== questionId) {
+                      _.remove(choices, (item) => item.questionId === urlId);
+                    }
+                  }
+                } else {
+                  choices.push(newEvaluate)
                 }
-                // choices.push(newEvaluate);
               }
               setIsLoading(true)
               await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
@@ -210,37 +218,34 @@ export default function EvaluateQuestionPage({
             }
           }
         } else if (pager.next.disabled) {
-          let isExists = _.find(evaluation.evaluate?.choices, function (o: Choice) {
-            return o.questionId === newEvaluate.questionId;
+          let isExists = _.some(singleEvaluation?.choices, function (o: Choice) {
+            return o.answerId === newEvaluate.answerId &&
+              o.internalNote === newEvaluate.internalNote &&
+              o.recommendedNote === newEvaluate.recommendedNote &&
+              o.additionalNote === newEvaluate.additionalNote &&
+              o.questionId === newEvaluate.questionId;
           });
           if (isExists) {
-            let choices = evaluation.evaluate.choices || [];
-            let index = _.findIndex(choices, {answerId: newEvaluate.answerId});
+            router.push(`/evaluate/${auditId}/${questionId}`)
+          } else {
+            let choices = singleEvaluation?.choices || [];
+            let index = _.findIndex(choices, {questionId: newEvaluate.questionId});
             if (index !== -1) {
               // Object with the same answerId exists, check if all properties match
-              let isExists = _.isEqual(choices[index], newEvaluate);
-              if (!isExists) {
+              let isSame = _.isEqual(choices[index], newEvaluate);
+              if (!isSame) {
                 // Properties do not match, update the object at this index
                 choices[index] = newEvaluate;
                 setIsLoading(true)
                 await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
                 router.push(`/evaluate/${auditId}/${questionId}`)
-              } else {
-                router.push(`/evaluate/${auditId}/${questionId}`)
               }
             } else {
-              // No object with the same answerId exists, add newEvaluate to the array
-              let index = _.findIndex(choices, {questionId: newEvaluate.questionId})
-              if (index !== -1) {
-                choices[index] = newEvaluate
-              }
+              choices.push(newEvaluate)
+              setIsLoading(true)
+              await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
+              router.push(`/evaluate/${auditId}/${questionId}`)
             }
-          } else {
-            const choices = evaluation.evaluate.choices || []
-            choices.push(newEvaluate)
-            setIsLoading(true)
-            await updateEvaluationById(auditId, evaluation.evaluate.uid, choices as Choice[], questionId);
-            router.push(`/evaluate/${auditId}/${questionId}`)
           }
         }
         setIsLoading(false);

@@ -90,7 +90,6 @@ const PdfDownload = () => {
   let pdfData = {
     blocks: reportData
   };
-  console.log(pdfData.blocks)
 
 
   const generateAndDownloadPdf = async () => {
