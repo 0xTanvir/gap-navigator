@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { ProfileNav } from "@/components/nav/profile-nav";
 import { SiteFooter } from "@/components/site-footer";
 import SettingsShell from "@/components/settings/settings-shell";
+import NotificationNav from "@/components/nav/notification-nav";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -25,6 +26,7 @@ export default function SettingsLayout({children}: SettingsLayoutProps) {
           <nav className="flex gap-2">
             <ProfileNav/>
             <ModeToggle/>
+            <NotificationNav />
           </nav>
         </div>
       </header>
