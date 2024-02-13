@@ -37,7 +37,8 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
       participantPhone: '',
       isCompleted: false,
       createdAt: Timestamp.now(),
-      choices: []
+      choices: [],
+      nextQuestionId: ""
     },
     evaluateFormData: {
       uid: '',
@@ -47,7 +48,8 @@ export const EvaluationProvider: React.FC<EvaluationProviderProps> = ({children,
       participantPhone: '',
       isCompleted: false,
       createdAt: Timestamp.now(),
-      choices: []
+      choices: [],
+      nextQuestionId: ""
     },
     evaluations: [],
   };

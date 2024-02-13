@@ -25,6 +25,7 @@ import Link from "next/link";
 import { AccountType } from "@/config/site";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect } from "react";
+import { Timestamp } from "firebase/firestore";
 
 interface UserAuthSignupProps extends React.HTMLAttributes<HTMLDivElement> {
 }
@@ -81,6 +82,7 @@ export function UserAuthSignup({className, ...props}: UserAuthSignupProps) {
           image: result.user.photoURL!,
           audits: [],
           invitedAuditsList: [],
+          createdAt:Timestamp.now(),
         };
         try {
           await setUser(result.user.uid, user);

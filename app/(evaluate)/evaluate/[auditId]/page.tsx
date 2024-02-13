@@ -88,6 +88,7 @@ export default function EvaluatePage({
       auditName: audit?.name,
       isCompleted: false,
       choices: [],
+      nextQuestionId: "",
       createdAt: Timestamp.now(),
     };
 
@@ -103,11 +104,20 @@ export default function EvaluatePage({
       });
       form.reset();
       setShowDialog(false);
-      if (evaluation.questions.length > 0) {
+      if (emailExists.nextQuestionId) {
+        router.push(`/evaluate/${auditId}/${emailExists.nextQuestionId}`);
+      } else if (evaluation.questions.length > 0) {
         router.push(`/evaluate/${auditId}/${evaluation.questions[0]?.uid}`);
       }
       toast.info("This email evaluation already created.");
     } else {
+      toast.info("Evaluation start.");
+      if (evaluation.questions.length > 0) {
+        evaluate.nextQuestionId = evaluation.questions[0]?.uid
+        router.push(
+          `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
+        );
+      }
       dispatch({
         type: EvaluationActionType.ADD_EVALUATE,
         payload: evaluate,
@@ -116,12 +126,54 @@ export default function EvaluatePage({
       form.reset();
       setIsLoading(false)
       setShowDialog(false);
-      toast.info("Evaluation start.");
+    }
+  }
+
+  const startEvaluation = async () => {
+    const emailExists = evaluation.evaluations.find(
+      (item) => item.uid === user?.email
+    );
+    if (emailExists) {
+      dispatch({
+        type: EvaluationActionType.ADD_EVALUATE,
+        payload: emailExists,
+      });
+
+      if (emailExists.nextQuestionId) {
+        router.push(`/evaluate/${auditId}/${emailExists.nextQuestionId}`);
+      } else if (evaluation.questions.length > 0) {
+        router.push(`/evaluate/${auditId}/${evaluation.questions[0]?.uid}`);
+      }
+      toast.info("This email evaluation already created.");
+      setIsLoading(false)
+    } else if (user?.role === "client" && audit?.name) {
+      let clientEvaluate = {
+        uid: user?.email,
+        participantFirstName: user?.firstName,
+        participantLastName: user?.lastName,
+        participantEmail: user?.email,
+        participantPhone: "",
+        auditId: auditId,
+        auditName: audit?.name,
+        isCompleted: false,
+        choices: [],
+        nextQuestionId: "",
+        createdAt: Timestamp.now(),
+      };
+
       if (evaluation.questions.length > 0) {
+        clientEvaluate.nextQuestionId = evaluation.questions[0]?.uid
         router.push(
           `/evaluate/${params.auditId}/${evaluation.questions[0]?.uid}`
         );
       }
+      dispatch({
+        type: EvaluationActionType.ADD_EVALUATE,
+        payload: clientEvaluate,
+      });
+      toast.info("Evaluation start.");
+      setIsLoading(false)
+      await setEvaluation(auditId, clientEvaluate);
     }
   }
 
@@ -158,13 +210,28 @@ export default function EvaluatePage({
       {
         evaluation.welcome !== "" &&
           <div className="w-full text-end mb-2">
-              <Button
+            {
+              user?.role === "client" ?
+                <Button
+                  size="xl"
+                  className="mt-8 text-sm font-semibold rounded-full"
+                  onClick={() => {
+                    startEvaluation()
+                    setIsLoading(true)
+                  }}
+                >
+                  {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
+                  Start Evaluation
+                </Button>
+                :
+                <Button
                   size="lg"
                   className="text-sm font-semibold rounded-full"
                   onClick={() => setShowDialog(true)}
-              >
+                >
                   Lets Get Started
-              </Button>
+                </Button>
+            }
           </div>
       }
       {
@@ -186,13 +253,29 @@ export default function EvaluatePage({
               {evaluation.questions.length >= 2 ? " Questions" : " Question"}
             </EmptyPlaceholder.Title>
 
-            <Button
-              size="xl"
-              className="mt-8 text-sm font-semibold rounded-full"
-              onClick={() => setShowDialog(true)}
-            >
-              Lets Get Started
-            </Button>
+            {
+              user?.role === "client" ?
+                <Button
+                  size="xl"
+                  className="mt-8 text-sm font-semibold rounded-full"
+                  onClick={() => {
+                    startEvaluation()
+                    setIsLoading(true)
+                  }}
+                >
+                  {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>}
+                  Start Evaluation
+                </Button>
+                :
+                <Button
+                  size="xl"
+                  className="mt-8 text-sm font-semibold rounded-full"
+                  onClick={() => setShowDialog(true)}
+                >
+                  Lets Get Started
+                </Button>
+            }
+
           </EmptyPlaceholder>
       }
 

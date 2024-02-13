@@ -19,6 +19,7 @@ export interface User {
   audits: string[],
   invitedAuditsList: string[],
   status?: string
+  createdAt: Timestamp
 }
 
 export enum UserRole {
@@ -140,11 +141,16 @@ export enum EvaluationActionType {
   REMOVE_QUESTION_ANSWER = "REMOVE_QUESTION_ANSWER",
 }
 
+export interface Complex {
+  nextQuestionId?: string
+  choices: Choice
+}
+
 export type EvaluationAction =
   | { type: EvaluationActionType.ADD_EVALUATION; payload: Evaluation }
   | { type: EvaluationActionType.ADD_EVALUATE; payload: Evaluate }
   | { type: EvaluationActionType.UPDATE_EVALUATE; payload: Evaluate }
-  | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Choice }
+  | { type: EvaluationActionType.ADD_QUESTION_ANSWER; payload: Complex }
   | { type: EvaluationActionType.REMOVE_QUESTION_ANSWER; payload: string }
 
 export interface Evaluate {
@@ -159,6 +165,7 @@ export interface Evaluate {
   auditId?: string
   isCompleted: boolean
   count?: number;
+  nextQuestionId?: string
 }
 
 export interface AuditEvaluations {
@@ -172,6 +179,8 @@ export interface AuditEvaluations {
   status?: string,
   authorId: string
   auditCreatedAt: Timestamp
+
+  questions?: Question[]
 
   uid: string;
   participantFirstName: string;

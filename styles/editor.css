@@ -27,6 +27,17 @@
     box-shadow: none;
 }
 
+.dark .ce-popover__item-title,
+.dark .ce-popover-item__title {
+    color: theme('colors.accent.foreground');
+    box-shadow: none;
+}
+
+.dark .ce-popover__item:hover,
+.dark .ce-popover-item:hover {
+    background-color: theme('colors.accent.DEFAULT');
+}
+
 .dark .cdx-search-field {
     border-color: theme('colors.border');
     background: theme('colors.input');
@@ -48,7 +59,7 @@
 .dark .ce-conversion-tool:hover,
 .dark .ce-toolbar__settings-btn:hover {
     background-color: theme('colors.accent.DEFAULT');
-    color: theme('colors.accent.foreground');;
+    color: theme('colors.accent.foreground');
 }
 
 .dark .cdx-notify--error {

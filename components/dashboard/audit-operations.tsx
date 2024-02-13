@@ -701,7 +701,7 @@ export function AuditOperations({
       </AlertDialog>
 
       <Sheet open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
-        <SheetContent className="sm:max-w-[75vw] overflow-y-auto">
+        <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Update audit</SheetTitle>
             <SheetDescription>
@@ -777,10 +777,14 @@ export function AuditOperations({
                               </div>
                               <div className="ml-3 text-sm leading-6">
                                 <label htmlFor="condition" className="font-medium">
-                                  Condition
+                                  Mark it as a conditional audit.
                                 </label>
                               </div>
                             </div>
+                            <FormDescription>
+                              Conditional audit can have different sequence of question based on answer choice,
+                              where non conditional audit is linear sequence.
+                            </FormDescription>
                           </FormItem>
                         )}
                       />
@@ -912,7 +916,6 @@ export function AuditOperations({
             <form onSubmit={inviteForm.handleSubmit(onInviteSubmit)}>
               <DialogHeader>
                 <DialogTitle>Audit invite</DialogTitle>
-                <DialogDescription>lorem ipsum</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
@@ -962,7 +965,6 @@ export function AuditOperations({
             <form onSubmit={shareForm.handleSubmit(onShareSubmit)}>
               <DialogHeader>
                 <DialogTitle>Share audit</DialogTitle>
-                <DialogDescription>lorem ipsum</DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">

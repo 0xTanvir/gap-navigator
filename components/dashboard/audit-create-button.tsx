@@ -158,7 +158,7 @@ export function AuditCreateButton({
       const audit: Audit = {
         name: auditFormData?.auditName as string,
         type: auditFormData?.auditType as string,
-        condition:auditFormData?.condition as boolean,
+        condition: auditFormData?.condition as boolean,
         welcome: auditFormData?.welcome as string,
         thank_you: data?.thank_you as string,
         uid: uuidv4(),
@@ -275,10 +275,14 @@ export function AuditCreateButton({
                               </div>
                               <div className="ml-3 text-sm leading-6">
                                 <label htmlFor="condition" className="font-medium">
-                                  Condition
+                                  Mark it as a conditional audit.
                                 </label>
                               </div>
                             </div>
+                            <FormDescription>
+                              Conditional audit can have different sequence of question based on answer choice,
+                              where non conditional audit is linear sequence.
+                            </FormDescription>
                           </FormItem>
                         )}
                       />

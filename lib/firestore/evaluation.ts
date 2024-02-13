@@ -1,4 +1,4 @@
-import { Audit, AuditEvaluations, Choice, Evaluate } from "@/types/dto";
+import { Audit, AuditEvaluations, Choice, Evaluate, Question } from "@/types/dto";
 import { Collections } from "@/lib/firestore/client";
 import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getAudit } from "@/lib/firestore/audit";
@@ -34,11 +34,13 @@ export async function updateEvaluation(auditId: string, evaluation: any) {
 export async function updateEvaluationById(
   auditId: string,
   evaluationId: string,
-  newChoices: Choice[]
+  newChoices: Choice[],
+  nextQuestionId?: string
 ) {
   const evaluationRef = Collections.evaluation(auditId, evaluationId);
   try {
     await updateDoc(evaluationRef, {
+      nextQuestionId: nextQuestionId,
       choices: newChoices
     });
   } catch (error: any) {
@@ -123,6 +125,7 @@ export async function getAllEvaluations(auditId: string) {
           isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
+          nextQuestionId: data.nextQuestionId
         } as Evaluate
       });
     } else {
@@ -155,6 +158,7 @@ export async function getEvaluationByIds(auditIds: string[], evaluationID: strin
         isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
+        nextQuestionId: data.nextQuestionId
       };
       evaluations.push(evaluation);
     }
@@ -183,6 +187,7 @@ export async function getAllEvaluationWithAuditName(auditId: string) {
           isCompleted: data.isCompleted,
           createdAt: data.createdAt,
           choices: data.choices,
+          nextQuestionId: data.nextQuestionId
         } as Evaluate
       });
     } else {
@@ -216,6 +221,7 @@ export async function getEvaluationWithUseInfoAndEvaluations(auditIds: string[],
         isCompleted: data.isCompleted,
         createdAt: data.createdAt,
         choices: data.choices,
+        nextQuestionId: data.nextQuestionId
       };
       userInfo = {
         participantFirstName: data.participantFirstName,
@@ -241,9 +247,22 @@ export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID:
       const auditData = auditSnap.data() as Audit;
 
       const evaluationsRef = Collections.evaluation(auditData.uid, evaluationID);
+      const questionsRef = Collections.questions(auditId);
+      const snap = await getDocs(questionsRef)
       const evalDocSnapshot = await getDoc(evaluationsRef);
       if (evalDocSnapshot.exists()) {
         const evalData = evalDocSnapshot.data();
+        const questionData = snap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: data.id,
+            uid: doc.id,
+            name: data.name,
+            answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
+            createdAt: data.createdAt,
+          } as Question;
+        });
+
         const auditEvaluation: AuditEvaluations = {
 
           auditUid: auditData.uid,
@@ -256,7 +275,7 @@ export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID:
           status: auditData.status,
           authorId: auditData.authorId,
           auditCreatedAt: auditData.createdAt,
-
+          questions: questionData,
           uid: evalData.uid,
           participantFirstName: evalData.participantFirstName,
           participantLastName: evalData.participantLastName,

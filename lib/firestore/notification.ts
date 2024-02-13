@@ -51,7 +51,7 @@ export async function setNotificationData(userId: string, notificationData: Noti
 
 export async function updateNotificationById(userId: string, notification: Notification) {
     try {
-        const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.auditId}`);
+        const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.uid}`);
 
         // Update the notification with the provided data
         await update(notificationRef, {isSeen: true});

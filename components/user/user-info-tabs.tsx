@@ -44,7 +44,10 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
             onClick={(e) => {
               setActiveTab("profile")
             }}
-            style={activeTab === "profile" ? {background: "hsl(210 40% 96.1%)",color:"#000"} : {background: "transparent"}}
+            style={activeTab === "profile" ? {
+              background: "hsl(210 40% 96.1%)",
+              color: "#000"
+            } : {background: "transparent"}}
             className="w-full justify-start"
             value="profile"
           >
@@ -55,7 +58,10 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
               setActiveTab("evaluation")
             }}
             className="w-full justify-start"
-            style={activeTab === "evaluation" ? {background: "hsl(210 40% 96.1%)",color:"#000"} : {background: "transparent"}}
+            style={activeTab === "evaluation" ? {
+              background: "hsl(210 40% 96.1%)",
+              color: "#000"
+            } : {background: "transparent"}}
             value="evaluation"
           >
             Evaluation
@@ -71,7 +77,7 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoading && userInfo === null ?
-                <ProfileInfo.Skeleton />
+                <ProfileInfo.Skeleton/>
                 :
                 <ProfileInfo userId={userId} userInfo={userInfo}/>}
             </CardContent>
@@ -81,35 +87,39 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
           <Card>
             <CardHeader>
               <CardTitle>All Evaluations</CardTitle>
-              <CardDescription>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestiae, perspiciatis?
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="divide-y divide-border rounded-md border mt-3">
-                {
-                  isLoading ?
-                    <>
-                      <AuditItem.Skeleton />
-                      <AuditItem.Skeleton />
-                      <AuditItem.Skeleton />
-                    </> :
+              {
+                evaluations.length > 0 ?
+                  <div className="divide-y divide-border rounded-md border mt-3">
+                    {
+                      isLoading ?
+                        <>
+                          <AuditItem.Skeleton/>
+                          <AuditItem.Skeleton/>
+                          <AuditItem.Skeleton/>
+                        </> :
 
-                  evaluations.map(evaluation => (
-                    <div key={evaluation.uid} className="flex items-center justify-between p-4">
-                      <div className="grid gap-1">
-                        <div className="flex gap-2">
-                          <div className="font-semibold">
-                            <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
-                              {evaluation.auditName}
-                            </Link>
+                        evaluations.map(evaluation => (
+                          <div key={evaluation.uid} className="flex items-center justify-between p-4">
+                            <div className="grid gap-1">
+                              <div className="flex gap-2">
+                                <div className="font-semibold">
+                                  <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
+                                    {evaluation.auditName}
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                }
-              </div>
+                        ))
+                    }
+                  </div>
+                  :
+                  <div className="divide-y divide-border rounded-md border">
+                    <div className="text-center font-semibold py-10">No Data Found</div>
+                  </div>
+              }
             </CardContent>
           </Card>
         </TabsContent>

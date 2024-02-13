@@ -30,17 +30,17 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
   const [clientsUniqueEvaluation, setClientsUniqueEvaluation] = useState<
     Evaluate[] | []
   >([]);
-  const [auditsGroupByMonth, setAuditsGroupByMonth] = useState<GroupedAudits[]>(
+  const [auditsGroupByMonths, setAuditsGroupByMonths] = useState<GroupedAudits[]>(
     []
   );
   const [evaluations, setEvaluations] = useState<Evaluate[] | []>([])
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  function countAuditsByMonth(audits: Audit[]): GroupedAudits[] {
+  function countAuditsByMonths(audits: Audit[]): GroupedAudits[] {
     const groupedDates: { [key: string]: Date[] } = audits.reduce((acc: { [key: string]: Date[] }, audit) => {
-      const createdAt = new Date(audit.createdAt.seconds * 1000); // Convert seconds to milliseconds
-      const yearMonth = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
+      const createdAt = new Date(audit.createdAt.seconds * 1000);
+      const yearMonth = `${createdAt.toLocaleString('default', {month: 'short'})} ${createdAt.getFullYear()}`;
       if (!acc[yearMonth]) {
         acc[yearMonth] = [];
       }
@@ -48,16 +48,30 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
       return acc;
     }, {});
 
-    const groupedAudits: GroupedAudits[] = Object.keys(groupedDates).map((yearMonth) => {
-      const monthName = groupedDates[yearMonth][0].toLocaleString('default', {month: 'short'});
-      const total = groupedDates[yearMonth].length;
-      return {
-        name: `${monthName}`,
-        total: total,
-      };
-    });
+    const comparator = (a: GroupedAudits, b: GroupedAudits) => {
+      const aDate = new Date(a.name);
+      const bDate = new Date(b.name);
+      return aDate.getTime() - bDate.getTime();
+    };
 
-    return groupedAudits.slice(-12);
+    const groupedAudits: GroupedAudits[] = Object.keys(groupedDates)
+      .map((yearMonth) => {
+        const total = groupedDates[yearMonth].length;
+        // console.log(yearMonth.split(" ")[0] + " " + yearMonth.split(" ")[1].slice(-2))
+        return {
+          name: `${yearMonth}`,
+          total: total,
+        };
+      })
+      .sort(comparator);
+
+    let result = groupedAudits.map(audit => {
+      return {
+        name: audit.name.split(" ")[0] + " " + audit.name.split(" ")[1].slice(-2),
+        total: audit.total
+      }
+    })
+    return result.slice(-12);
   }
 
   async function fetchAuditsCount() {
@@ -65,8 +79,8 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
       const dbAudits = await getAuditsByIds(userAuditsId);
 
       if (dbAudits) {
-        const groupedAudits: GroupedAudits[] = countAuditsByMonth(dbAudits);
-        setAuditsGroupByMonth(groupedAudits);
+        const groupedAudits: GroupedAudits[] = countAuditsByMonths(dbAudits);
+        setAuditsGroupByMonths(groupedAudits);
       }
 
       const publicAuditsCount = dbAudits?.filter(
@@ -199,7 +213,7 @@ const ConsultantDashboard = ({userAuditsId}: ConsultantDashboardProps) => {
               <CardTitle>Audits Per Months</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              <DashboardOverviewChart auditsGroupByMonth={auditsGroupByMonth}/>
+              <DashboardOverviewChart auditsGroupByMonth={auditsGroupByMonths}/>
             </CardContent>
           </Card>
 
