@@ -334,6 +334,7 @@ export default function EvaluateQuestionPage({
       <div className="py-6 lg:py-10">
         <DocsPageHeader
           heading={question?.name ?? "Question not found"}
+          id={String(question?.id)}
           text="Please choose from the following answers:"
         />
         {question?.answers?.length ? (
@@ -471,6 +472,7 @@ export default function EvaluateQuestionPage({
     <div className="py-6 lg:py-10">
       <DocsPageHeader
         heading={question?.name ?? "Question not found"}
+        id={String(question?.id)}
         text="Please choose from the following answers:"
       />
       {question?.answers?.length ? (
