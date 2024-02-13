@@ -180,6 +180,8 @@ export interface AuditEvaluations {
   authorId: string
   auditCreatedAt: Timestamp
 
+  questions?: Question[]
+
   uid: string;
   participantFirstName: string;
   participantLastName: string;

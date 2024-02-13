@@ -1,4 +1,4 @@
-import { Audit, AuditEvaluations, Choice, Evaluate } from "@/types/dto";
+import { Audit, AuditEvaluations, Choice, Evaluate, Question } from "@/types/dto";
 import { Collections } from "@/lib/firestore/client";
 import { arrayUnion, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getAudit } from "@/lib/firestore/audit";
@@ -247,9 +247,22 @@ export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID:
       const auditData = auditSnap.data() as Audit;
 
       const evaluationsRef = Collections.evaluation(auditData.uid, evaluationID);
+      const questionsRef = Collections.questions(auditId);
+      const snap = await getDocs(questionsRef)
       const evalDocSnapshot = await getDoc(evaluationsRef);
       if (evalDocSnapshot.exists()) {
         const evalData = evalDocSnapshot.data();
+        const questionData = snap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: data.id,
+            uid: doc.id,
+            name: data.name,
+            answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
+            createdAt: data.createdAt,
+          } as Question;
+        });
+
         const auditEvaluation: AuditEvaluations = {
 
           auditUid: auditData.uid,
@@ -262,7 +275,7 @@ export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID:
           status: auditData.status,
           authorId: auditData.authorId,
           auditCreatedAt: auditData.createdAt,
-
+          questions: questionData,
           uid: evalData.uid,
           participantFirstName: evalData.participantFirstName,
           participantLastName: evalData.participantLastName,
