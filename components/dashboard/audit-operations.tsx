@@ -777,10 +777,14 @@ export function AuditOperations({
                               </div>
                               <div className="ml-3 text-sm leading-6">
                                 <label htmlFor="condition" className="font-medium">
-                                  Condition
+                                  Mark it as a conditional audit.
                                 </label>
                               </div>
                             </div>
+                            <FormDescription>
+                              Conditional audit can have different sequence of question based on answer choice,
+                              where non conditional audit is linear sequence.
+                            </FormDescription>
                           </FormItem>
                         )}
                       />
