@@ -1,7 +1,11 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Icons } from "@/components/icons";
-import { getNotificationById, updateNotificationsAlertById } from "@/lib/firestore/notification";
+import {
+  getNotificationById,
+  updateNotificationById,
+  updateNotificationsAlertById
+} from "@/lib/firestore/notification";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/auth-provider";
 import { getDatabase, onValue, ref } from "firebase/database";
@@ -47,6 +51,14 @@ const NotificationNav = () => {
       });
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function updateNotification(notification: Notification) {
+    try {
+      await updateNotificationById(notification.inviteUserId, notification)
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -110,7 +122,10 @@ const NotificationNav = () => {
                       }
                       <div className="space-y-1">
                         <p
-                          onClick={() => router.push(`/evaluate/${notification.auditId}`)}
+                          onClick={() => {
+                            updateNotification(notification)
+                            router.push(`/evaluate/${notification.auditId}`)
+                          }}
                           className="text-sm font-medium leading-none cursor-pointer hover:underline"
                         >
                           {notification.auditName}

@@ -17,7 +17,7 @@ export function formatDate(input: Timestamp): string {
 }
 
 export function dateFormat(timestampObject: any): string {
-    const firestoreTimestamp = new Timestamp(timestampObject.seconds, timestampObject.nanoseconds);
+    const firestoreTimestamp = new Timestamp(timestampObject?.seconds, timestampObject?.nanoseconds);
 
     const dateObject = firestoreTimestamp.toDate();
     return dateObject.toLocaleDateString("en-US", {
