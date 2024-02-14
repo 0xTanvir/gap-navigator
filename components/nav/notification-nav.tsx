@@ -11,7 +11,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Notification } from "@/types/dto";
 import { dateFormat } from "@/lib/utils";
@@ -149,11 +149,11 @@ const NotificationNav = () => {
           <CardFooter>
             {
               notifications.length > 0 &&
-                <Button className="w-full">
-                    <Link href="/notification">
+                <Link href="/notification" className="w-full">
+                    <Button className="w-full">
                         View All
-                    </Link>
-                </Button>
+                    </Button>
+                </Link>
             }
           </CardFooter>
         </Card>

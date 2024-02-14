@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { AuditEvaluations } from "@/types/dto";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -30,6 +30,7 @@ const ClientAudits = () => {
   const [currentAudits, setCurrentAudits] = useState<AuditEvaluations[] | []>([]);
   const [currentSliceAudits, setCurrentSliceAudits] = useState<AuditEvaluations[] | []>([]);
   const [filterData, setFilterData] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const {user} = useAuth();
   const router = useRouter()
@@ -46,12 +47,18 @@ const ClientAudits = () => {
   function onSubmit(data: FormData) {
     setFilterData(true)
     if (data.auditName) {
-      let filterData = audits.filter(audit => audit.name === data.auditName);
+      let filterData = audits.filter(audit => audit.name.toLowerCase().includes(data?.auditName?.toLowerCase() as string));
       setCurrentAudits(filterData)
       setCurrentPage(1)
     }
   }
 
+  useEffect(() => {
+    if (inputRef?.current?.value === "") {
+      setCurrentAudits(audits)
+      setFilterData(false)
+    }
+  }, [inputRef?.current?.value === ""]);
 
   const indexOfLastAudit = currentPage * pageSize
   const indexOfFirstAudit = indexOfLastAudit - pageSize
@@ -127,6 +134,7 @@ const ClientAudits = () => {
                       <Input
                         placeholder="Audit Name"
                         {...field}
+                        ref={inputRef}
                       />
                     </FormControl>
                     <FormMessage/>
