@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Timestamp } from "firebase/firestore";
 import Output from "editorjs-react-renderer";
-import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/editorjs-utils";
+import { CodeBlockRenderer, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
 import { setEvaluation } from "@/lib/firestore/evaluation";
 import { getAudit } from "@/lib/firestore/audit";
@@ -63,7 +63,6 @@ export default function EvaluatePage({
 
   const renderers = {
     code: CodeBlockRenderer,
-    image: ImageBlock
   };
 
   const form = useForm<FormData>({

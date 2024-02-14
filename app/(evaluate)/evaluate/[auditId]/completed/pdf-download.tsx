@@ -11,7 +11,7 @@ import htmlToPdfmake from "html-to-pdfmake"
 import edjsParser from "editorjs-parser";
 import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 import Output from "editorjs-react-renderer";
-import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/editorjs-utils";
+import { CodeBlockRenderer, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -29,7 +29,6 @@ const PdfDownload = () => {
 
   const renderers = {
     code: CodeBlockRenderer,
-    image: ImageBlock
   };
 
   function evaluateFormat() {

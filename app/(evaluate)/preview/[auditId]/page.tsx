@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import usePreview from "../../preview-context"
 import { Skeleton } from "@/components/ui/skeleton";
 import Output from "editorjs-react-renderer";
-import { CodeBlockRenderer, ImageBlock, style } from "@/components/editorjs/editorjs-utils";
+import { CodeBlockRenderer, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
 import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
@@ -26,8 +26,7 @@ export default function PreviewsPage({params}: { params: { auditId: string } }) 
   };
 
   const renderers = {
-    code: CodeBlockRenderer,
-    image: ImageBlock
+    code: CodeBlockRenderer
   };
 
   useEffect(() => {
@@ -53,7 +52,11 @@ export default function PreviewsPage({params}: { params: { auditId: string } }) 
                           href={`/preview/${params.auditId}/${preview.questions[0]?.uid}`}>
                       Lets Get Started
                     </Link>) :
-                  (<Link className="flex-none" href={`/audit/${params.auditId}`}>Lets Create Question</Link>)
+                  (
+                    <Link className="flex-none" href={`/preview/${params.auditId}/completed`}>
+                      Lets Create Question
+                    </Link>
+                  )
                 }
               </Button>
           </div>

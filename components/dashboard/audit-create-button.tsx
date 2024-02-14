@@ -160,7 +160,7 @@ export function AuditCreateButton({
         type: auditFormData?.auditType as string,
         condition: auditFormData?.condition as boolean,
         welcome: auditFormData?.welcome === undefined ? "" : auditFormData?.welcome as string,
-        thank_you: auditFormData?.thank_you === undefined ? "" : data?.thank_you as string,
+        thank_you: data?.thank_you === undefined ? "" : data?.thank_you as string,
         uid: uuidv4(),
         authorId: userId,
         createdAt: Timestamp.now(),
