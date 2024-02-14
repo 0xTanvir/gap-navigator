@@ -159,21 +159,21 @@ export function AuditCreateButton({
         name: auditFormData?.auditName as string,
         type: auditFormData?.auditType as string,
         condition: auditFormData?.condition as boolean,
-        welcome: auditFormData?.welcome as string,
-        thank_you: data?.thank_you as string,
+        welcome: auditFormData?.welcome === undefined ? "" : auditFormData?.welcome as string,
+        thank_you: auditFormData?.thank_you === undefined ? "" : data?.thank_you as string,
         uid: uuidv4(),
         authorId: userId,
         createdAt: Timestamp.now(),
       };
 
-      const auditId = await setAudit(userId, audit);
+      await setAudit(userId, audit);
       dispatch({type: AuditActionType.ADD_AUDIT, payload: audit});
       user?.audits.push(audit.uid);
       updateUser(user);
       router.push(`/audit/${audit.uid}`);
 
       return toast.success("Audit created.", {
-        description: `Your audit was created with id ${auditId}.`,
+        description: `Your audit was created with id ${audit.uid}.`,
       });
     } catch (error) {
       // Handle the error, which could come from the setAudit
