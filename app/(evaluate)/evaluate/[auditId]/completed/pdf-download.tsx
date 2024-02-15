@@ -308,7 +308,7 @@ function generatePdfDefinition(data: DataItem[]) {
       case 'image':
         content.push(
           {
-            image: item.data.url,
+            image: item.data.file.url.split(";")[0],
             width: 500,
             margin: [0, 6]
           }
