@@ -36,6 +36,7 @@ export type SettingsConfig = {
 
 export type SidebarNavItem = {
     title: string
+    id?: string
     disabled?: boolean
     external?: boolean
     icon?: keyof typeof Icons
