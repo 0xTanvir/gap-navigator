@@ -5,7 +5,7 @@ import React from "react";
 interface DocsPageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   heading: string
   text?: string
-  id: string
+  id?: string
 }
 
 export function DocsPageHeader({
