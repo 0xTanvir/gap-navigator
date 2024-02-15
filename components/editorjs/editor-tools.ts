@@ -17,107 +17,116 @@ import ChangeCase from 'editorjs-change-case';
 import InlineCode from '@editorjs/inline-code';
 import Warning from '@editorjs/warning';
 import "@/styles/editor.css"
+import { getDownloadURL, getStorage, ref, uploadBytes } from "@firebase/storage";
+import { Timestamp } from "firebase/firestore";
 
 export const EditorTools = {
-    code: Code,
-    header: {
-        class: Header,
-        inlineToolbar: true,
-    },
-    paragraph: {
-        class: Paragraph,
-        inlineToolbar: true
-    },
-    checklist: {
-        class: CheckList,
-        inlineToolbar: true
-    },
-    embed: {
-        class: Embed,
-        inlineToolbar: false,
-        config: {
-            services: {
-                youtube: true,
-                facebook: true,
-                twitter: true,
-                instagram: true,
-            }
-        }
-    },
-    image: {
-        class: SimpleImage,
-        inlineToolbar: false
-    },
-    // image: {
-    //     class: Image,
-    //     config: {
-    //         uploader: {
-    //             async uploadByFile(file: any) {
-    //                 const formData = new FormData()
-    //                 formData.append('file', file)
-    //                 const response = await fetch('/api/create', {
-    //                         method: 'POST',
-    //                         headers: {
-    //                             // 'Accept': 'application.json',
-    //                             'Content-Type': 'multipart/form-data',
-    //                         },
-    //                         body: JSON.stringify(formData),
-    //                         credentials: "same-origin"
-    //                     }
-    //                 )
-    //                 const res = await response.json()
-    //                 if (res.data.success === 1) {
-    //                     return res.data
-    //                 }
-    //             },
-    //             async uploadByUrl(url: string) {
-    //                 const response = await fetch('', {
-    //                     method: 'POST',
-    //                     headers: {
-    //                         'Accept': 'application.json',
-    //                     },
-    //                     body: JSON.stringify(url),
-    //                     credentials: "same-origin"
-    //                 })
-    //                 const res = await response.json()
-    //                 if (res.data.success === 1) {
-    //                     return res.data
-    //                 }
-    //             }
-    //         }
-    //     }
-    // },
-    // simpleImage: {
-    //     class:SimpleImage,
-    //     inlineToolbar:false
-    // },
-    link: {
-        class: LinkAutocomplete,
-    },
-    list: {
-        class: List,
-        inlineToolbar: true
-    },
-    quote: Quote,
-    delimiter: Delimiter,
-    table: Table,
-    marker: {
-        class: Marker,
-        inlineToolbar: true
-    },
-    underline: {
-        class: Underline,
-        inlineToolbar: true
-    },
-    warning: {
-        class: Warning,
-        inlineToolbar: true,
-        config: {
-            titlePlaceholder: 'Title',
-            messagePlaceholder: 'Message',
+  code: Code,
+  header: {
+    class: Header,
+    inlineToolbar: true,
+  },
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true
+  },
+  checklist: {
+    class: CheckList,
+    inlineToolbar: true
+  },
+  embed: {
+    class: Embed,
+    inlineToolbar: false,
+    config: {
+      services: {
+        youtube: true,
+        facebook: true,
+        twitter: true,
+        instagram: true,
+      }
+    }
+  },
+  image: {
+    class: Image,
+    config: {
+      uploader: {
+        async uploadByFile(file: any) {
+          try {
+            const storage = getStorage();
+            const storageRef = ref(storage, `editorjs/images/${Timestamp.now()}_${file.name}`); // Customize your path
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            // Assuming the success structure for Editor.js needs a URL and success status
+            return {success: 1, file: {url: downloadURL}};
+          } catch (error) {
+            console.error("Upload failed", error);
+            // Handle upload error
+            return {success: 0};
+          }
         },
+        // async uploadByFile(file: any) {
+        //   const formData = new FormData()
+        //   formData.append('file', file)
+        //   const response = await fetch('/api/create', {
+        //       method: 'POST',
+        //       headers: {
+        //         // 'Accept': 'application.json',
+        //         'Content-Type': 'multipart/form-data',
+        //       },
+        //       body: JSON.stringify(formData),
+        //       credentials: "same-origin"
+        //     }
+        //   )
+        //   const res = await response.json()
+        //   if (res.data.success === 1) {
+        //     return res.data
+        //   }
+        // },
+        // async uploadByUrl(url: string) {
+        //   const response = await fetch('', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Accept': 'application.json',
+        //     },
+        //     body: JSON.stringify(url),
+        //     credentials: "same-origin"
+        //   })
+        //   const res = await response.json()
+        //   if (res.data.success === 1) {
+        //     return res.data
+        //   }
+        // }
+      }
     },
-    strikethrough: Strikethrough,
-    changeCase: ChangeCase,
-    inlineCode: InlineCode
+    inlineToolbar: true
+  },
+  link: {
+    class: LinkAutocomplete,
+  },
+  list: {
+    class: List,
+    inlineToolbar: true
+  },
+  quote: Quote,
+  delimiter: Delimiter,
+  table: Table,
+  marker: {
+    class: Marker,
+    inlineToolbar: true
+  },
+  underline: {
+    class: Underline,
+    inlineToolbar: true
+  },
+  warning: {
+    class: Warning,
+    inlineToolbar: true,
+    config: {
+      titlePlaceholder: 'Title',
+      messagePlaceholder: 'Message',
+    },
+  },
+  strikethrough: Strikethrough,
+  changeCase: ChangeCase,
+  inlineCode: InlineCode
 }

@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import usePreview from "@/app/(evaluate)/preview-context";
 import {DocsPageHeader} from "@/app/(evaluate)/preview/page-header";
 import Output from "editorjs-react-renderer";
-import {CodeBlockRenderer, ImageBlock, style} from "@/components/editorjs/editorjs-utils";
+import {CodeBlockRenderer, style} from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -19,8 +19,7 @@ const PreviewPdfDownload = () => {
         version: "2.0.0"
     };
     const renderers = {
-        code: CodeBlockRenderer,
-        image: ImageBlock
+        code: CodeBlockRenderer
     };
     return (
         <>

@@ -1,13 +1,17 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Icons } from "@/components/icons";
-import { getNotificationById, updateNotificationsAlertById } from "@/lib/firestore/notification";
+import {
+  getNotificationById,
+  updateNotificationById,
+  updateNotificationsAlertById
+} from "@/lib/firestore/notification";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/auth-provider";
 import { getDatabase, onValue, ref } from "firebase/database";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Notification } from "@/types/dto";
 import { dateFormat } from "@/lib/utils";
@@ -47,6 +51,14 @@ const NotificationNav = () => {
       });
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function updateNotification(notification: Notification) {
+    try {
+      await updateNotificationById(notification.inviteUserId, notification)
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -110,7 +122,10 @@ const NotificationNav = () => {
                       }
                       <div className="space-y-1">
                         <p
-                          onClick={() => router.push(`/evaluate/${notification.auditId}`)}
+                          onClick={() => {
+                            updateNotification(notification)
+                            router.push(`/evaluate/${notification.auditId}`)
+                          }}
                           className="text-sm font-medium leading-none cursor-pointer hover:underline"
                         >
                           {notification.auditName}
@@ -134,11 +149,11 @@ const NotificationNav = () => {
           <CardFooter>
             {
               notifications.length > 0 &&
-                <Button className="w-full">
-                    <Link href="/notification">
+                <Link href="/notification" className="w-full">
+                    <Button className="w-full">
                         View All
-                    </Link>
-                </Button>
+                    </Button>
+                </Link>
             }
           </CardFooter>
         </Card>

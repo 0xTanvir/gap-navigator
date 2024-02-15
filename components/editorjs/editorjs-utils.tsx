@@ -12,23 +12,6 @@ export const CodeBlockRenderer = ({data}: any) => {
         return <div>Error: Unable to render code block</div>;
     }
 };
-export const ImageBlock = ({data}: any) => {
-    const {url, withBackground, withBorder, stretched, caption} = data;
-
-    const imageStyle = {
-        maxWidth: stretched ? '100%' : 'auto',
-        height: 'auto',
-        borderRadius: withBorder ? '4px' : '0',
-        backgroundColor: withBackground ? '#f2f2f2' : 'transparent',
-    };
-
-    return (
-        <figure>
-            <img src={url} alt={caption} style={imageStyle}/>
-            {caption && <figcaption>{caption}</figcaption>}
-        </figure>
-    );
-};
 
 // All valid JSX inline styles are allowed
 export const style = {

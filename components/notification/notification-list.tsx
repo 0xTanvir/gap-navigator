@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Notification } from "@/types/dto";
 import NotificationItem from "@/components/notification/notification-item";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -31,6 +31,7 @@ const NotificationList = () => {
   const [currentNotifications, setCurrentNotifications] = useState<Notification[]>([]);
   const [currentSliceNotifications, setCurrentSliceNotifications] = useState<Notification[]>([]);
   const [filterData, setFilterData] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const {user} = useAuth()
 
@@ -44,11 +45,18 @@ const NotificationList = () => {
   function onSubmit(data: FormData) {
     setFilterData(true)
     if (data.auditName) {
-      let filterData = notifications.filter(notification => notification.auditName === data.auditName);
+      let filterData = notifications.filter(notification => notification.auditName.toLowerCase().includes(data?.auditName?.toLowerCase() as string));
       setCurrentNotifications(filterData)
       setCurrentPage(1)
     }
   }
+
+  useEffect(() => {
+    if (inputRef?.current?.value === "") {
+      setCurrentNotifications(notifications)
+      setFilterData(false)
+    }
+  }, [inputRef?.current?.value === ""]);
 
   async function fetchNotifications() {
     try {
@@ -136,15 +144,16 @@ const NotificationList = () => {
                       <Input
                         placeholder="Audit Name"
                         {...field}
+                        ref={inputRef}
                       />
                     </FormControl>
                     <FormMessage/>
                   </FormItem>
                 )}
               />
-              <Button type="submit">
-                Submit
-              </Button>
+              {/*<Button type="submit">*/}
+              {/*  Submit*/}
+              {/*</Button>*/}
               {form.getValues("auditName") &&
                   <Button
                       variant="destructive"
@@ -158,7 +167,7 @@ const NotificationList = () => {
                         setFilterData(false)
                       }}
                   >
-                      Reset
+                      <Icons.searchX/>
                   </Button>
               }
 

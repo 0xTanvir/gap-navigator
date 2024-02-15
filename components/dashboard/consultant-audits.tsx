@@ -44,7 +44,7 @@ export default function ConsultantAudits({
   useEffect(() => {
     if (searchParams) {
       if (searchParams && auditName) {
-        let filterData = audits.filter(audit => audit.name === auditName && audit.type === searchParams)
+        let filterData = audits.filter(audit => audit.name.toLowerCase().includes(auditName.toLowerCase()) && audit.type === searchParams)
         setTotalData(filterData.length)
         setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
       } else {
@@ -53,11 +53,11 @@ export default function ConsultantAudits({
         setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
       }
     } else if (auditName && auditType === "all") {
-      let filterData = audits.filter(audit => audit.name === auditName);
+      let filterData = audits.filter(audit => audit.name.toLowerCase().includes(auditName.toLowerCase()));
       setTotalData(filterData.length)
       setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
     } else if (auditName && auditType !== "all") {
-      let filterData = audits.filter(audit => audit.name === auditName && audit.type === auditType)
+      let filterData = audits.filter(audit => audit.name.toLowerCase().includes(auditName.toLowerCase()) && audit.type === auditType)
       setTotalData(filterData.length)
       setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
     } else if (auditType !== "all") {

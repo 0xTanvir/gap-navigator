@@ -31,7 +31,7 @@ export async function getAuditsByIds(userAuditsId: string[], status: string = ""
         uid: doc.id,
         name: data.name,
         type: data.type,
-        condition:data.condition,
+        condition: data.condition,
         welcome: data.welcome ? data.welcome : "",
         thank_you: data.thank_you ? data.thank_you : "",
         exclusiveList: data.exclusiveList ? data.exclusiveList : [],
@@ -57,6 +57,7 @@ export async function setAudit(userId: string, audit: Audit): Promise<void> {
       audits: arrayUnion(newAuditRef.id),
     });
   } catch (error) {
+    console.log(error)
     // If error is an instance of Error, rethrow it
     if (error instanceof Error) {
       throw error;
@@ -69,7 +70,21 @@ export async function setAudit(userId: string, audit: Audit): Promise<void> {
 export async function deleteAudit(userId: string, auditId: string) {
   const auditRef = Collections.audit(auditId);
   const userRef = Collections.userAudits(userId);
+  const questionsRef = Collections.questions(auditId);
+  const evaluationsRef = Collections.evaluations(auditId);
+  const questionsQuerySnapshot = await getDocs(questionsRef)
+  const evaluationsQuerySnapshot = await getDocs(evaluationsRef)
   try {
+    if (!questionsQuerySnapshot.empty) {
+      questionsQuerySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref);
+      })
+    }
+    if (!evaluationsQuerySnapshot.empty) {
+      evaluationsQuerySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref);
+      });
+    }
     await deleteDoc(auditRef);
     await updateDoc(userRef, {
       audits: arrayRemove(auditId),
@@ -137,7 +152,7 @@ export async function fetchAuditsWithCount(searchName?: string): Promise<{ audit
       uid: doc.id,
       name: data.name,
       type: data.type,
-      condition:data.condition,
+      condition: data.condition,
       welcome: data.welcome ? data.welcome : "",
       thank_you: data.thank_you ? data.thank_you : "",
       exclusiveList: data.exclusiveList ? data.exclusiveList : [],
@@ -195,7 +210,7 @@ export async function fetchPaginatedData(entity_object: any) {
       uid: doc.id,
       name: data.name,
       type: data.type,
-      condition:data.condition,
+      condition: data.condition,
       welcome: data.welcome ? data.welcome : "",
       thank_you: data.thank_you ? data.thank_you : "",
       exclusiveList: data.exclusiveList ? data.exclusiveList : [],
@@ -211,8 +226,8 @@ export async function getAuditsByType(userId: string, auditType: string): Promis
   try {
     const auditsRef = Collections.audits()
     let queryRef = query(auditsRef,
-        where('authorId', '==', userId),
-        where('type', '==', auditType),
+      where('authorId', '==', userId),
+      where('type', '==', auditType),
     )
     const querySnapshot = await getDocs(queryRef);
 
@@ -222,7 +237,7 @@ export async function getAuditsByType(userId: string, auditType: string): Promis
         uid: doc.id,
         name: data.name,
         type: data.type,
-        condition:data.condition,
+        condition: data.condition,
         welcome: data.welcome ? data.welcome : "",
         thank_you: data.thank_you ? data.thank_you : "",
         exclusiveList: data.exclusiveList ? data.exclusiveList : [],
