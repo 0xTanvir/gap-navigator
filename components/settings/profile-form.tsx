@@ -148,7 +148,7 @@ export function ProfileForm() {
                 <>
                   {preview ? (
                     <div
-                      className="absolute z-10 bottom-5 right-0 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                      className="absolute z-10 bottom-5 right-0 bg-popover border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
                       style={{
                         boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)",
                       }}
@@ -162,7 +162,7 @@ export function ProfileForm() {
                     </div>
                   ) : (
                     <FormItem
-                      className="absolute z-10 bottom-5 right-0 w-8 h-8 bg-white border border-transparent rounded-2xl transition-all duration-75 ease-in-out"
+                      className="absolute z-10 bottom-5 right-0 w-8 h-8 bg-popover border border-secondary rounded-2xl transition-all duration-75 ease-in-out"
                       style={{
                         boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.12)",
                       }}
