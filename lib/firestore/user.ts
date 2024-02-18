@@ -1,6 +1,17 @@
-import { getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore"
+import { getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { Collections } from './client'
 import { User } from '@/types/dto'
+import { getStorage, deleteObject, ref } from "firebase/storage";
+
+export async function deleteImageFromFirebaseBucket(downloadURL: string): Promise<void> {
+  try {
+    const storage = getStorage();
+    const fileRef = ref(storage, downloadURL);
+    await deleteObject(fileRef);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+  }
+}
 
 // TODO: instead of promise reject throw error
 // getUserById get an user by id

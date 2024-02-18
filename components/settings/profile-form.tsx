@@ -17,13 +17,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { profileFormSchema } from "@/lib/validations/profile";
 import { useAuth } from "@/components/auth/auth-provider";
-import { updateUserProfile } from "@/lib/firestore/user";
+import { deleteImageFromFirebaseBucket, updateUserProfile } from "@/lib/firestore/user";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getDownloadURL, ref, uploadBytesResumable } from "@firebase/storage";
 import { storage } from "@/firebase";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore"
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
@@ -62,6 +62,12 @@ export function ProfileForm() {
         lastName: data.lastName,
         image: fileName ? url : user?.image,
       });
+
+      if (fileName && url) {
+        if (user?.image) {
+          await deleteImageFromFirebaseBucket(user.image)
+        }
+      }
       setUser(dbUser);
       toast.success("Profile Updated.");
       setLoader(false);
