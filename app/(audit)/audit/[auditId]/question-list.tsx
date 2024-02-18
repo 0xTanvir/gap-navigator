@@ -218,7 +218,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                                                     {...provided.dragHandleProps}
                                                     {...provided.draggableProps}
                                                     ref={provided.innerRef}
-                                                    className="divide-y divide-border border"
+                                                    className="divide-y divide-border border !cursor-move"
                                                 >
                                                     <QuestionItem
                                                         question={question}
