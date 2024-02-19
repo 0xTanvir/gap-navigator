@@ -116,6 +116,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
 
   const generateAndDownloadPdf = async () => {
     setLoading(true)
+    toast.success("It will take some time.")
     try {
       if (!reportData) {
         throw new Error('Invalid evaluation data');
@@ -230,6 +231,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
         });
       }
 
+
       const docDefinition: TDocumentDefinitions = {
         header: {
           text: 'Gap Navigator', fontSize: 14, alignment: 'center', margin: [10, 10]
@@ -266,7 +268,6 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
         }
       };
       const createPdf = () => {
-        toast.success("It will take some time.")
         setLoading(false)
         const pdfGenerator = pdfMake.createPdf(docDefinition, {});
         pdfGenerator.download(`${generateRandomText(6)}.pdf`);

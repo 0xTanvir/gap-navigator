@@ -96,6 +96,7 @@ const PdfDownload = () => {
 
   const generateAndDownloadPdf = async () => {
     setIsLoading(true)
+    toast.success("It will take some time.")
     try {
       if (!evaluation || !evaluation.evaluate) {
         throw new Error('Invalid evaluation data');
@@ -251,7 +252,6 @@ const PdfDownload = () => {
         }
       };
       const createPdf = () => {
-        toast.success("It will take some time.")
         setIsLoading(false)
         const pdfGenerator = pdfMake.createPdf(docDefinition, {});
         pdfGenerator.download(`${generateRandomText(6)}.pdf`);

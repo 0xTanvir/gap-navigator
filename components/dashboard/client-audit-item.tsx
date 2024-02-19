@@ -70,8 +70,8 @@ const ClientAuditItem = ({audit}: ClientAuditItemProps) => {
             }
           </DropdownMenuItem>
 
-          {/*{*/}
-          {/*  audit.isCompleted === true &&*/}
+          {
+            audit.isCompleted === true &&
               <>
                   <DropdownMenuSeparator/>
 
@@ -83,7 +83,7 @@ const ClientAuditItem = ({audit}: ClientAuditItemProps) => {
                       Preview
                   </DropdownMenuItem>
               </>
-          {/*}*/}
+          }
 
         </DropdownMenuContent>
       </DropdownMenu>
