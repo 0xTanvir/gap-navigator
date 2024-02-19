@@ -324,4 +324,85 @@ export async function getAuditsEvaluationByIds(auditIds: string[], evaluationID:
   return auditEvaluations;
 }
 
+export async function getAuditsEvaluationById(auditId: string, evaluationID: string) {
+  let auditEvaluation: AuditEvaluations
+  const auditResult = Collections.audit(auditId);
+  const auditSnap = await getDoc(auditResult);
+  if (auditSnap.exists()) {
+    const auditData = auditSnap.data() as Audit;
+
+    const evaluationsRef = Collections.evaluation(auditData.uid, evaluationID);
+    const questionsRef = Collections.questions(auditId);
+    const snap = await getDocs(questionsRef)
+    const evalDocSnapshot = await getDoc(evaluationsRef);
+    const questionData = snap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: data.id,
+        uid: doc.id,
+        name: data.name,
+        answers: data.answers.sort((a: any, b: any) => a.createdAt.seconds - b.createdAt.seconds),
+        createdAt: data.createdAt,
+      } as Question;
+    });
+    if (evalDocSnapshot.exists()) {
+      const evalData = evalDocSnapshot.data();
+
+      auditEvaluation = {
+        auditUid: auditData.uid,
+        name: auditData.name,
+        type: auditData.type,
+        condition: auditData.condition,
+        welcome: auditData.welcome,
+        thank_you: auditData.thank_you,
+        exclusiveList: auditData.exclusiveList,
+        status: auditData.status,
+        authorId: auditData.authorId,
+        auditCreatedAt: auditData.createdAt,
+        questions: questionData,
+        uid: evalData.uid,
+        participantFirstName: evalData.participantFirstName,
+        participantLastName: evalData.participantLastName,
+        participantEmail: evalData.participantEmail,
+        participantPhone: evalData.participantPhone,
+        auditId: evalData.auditId,
+        auditName: evalData.auditName,
+        isCompleted: evalData.isCompleted,
+        choices: evalData.choices,
+        createdAt: evalData.createdAt,
+      };
+      return auditEvaluation
+    } else {
+      const evalData = evalDocSnapshot.data();
+      if (evalData === undefined) {
+
+        auditEvaluation = {
+          auditUid: auditData.uid,
+          name: auditData.name,
+          type: auditData.type,
+          condition: auditData.condition,
+          welcome: auditData.welcome,
+          thank_you: auditData.thank_you,
+          exclusiveList: auditData.exclusiveList,
+          status: auditData.status,
+          authorId: auditData.authorId,
+          auditCreatedAt: auditData.createdAt,
+          questions: questionData,
+
+          uid: "",
+          participantFirstName: "",
+          participantLastName: "",
+          participantEmail: "",
+          participantPhone: "",
+          auditId: "",
+          auditName: "",
+          choices: [],
+          isCompleted: "invited"
+        };
+        return auditEvaluation
+      }
+    }
+  }
+}
+
 

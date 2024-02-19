@@ -2,7 +2,6 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { AuditEvaluations } from "@/types/dto";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import ClientAuditItem from "@/components/dashboard/client-audit-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
 import { toast } from "sonner";
@@ -17,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { getAuditsEvaluationByIds } from "@/lib/firestore/evaluation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icons } from "@/components/icons";
+import ClientAuditItem from "@/components/dashboard/client-audit-item";
 
 type FormData = z.infer<typeof auditFilterSchema>
 const ClientAudits = () => {
