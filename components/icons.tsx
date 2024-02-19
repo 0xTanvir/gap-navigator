@@ -40,7 +40,17 @@ import {
   ScanEye,
   ClipboardCheck,
   Copy,
-  Save, CheckCircle2, BellRing, Bell, Archive, ArchiveRestore, Circle, ArrowLeft, RefreshCcw, SearchX,
+  Save,
+  CheckCircle2,
+  BellRing,
+  Bell,
+  Archive,
+  ArchiveRestore,
+  Circle,
+  ArrowLeft,
+  RefreshCcw,
+  SearchX,
+  ArrowLeftFromLine,
 } from "lucide-react"
 
 export const Icons = {
@@ -94,6 +104,7 @@ export const Icons = {
   archiveRestore: ArchiveRestore,
   reLoad: RefreshCcw,
   searchX: SearchX,
+  back: ArrowLeftFromLine,
   x: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
       <path

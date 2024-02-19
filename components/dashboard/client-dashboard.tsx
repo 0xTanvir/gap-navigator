@@ -111,9 +111,10 @@ const ClientDashboard = () => {
             }}
           />
           <DashboardCard
-            title="Incomplete evaluation"
+            title={evaluationIncomplete > 1 ? "Audits Invited" : "Audit Invited"}
             totalNumber={evaluationIncomplete}
-            iconName="evaluate"
+            iconName="audit"
+            invited={true}
             handleClick={() => {
               router.push("/audits?status=invited");
             }}
