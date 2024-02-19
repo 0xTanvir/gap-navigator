@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useEvaluation from "@/app/(evaluate)/evaluate/evaluate-context";
 import pdfMake from "pdfmake/build/pdfmake";
 import { Content, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
@@ -13,10 +13,13 @@ import { DocsPageHeader } from "@/app/(evaluate)/preview/page-header";
 import Output from "editorjs-react-renderer";
 import { CodeBlockRenderer, style } from "@/components/editorjs/editorjs-utils";
 import "@/components/editorjs/editorjs.css"
+import { toast } from "sonner";
+import { Icons } from "@/components/icons";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const PdfDownload = () => {
+  const [isLoading, setIsLoading] = useState(false)
   const {evaluation} = useEvaluation()
   const {uid} = evaluation
   const router = useRouter()
@@ -92,6 +95,7 @@ const PdfDownload = () => {
 
 
   const generateAndDownloadPdf = async () => {
+    setIsLoading(true)
     try {
       if (!evaluation || !evaluation.evaluate) {
         throw new Error('Invalid evaluation data');
@@ -141,22 +145,22 @@ const PdfDownload = () => {
       let pdfMakeDelimiterData: any
       let pdfMakeWarningData: any
       if (formatDataImage) {
-        pdfMakeImageData = generatePdfDefinition(formatDataImage)
+        pdfMakeImageData = await generatePdfDefinition(formatDataImage)
       }
       if (formatDataEmbed) {
-        pdfMakeEmbedData = generatePdfDefinition(formatDataEmbed)
+        pdfMakeEmbedData = await generatePdfDefinition(formatDataEmbed)
       }
       if (formatDataCheckList) {
-        pdfMakeCheckListData = generatePdfDefinition(formatDataCheckList)
+        pdfMakeCheckListData = await generatePdfDefinition(formatDataCheckList)
       }
       if (formatDataTable) {
-        pdfMakeTableData = generatePdfDefinition(formatDataTable)
+        pdfMakeTableData = await generatePdfDefinition(formatDataTable)
       }
       if (formatDataDelimiter) {
-        pdfMakeDelimiterData = generatePdfDefinition(formatDataDelimiter)
+        pdfMakeDelimiterData = await generatePdfDefinition(formatDataDelimiter)
       }
       if (formatDataWarning) {
-        pdfMakeWarningData = generatePdfDefinition(formatDataWarning)
+        pdfMakeWarningData = await generatePdfDefinition(formatDataWarning)
       }
 
       const markup = parser.parse(pdfData);
@@ -205,7 +209,7 @@ const PdfDownload = () => {
           html.splice(data + index, 0, pdfMakeWarningData[index]);
         });
       }
-      console.log(html)
+      // console.log(html)
 
       // const evaluationChoiceRecommendedNote = (evaluation?.evaluate?.choices?.filter(choice => choice.recommendedNote) || [])
       //   .flatMap(item => JSON.parse(item?.recommendedNote ?? '[]'));
@@ -247,12 +251,16 @@ const PdfDownload = () => {
         }
       };
       const createPdf = () => {
+        toast.success("It will take some time.")
+        setIsLoading(false)
         const pdfGenerator = pdfMake.createPdf(docDefinition, {});
         pdfGenerator.download(`${generateRandomText(6)}.pdf`);
       };
 
       createPdf();
     } catch (error) {
+      toast.error("Error generating PDF")
+      setIsLoading(false)
       console.error('Error generating PDF:', error);
     }
   };
@@ -271,7 +279,12 @@ const PdfDownload = () => {
         text={"Analyze your report."}
       />
       <div className="w-full text-end">
-        <Button onClick={generateAndDownloadPdf}>Generate PDF</Button>
+        <Button onClick={generateAndDownloadPdf}>
+          {
+            isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+          }
+          Generate PDF
+        </Button>
       </div>
       <div className="editorjs">
         <Output data={data} style={style} renderers={renderers}/>
@@ -284,16 +297,32 @@ const PdfDownload = () => {
 
 export default PdfDownload;
 
+async function imageToBase64(url: string) {
+  let requestBody = {"imageUrl": url}
+  const response = await fetch("https://us-central1-activeagency.cloudfunctions.net/imageToBase64", {
+    method: "POST",
+    headers: {"Content-Type": "application/json",},
+    body: JSON.stringify(requestBody),
+  });
+  if (response.ok) {
+    const data = await response.json();
+    return data.base64String
+  } else {
+    const error = await response.json();
+    console.error("Error sending email:", error);
+  }
+}
+
 interface DataItem {
   id: string;
   type: string;
   data: { [key: string]: any };
 }
 
-function generatePdfDefinition(data: DataItem[]) {
+async function generatePdfDefinition(data: DataItem[]) {
   const content: Content[] = [];
 
-  data.forEach((item) => {
+  for (const item of data) {
     switch (item.type) {
       case 'embed':
         let data: any = {
@@ -306,13 +335,12 @@ function generatePdfDefinition(data: DataItem[]) {
         content.push(data)
         break;
       case 'image':
-        content.push(
-          {
-            image: item.data.file.url.split(";")[0],
-            width: 500,
-            margin: [0, 6]
-          }
-        );
+        try {
+          const imageBase64 = await imageToBase64(item.data.file.url);
+          content.push({image: "data:image/jpeg;base64," + imageBase64, width: 500, margin: [0, 6]});
+        } catch (error) {
+          console.error(error);
+        }
         break;
       case 'quote':
         content.push({text: item.data.text, style: 'quote', alignment: item.data.alignment});
@@ -395,7 +423,7 @@ function generatePdfDefinition(data: DataItem[]) {
       default:
         break;
     }
-  });
+  }
 
   return content
 }

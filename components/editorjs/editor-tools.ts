@@ -1,5 +1,4 @@
 import CheckList from "@editorjs/checklist";
-import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";
 import Embed from "@editorjs/embed";
 import Image from "@editorjs/image";
@@ -10,7 +9,6 @@ import Header from "@editorjs/header"
 import Table from "@editorjs/table"
 import Marker from "@editorjs/marker"
 import Underline from "@editorjs/underline"
-import SimpleImage from "@editorjs/simple-image"
 import LinkAutocomplete from "@editorjs/link-autocomplete"
 import Strikethrough from '@sotaproject/strikethrough';
 import ChangeCase from 'editorjs-change-case';
@@ -21,7 +19,6 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "@firebase/storage"
 import { Timestamp } from "firebase/firestore";
 
 export const EditorTools = {
-  // code: Code,
   header: {
     class: Header,
     inlineToolbar: true,
@@ -30,22 +27,22 @@ export const EditorTools = {
     class: Paragraph,
     inlineToolbar: true
   },
-  // checklist: {
-  //   class: CheckList,
-  //   inlineToolbar: true
-  // },
-  // embed: {
-  //   class: Embed,
-  //   inlineToolbar: false,
-  //   config: {
-  //     services: {
-  //       youtube: true,
-  //       facebook: true,
-  //       twitter: true,
-  //       instagram: true,
-  //     }
-  //   }
-  // },
+  checklist: {
+    class: CheckList,
+    inlineToolbar: true
+  },
+  embed: {
+    class: Embed,
+    inlineToolbar: false,
+    config: {
+      services: {
+        youtube: true,
+        facebook: true,
+        twitter: true,
+        instagram: true,
+      }
+    }
+  },
   image: {
     class: Image,
     config: {
@@ -103,30 +100,30 @@ export const EditorTools = {
   link: {
     class: LinkAutocomplete,
   },
-  // list: {
-  //   class: List,
-  //   inlineToolbar: true
-  // },
-  // quote: Quote,
-  // delimiter: Delimiter,
+  list: {
+    class: List,
+    inlineToolbar: true
+  },
+  quote: Quote,
+  delimiter: Delimiter,
   table: Table,
-  // marker: {
-  //   class: Marker,
-  //   inlineToolbar: true
-  // },
+  marker: {
+    class: Marker,
+    inlineToolbar: true
+  },
   underline: {
     class: Underline,
     inlineToolbar: true
   },
-  // warning: {
-  //   class: Warning,
-  //   inlineToolbar: true,
-  //   config: {
-  //     titlePlaceholder: 'Title',
-  //     messagePlaceholder: 'Message',
-  //   },
-  // },
+  warning: {
+    class: Warning,
+    inlineToolbar: true,
+    config: {
+      titlePlaceholder: 'Title',
+      messagePlaceholder: 'Message',
+    },
+  },
   strikethrough: Strikethrough,
   changeCase: ChangeCase,
-  // inlineCode: InlineCode
+  inlineCode: InlineCode
 }
