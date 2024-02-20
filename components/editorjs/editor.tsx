@@ -60,7 +60,7 @@ const Editor = ({onSave, initialData, id, placeHolder, disable = false}: EditorC
         if (editorRef.current) {
           editorRef?.current?.destroy()
           // @ts-ignore
-          editorRef?.current = null
+          editorRef.current = null
         }
       }
     }
