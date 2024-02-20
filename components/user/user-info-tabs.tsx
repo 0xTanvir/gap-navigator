@@ -92,45 +92,112 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
           </Card>
         </TabsContent>
         <TabsContent className="w-full mt-0" value="evaluation">
+          <Card className="mb-5">
+            <CardHeader className="">
+              <CardContent
+                className="p-0 grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
+                <Card className="p-3 shadow-none">
+                  <CardHeader className="flex flex-row items-center justify-between p-0">
+                    <CardTitle className="text-[12px] uppercase font-normal">
+                      Name
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {
+                      isLoading ?
+                        <Skeleton className="h-6 w-full mt-2"/> :
+                        <div className="text-md capitalize font-medium">
+                          {userInfo?.participantFirstName + " " + userInfo?.participantLastName}
+                        </div>
+                    }
+                  </CardContent>
+                </Card>
+
+                <Card className="p-3 shadow-none">
+                  <CardHeader className="flex flex-row items-center justify-between p-0">
+                    <CardTitle className="text-[12px] uppercase font-normal">
+                      Email
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {
+                      isLoading ?
+                        <Skeleton className="h-6 w-full mt-2"/> :
+                        <div className="text-md font-medium">
+                          {userInfo?.participantEmail}
+                        </div>
+                    }
+                  </CardContent>
+                </Card>
+
+                <Card className="p-3 shadow-none">
+                  <CardHeader className="flex flex-row items-center justify-between p-0">
+                    <CardTitle className="text-[12px] uppercase font-normal">
+                      Phone Number
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {
+                      isLoading ?
+                        <Skeleton className="h-6 w-full mt-2"/> :
+                        <div className="text-md capitalize font-medium">
+                          {userInfo?.participantPhone ? userInfo?.participantPhone : "N/A"}
+                        </div>
+                    }
+                  </CardContent>
+                </Card>
+
+                <Card className="p-3 shadow-none">
+                  <CardHeader className="flex flex-row items-center justify-between p-0">
+                    <CardTitle className="text-[12px] uppercase font-normal">
+                      Complete Evaluation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {
+                      isLoading ?
+                        <Skeleton className="h-6 w-full mt-2"/> :
+                        <div className="text-md capitalize font-medium">
+                          {evaluations.length}
+                        </div>
+                    }
+                  </CardContent>
+                </Card>
+
+                {/*{*/}
+                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
+                {/*    <div className="flex items-center font-semibold">*/}
+                {/*      <div className="">Name<span className="mx-1">:</span></div>*/}
+                {/*      <div*/}
+                {/*        className="capitalize">{userInfo?.participantFirstName + " " + userInfo?.participantLastName}</div>*/}
+                {/*    </div>*/}
+                {/*}*/}
+                {/*{*/}
+                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
+                {/*    <div className="flex items-center font-semibold">*/}
+                {/*      <div className="">Email<span className="mx-1">:</span></div>*/}
+                {/*      <div className="">{userInfo?.participantEmail}</div>*/}
+                {/*    </div>*/}
+                {/*}*/}
+                {/*{*/}
+                {/*  userInfo?.participantPhone &&*/}
+                {/*    <div className="flex items-center font-semibold">*/}
+                {/*        <div className="">Email</div>*/}
+                {/*        <div className="">{userInfo?.participantPhone}</div>*/}
+                {/*    </div>*/}
+                {/*}*/}
+                {/*{*/}
+                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
+                {/*    <div className="flex items-center font-semibold">*/}
+                {/*      <div className="">Complete Evaluation<span className="mx-1">:</span></div>*/}
+                {/*      <div className="">{evaluations.length}</div>*/}
+                {/*    </div>*/}
+                {/*}*/}
+              </CardContent>
+            </CardHeader>
+          </Card>
+
           <Card>
-
-            <Card className="border-none shadow-none">
-              <CardHeader className="pb-0">
-                <CardTitle>User Info</CardTitle>
-                <CardContent className="space-y-2 p-0">
-                  {
-                    isLoading ? <Skeleton className="h-6 w-full mt-2"/> :
-                      <div className="flex items-center font-semibold">
-                        <div className="">Name<span className="mx-1">:</span></div>
-                        <div
-                          className="capitalize">{userInfo?.participantFirstName + " " + userInfo?.participantLastName}</div>
-                      </div>
-                  }
-                  {
-                    isLoading ? <Skeleton className="h-6 w-full mt-2"/> :
-                      <div className="flex items-center font-semibold">
-                        <div className="">Email<span className="mx-1">:</span></div>
-                        <div className="">{userInfo?.participantEmail}</div>
-                      </div>
-                  }
-                  {
-                    userInfo?.participantPhone &&
-                      <div className="flex items-center font-semibold">
-                          <div className="">Email</div>
-                          <div className="">{userInfo?.participantPhone}</div>
-                      </div>
-                  }
-                  {
-                    isLoading ? <Skeleton className="h-6 w-full mt-2"/> :
-                      <div className="flex items-center font-semibold">
-                        <div className="">Complete Evaluation<span className="mx-1">:</span></div>
-                        <div className="">{evaluations.length}</div>
-                      </div>
-                  }
-                </CardContent>
-              </CardHeader>
-            </Card>
-
             <CardHeader>
               <CardTitle>All Evaluations</CardTitle>
             </CardHeader>
