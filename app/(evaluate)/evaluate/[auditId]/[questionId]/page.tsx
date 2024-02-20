@@ -23,7 +23,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { Choice, Complex, Evaluate, EvaluationActionType } from "@/types/dto";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   getEvaluationById,
@@ -538,32 +538,53 @@ export default function EvaluateQuestionPage({
                     className="mt-4 grid grid-cols-1 gap-y-6 sm:gap-x-4"
                   >
                     {question.answers.map((answer, index) => (
-                      <FormItem
-                        key={answer.uid}
-                        className={`rounded-lg border shadow-sm focus:outline-none grid grid-cols-12 space-x-0 space-y-0 w-full ${
-                          form.getValues("answerId") === answer.uid
-                            ? "border-indigo-600 ring-2 ring-indigo-600"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        <FormControl style={{display: "none"}}>
-                          <RadioGroupItem value={answer.uid}/>
-                        </FormControl>
-                        <FormLabel
-                          className="font-normal block text-sm cursor-pointer col-span-11 py-2.5 px-1.5">
-                          {index + 1 + ". "}
-                          {answer.name}
-                        </FormLabel>
+                      <React.Fragment key={answer.uid}>
+                        <FormItem
+                          className={`rounded-lg border shadow-sm focus:outline-none grid grid-cols-12 space-x-0 space-y-0 w-full ${
+                            form.getValues("answerId") === answer.uid
+                              ? "border-indigo-600 ring-2 ring-indigo-600"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          <FormControl style={{display: "none"}}>
+                            <RadioGroupItem value={answer.uid}/>
+                          </FormControl>
+                          <FormLabel
+                            className="font-normal block text-sm cursor-pointer col-span-11 py-2.5 px-1.5">
+                            {index + 1 + ". "}
+                            {answer.name}
+                          </FormLabel>
 
-                        {/* Custom check icon */}
+                          {/* Custom check icon */}
+                          {form.getValues("answerId") === answer.uid && (
+                            <div
+                              className="text-green-500 col-span-1 grid place-content-center mr-0.5">
+                              {/* Replace the content below with your custom check icon */}
+                              <Icons.checkCircle2 size={20}/>
+                            </div>
+                          )}
+                        </FormItem>
                         {form.getValues("answerId") === answer.uid && (
-                          <div
-                            className="text-green-500 col-span-1 grid place-content-center mr-0.5">
-                            {/* Replace the content below with your custom check icon */}
-                            <Icons.checkCircle2 size={20}/>
-                          </div>
+                          <FormField
+                            control={form.control}
+                            name="additionalNote"
+                            render={({field}) => (
+                              <FormItem>
+                                <FormLabel>Additional Note</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    variant="ny"
+                                    placeholder="Share your thoughts and additional details..."
+                                    className="resize-none"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage/>
+                              </FormItem>
+                            )}
+                          />
                         )}
-                      </FormItem>
+                      </React.Fragment>
                     ))}
                   </RadioGroup>
 
@@ -575,24 +596,7 @@ export default function EvaluateQuestionPage({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="additionalNote"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Additional Note</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      variant="ny"
-                      placeholder="Share your thoughts and additional details..."
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
+
             {user?.role === "consultant" && (
               <>
                 <FormField
