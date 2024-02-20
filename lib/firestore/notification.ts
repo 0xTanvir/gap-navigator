@@ -2,7 +2,6 @@ import { getDatabase, onValue, ref, set, update, get, remove } from "firebase/da
 import { Notification } from "@/types/dto";
 
 const db = getDatabase();
-
 export async function setNotificationData(userId: string, notificationData: Notification) {
   try {
     const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.auditId);
@@ -94,12 +93,22 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
   try {
     const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
     const snapshot = await get(notificationsRef);
-    const data: Notification[] = Object.values(snapshot.val()) || [];
+    if (!snapshot.exists()) {
+      throw new Error(`No notifications found for user ${userId}.`);
+    }
+    const notifications: Notification = snapshot.val();
+    let notificationKeyToDelete = null;
 
-    const notificationToDelete = data.find(notification => notification.auditId === auditId);
+    // Iterate over the notification keys to find the one with the matching auditId
+    for (const [key, notification] of Object.entries(notifications)) {
+      if (notification.auditId === auditId) {
+        notificationKeyToDelete = key;
+        break;
+      }
+    }
 
-    if (notificationToDelete) {
-      await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationToDelete.auditId}`));
+    if (notificationKeyToDelete) {
+      await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationKeyToDelete}`));
       return true;
     } else {
       throw new Error(`Notification with auditId ${auditId} not found.`);
@@ -108,4 +117,23 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
     throw new Error(`Error deleting notification: ${error}`);
   }
 }
+
+// export async function deleteNotificationsAlertById(userId: string, auditId: string): Promise<boolean> {
+//   try {
+//     const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
+//     const snapshot = await get(notificationsRef);
+//     const data: Notification[] = Object.values(snapshot.val()) || [];
+//
+//     const notificationToDelete = data.find(notification => notification.auditId === auditId);
+//
+//     if (notificationToDelete) {
+//       await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationToDelete.auditId}`));
+//       return true;
+//     } else {
+//       throw new Error(`Notification with auditId ${auditId} not found.`);
+//     }
+//   } catch (error) {
+//     throw new Error(`Error deleting notification: ${error}`);
+//   }
+// }
 
