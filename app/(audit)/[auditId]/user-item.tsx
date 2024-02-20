@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {updateAuditUser} from "@/lib/firestore/audit";
 import {toast} from "sonner";
-import {deleteNotificationsAlertById} from "@/lib/firestore/notification";
 
 interface UserItemProps {
     auditId: string;
@@ -69,9 +68,8 @@ const UserItem = ({user, auditId, setUsers}: UserItemProps) => {
                                 setIsDeleteLoading(true);
                                 try {
                                     const updated = await updateAuditUser(user.uid, auditId);
-                                    const deleteNotification = await deleteNotificationsAlertById(user.uid, auditId)
 
-                                    if (updated && deleteNotification) {
+                                    if (updated) {
                                         setUsers((prevUsers: User[]) =>
                                             prevUsers.filter((u) => u.uid !== user.uid)
                                         );

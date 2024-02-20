@@ -58,7 +58,7 @@ const Editor = ({onSave, initialData, id, placeHolder, disable = false}: EditorC
       init();
       return () => {
         if (editorRef.current) {
-          editorRef.current?.destroy()
+          editorRef?.current?.destroy()
           // @ts-ignore
           editorRef.current = null
         }

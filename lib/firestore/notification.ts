@@ -2,47 +2,24 @@ import { getDatabase, onValue, ref, set, update, get, remove } from "firebase/da
 import { Notification } from "@/types/dto";
 
 const db = getDatabase();
-
 export async function setNotificationData(userId: string, notificationData: Notification) {
   try {
     const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.auditId);
-    const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/`);
+    const userNotificationsAlertRef = ref(db, `root/audit-notifications/${userId}/notificationAlert`);
 
-    const allNotification: Notification[] = [];
-    onValue(ref(db, `root/audit-notifications/${userId}/notifications/`), (snapshot) => {
-      const snapshotVal = snapshot.val();
-      if (snapshot.exists() && snapshotVal) {
-        const values = Object.values(snapshotVal);
-
-        // Filter out null entries and append them to allNotification
-        const validNotifications = values.filter((item): item is Notification => item !== null);
-        allNotification.push(...validNotifications);
-      }
-    });
-
-    // Check if the notification with the given uid already exists
-    const existingNotification = allNotification.find(notification => notification.auditId === notificationData.auditId);
-
-    if (existingNotification) {
-      // If the notification exists, update it
-      if (existingNotification.isSeen) {
-        const existingNotificationRef = ref(db, `root/audit-notifications/${userId}/notifications/` + existingNotification.auditId);
-        await update(existingNotificationRef, {isSeen: false});
+    await set(userNotificationsRef, notificationData);
+    // Check the current state of notificationAlert
+    const snapshot = await get(userNotificationsAlertRef);
+    if (snapshot.exists()) {
+      const notificationAlert = snapshot.val().notificationAlert;
+      // If notificationAlert is false, then update it to true
+      if (!notificationAlert) {
+        await update(userNotificationsAlertRef, { notificationAlert: true });
       }
     } else {
-      // If the notification doesn't exist, add a new one
-      await set(userNotificationsRef, notificationData);
+      // If there's no notificationAlert set, initialize it to true
+      await update(userNotificationsAlertRef, { notificationAlert: true });
     }
-
-    // Check if notificationAlert is currently false before updating
-    const snapshotAlert = await get(userNotificationsAlert);
-    const currentNotificationAlert = snapshotAlert.val()?.notificationAlert;
-
-    if (currentNotificationAlert === false) {
-      // Update notificationAlert to true only if it's currently false
-      await update(userNotificationsAlert, {notificationAlert: true});
-    }
-
     return true;
   } catch (error) {
     throw new Error("Error notification data");
@@ -64,7 +41,7 @@ export async function updateNotificationById(userId: string, notification: Notif
 
 export async function updateNotificationsAlertById(userId: string) {
   try {
-    const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/`);
+    const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/notificationAlert`);
 
     // Update notificationAlert to true
     await update(userNotificationsAlert, {notificationAlert: false});
@@ -81,7 +58,7 @@ export async function getNotificationById(userId: string): Promise<Notification 
     return new Promise((resolve) => {
       onValue(userNotificationsRef, (snapshot) => {
         const notifications: Notification[] | [] = (snapshot.exists() ? Object.values(snapshot.val()) : []);
-        resolve(notifications);
+        resolve(notifications.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds));
       });
     });
 
@@ -94,12 +71,22 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
   try {
     const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
     const snapshot = await get(notificationsRef);
-    const data: Notification[] = Object.values(snapshot.val()) || [];
+    if (!snapshot.exists()) {
+      throw new Error(`No notifications found for user ${userId}.`);
+    }
+    const notifications: Notification = snapshot.val();
+    let notificationKeyToDelete = null;
 
-    const notificationToDelete = data.find(notification => notification.auditId === auditId);
+    // Iterate over the notification keys to find the one with the matching auditId
+    for (const [key, notification] of Object.entries(notifications)) {
+      if (notification.auditId === auditId) {
+        notificationKeyToDelete = key;
+        break;
+      }
+    }
 
-    if (notificationToDelete) {
-      await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationToDelete.auditId}`));
+    if (notificationKeyToDelete) {
+      await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationKeyToDelete}`));
       return true;
     } else {
       throw new Error(`Notification with auditId ${auditId} not found.`);
@@ -108,4 +95,23 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
     throw new Error(`Error deleting notification: ${error}`);
   }
 }
+
+// export async function deleteNotificationsAlertById(userId: string, auditId: string): Promise<boolean> {
+//   try {
+//     const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
+//     const snapshot = await get(notificationsRef);
+//     const data: Notification[] = Object.values(snapshot.val()) || [];
+//
+//     const notificationToDelete = data.find(notification => notification.auditId === auditId);
+//
+//     if (notificationToDelete) {
+//       await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationToDelete.auditId}`));
+//       return true;
+//     } else {
+//       throw new Error(`Notification with auditId ${auditId} not found.`);
+//     }
+//   } catch (error) {
+//     throw new Error(`Error deleting notification: ${error}`);
+//   }
+// }
 

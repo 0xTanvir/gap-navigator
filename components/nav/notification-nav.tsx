@@ -68,7 +68,8 @@ const NotificationNav = () => {
         onValue(
           ref(db, `root/audit-notifications/${user.uid}/`),
           (snapshot) => {
-            setNotificationAlert(snapshot.val()?.notificationAlert);
+            let alert = snapshot.val()?.notificationAlert.notificationAlert
+            setNotificationAlert(alert);
           }
         );
         fetchNotifications()
@@ -83,12 +84,9 @@ const NotificationNav = () => {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={notificationAlertUpdate}>
       <DropdownMenuTrigger>
-        <div
-          onClick={notificationAlertUpdate}
-          className="cursor-pointer"
-        >
+        <div className="cursor-pointer">
           {notificationAlert ? (
             <Icons.notificationRing
               fill="blue"
