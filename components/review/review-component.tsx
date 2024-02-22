@@ -18,6 +18,7 @@ import { generateRandomText } from "@/lib/utils";
 import edjsParser from "editorjs-parser";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { generatePdfDefinition } from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-download";
+import { usePathname } from 'next/navigation'
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
   ssr: false,
@@ -29,19 +30,22 @@ interface ReviewComponent {
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 const ReviewComponent = ({auditId}: ReviewComponent) => {
-  const [audit, setAudit] = useState<AuditEvaluations | undefined>(undefined);
+  const [audit, setAudit] = useState<AuditEvaluations | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const {user} = useAuth();
   const router = useRouter()
   const parser = new edjsParser();
+  const pathname = usePathname()
+  let evaluationId = pathname.split("/").pop();
 
   async function fetchAuditsEvaluation() {
     setIsLoading(true)
     try {
-      if (user?.invitedAuditsList) {
-        let data = await getAuditsEvaluationById(auditId, user.email)
+      if (evaluationId) {
+        let data = await getAuditsEvaluationById(auditId, evaluationId)
         if (data) {
+          console.log(data)
           setAudit(data)
         }
       }
@@ -283,7 +287,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
 
   useEffect(() => {
     fetchAuditsEvaluation();
-  }, [user?.invitedAuditsList]);
+  }, [evaluationId]);
 
   if (isLoading) {
     return <Icons.spinner/>
@@ -294,7 +298,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
       <div className="flex justify-end items-center gap-2">
         <Button
           variant="secondary"
-          onClick={() => router.push("/audits")}
+          onClick={() => router.back()}
         >
           <Icons.back className="mr-2 h-4 w-4"/>
           Back

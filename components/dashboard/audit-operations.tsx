@@ -110,6 +110,7 @@ interface AuditOperationsProps {
   audit: Audit;
   archive?: boolean;
   setAudits?: React.Dispatch<React.SetStateAction<Audits | []>>;
+  countEvaluations: number
 }
 
 interface AuditData {
@@ -125,6 +126,7 @@ export function AuditOperations({
                                   audit,
                                   archive,
                                   setAudits,
+                                  countEvaluations
                                 }: AuditOperationsProps) {
   const {dispatch} = useAudits();
   const {user, updateUser} = useAuth();
@@ -521,6 +523,19 @@ export function AuditOperations({
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator/>
+            {
+              (user?.role === "consultant" && countEvaluations > 0) &&
+                <>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/audit/${audit.uid}/evaluations-list`)}
+                    >
+                        <Icons.list className="mr-2 h-4 w-4"/>
+                        Evaluation List
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                </>
+            }
             {user?.role !== "admin" && (
               <>
                 <DropdownMenuItem
