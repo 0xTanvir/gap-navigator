@@ -4,7 +4,7 @@ import sgMail from '@sendgrid/mail';
 import { EmailMsg } from '@/types/dto';
 import { siteConfig } from '@/config/site';
 import { render } from '@react-email/render';
-import { InviteUserEmail } from '../../../emails/user-invite';
+import { InviteUserEmail } from '../../../../emails/user-invite';
 
 export interface UserInviteDTO {
     inviterEmail: string,

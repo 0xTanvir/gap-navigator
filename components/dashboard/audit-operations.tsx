@@ -329,7 +329,7 @@ export function AuditOperations({
                 receiverFirstName: inviteUser.firstName,
                 auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
               };
-              const response = await fetch("/api/mailer", {
+              const response = await fetch("/api/mailer/exclusive", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -385,7 +385,7 @@ export function AuditOperations({
             receiverFirstName: shareUser.firstName,
             auditLink: `${siteConfig.url}/evaluate/${audit.uid}`,
           };
-          const responseData = await fetch("/api/mailer", {
+          const responseData = await fetch("/api/mailer/exclusive", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
