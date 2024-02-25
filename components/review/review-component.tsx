@@ -19,6 +19,7 @@ import edjsParser from "editorjs-parser";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { generatePdfDefinition } from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-download";
 import { usePathname } from 'next/navigation'
+import { AuditEditorHeader } from "@/app/(audit)/audit/[auditId]/audit-editor-header";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
   ssr: false,
@@ -295,6 +296,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
 
   return (
     <div>
+      <AuditEditorHeader heading={audit?.auditName as string}/>
       <div className="flex justify-end items-center gap-2">
         <Button
           variant="secondary"
@@ -357,7 +359,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
                               className="resize-none mb-3"
                               value={choice.additionalNote}
                           />
-                        {user?.role === "consultant" && (
+                        {(user?.role === "consultant" || user?.role === "admin") && (
                           <>
                             <Editor
                               onSave={() => {

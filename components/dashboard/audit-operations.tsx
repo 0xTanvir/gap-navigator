@@ -524,7 +524,7 @@ export function AuditOperations({
             </DropdownMenuItem>
             <DropdownMenuSeparator/>
             {
-              (user?.role === "consultant" && countEvaluations > 0) &&
+              ((user?.role === "consultant" || user?.role === "admin") && countEvaluations > 0) &&
                 <>
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center"
