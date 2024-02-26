@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Icons } from "@/components/icons";
 import {
-  getNotificationById,
+  getNavNotificationById,
   updateNotificationById,
   updateNotificationsAlertById
 } from "@/lib/firestore/notification";
@@ -43,7 +43,7 @@ const NotificationNav = () => {
 
   async function fetchNotifications() {
     try {
-      let dbNotifications = await getNotificationById(user?.uid as string)
+      let dbNotifications = await getNavNotificationById(user?.uid as string)
       setNotifications(dbNotifications)
     } catch (e) {
       toast.error("Something went wrong.", {
@@ -56,7 +56,9 @@ const NotificationNav = () => {
 
   async function updateNotification(notification: Notification) {
     try {
-      await updateNotificationById(notification.inviteUserId, notification)
+      if (user?.uid) {
+        await updateNotificationById(user?.uid, notification)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -66,9 +68,9 @@ const NotificationNav = () => {
     if (user) {
       if (user) {
         onValue(
-          ref(db, `root/audit-notifications/${user.uid}/`),
+          ref(db, `root/gn-notifications/${user.uid}/`),
           (snapshot) => {
-            let alert = snapshot.val()?.notificationAlert.notificationAlert
+            let alert = snapshot.val()?.alert?.notificationAlert
             setNotificationAlert(alert);
           }
         );
@@ -84,7 +86,12 @@ const NotificationNav = () => {
   }
 
   return (
-    <DropdownMenu onOpenChange={notificationAlertUpdate}>
+    <DropdownMenu
+      onOpenChange={() => {
+        notificationAlertUpdate()
+        fetchNotifications()
+      }}
+    >
       <DropdownMenuTrigger>
         <div className="cursor-pointer">
           {notificationAlert ? (
@@ -101,33 +108,39 @@ const NotificationNav = () => {
         <Card className="border-0 shadow-none">
           <CardHeader>
             {notifications.length > 0 && <CardTitle>Notifications</CardTitle>}
-            {/*<CardDescription>You have 3 unread messages.</CardDescription>*/}
           </CardHeader>
           <CardContent className="grid gap-4">
             <div>
               {
                 notifications.length > 0 ?
-                  notifications.slice(0, 3).map((notification, index) => (
+                  notifications.map((notification, index) => (
                     <div
                       key={index}
                       className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
                     >
                       {
-                        notification.isSeen ?
+                        notification.status ?
                           <span className="flex h-2 w-2 translate-y-1 rounded-full bg-gray-500"/> :
 
                           <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500"/>
                       }
-                      <div className="space-y-1">
+                      <div className="space-y-1 w-[280px]">
                         <p
                           onClick={() => {
                             updateNotification(notification)
-                            router.push(`/evaluate/${notification.auditId}`)
+                            if (notification.action_type === "ROLE_CHANGE") {
+                              router.push(`/settings`)
+                            } else {
+                              router.push(`${notification.action_value}`)
+                            }
                           }}
-                          className="text-sm font-medium leading-none cursor-pointer hover:underline"
+                          className="text-sm font-medium cursor-pointer leading-[1.5] hover:underline truncate ..."
+                          dangerouslySetInnerHTML={{__html: notification.message}}
                         >
-                          {notification.auditName}
+                          {/*<div dangerouslySetInnerHTML={{__html: notification.message}} /> ...*/}
+                          {/*{notification.message}*/}
                         </p>
+
                         <p className="text-sm text-muted-foreground">
                           {dateFormat(notification?.createdAt)}
                         </p>

@@ -302,13 +302,13 @@ export function AuditOperations({
             };
             const notificationData: Notification = {
               uid: uuidv4(),
-              auditName: audit.name,
-              type: "AUDIT_INVITED",
-              ownerAuditUserId: audit.authorId,
-              inviteUserId: inviteUser.uid,
-              auditId: audit.uid,
-              isSeen: false,
+              title: audit.name,
+              action_type: "AUDIT_INVITED",
+              action_value: `/evaluate/${audit.uid}`,
+              message: `You have been invited to evaluate audit <br><b>${audit.name}</b>.`,
+              status: false,
               createdAt: Timestamp.now(),
+              updatedAt: Timestamp.now(),
             };
             let isSuccess = await setNotificationData(
               inviteUser.uid,

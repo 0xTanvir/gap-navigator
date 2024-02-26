@@ -30,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, dateFormat } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { User, UserAccountStatus, UserRole } from "@/types/dto";
 import * as z from "zod";
@@ -48,6 +48,9 @@ import { profileFormSchema } from "@/lib/validations/profile";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getImageData, userImageUpload } from "@/components/settings/profile-form";
+import { Timestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import { setRoleChangeNotification, setUserStatusChangeNotification } from "@/lib/firestore/notification";
 
 interface UserOperationsProps {
   user: User;
@@ -96,6 +99,23 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
           setUser((users) => {
             return users.filter((u) => u.uid !== user.uid);
           });
+
+          let roleChangeNotification = {
+            uid: uuidv4(),
+            title: `${updateUser.firstName + " " + updateUser.lastName} role change`,
+            action_type: "ROLE_CHANGE",
+            action_value: "role change",
+            message: "",
+            status: false,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          }
+
+          roleChangeNotification.message = `<b class="capitalize">${updateUser.firstName + " " + updateUser.lastName}'s</b> role has been updated <br/> from 
+          <b class="capitalize">${user.role}</b> to <b>${updateUser.role}</b> on ${dateFormat(roleChangeNotification.createdAt)}.`
+
+          await setRoleChangeNotification(updateUser.uid, roleChangeNotification)
+
           return toast.info("User role updated successfully.");
         }
       } else {
@@ -137,6 +157,21 @@ const UserOperations = ({user, setUser}: UserOperationsProps) => {
               u.uid === user.uid ? {...u, status: data.status} : u
             );
           });
+
+          let userStatusNotification = {
+            uid: uuidv4(),
+            title: `${updateUser.firstName} ${updateUser.lastName} account ${updateUser.status === "" ? "Activated" : "Deactivated"}`,
+            action_type: "USER_STATUS",
+            action_value: "user status",
+            message: "",
+            status: false,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          }
+          userStatusNotification.message = `<b class="capitalize">${updateUser.firstName + " " + updateUser.lastName}'s</b>
+            account has been <br> <b>${updateUser.status === "" ? "Activated" : "Deactivated"} </b> on 
+          ${dateFormat(userStatusNotification.createdAt)}.`;
+          await setUserStatusChangeNotification(updateUser.uid, userStatusNotification)
 
           return toast.info(`User account status has been set to ${data.status}.`);
         }
