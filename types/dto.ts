@@ -216,11 +216,11 @@ export interface GroupedEvaluation {
 
 export interface Notification {
   uid: string;
-  auditName: string;
-  type: string;
-  ownerAuditUserId: string;
-  inviteUserId: string;
-  auditId: string;
-  isSeen: boolean;
+  title: string;
+  action_type: string;
+  action_value: string;
+  message: string;
+  status: boolean;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
 }

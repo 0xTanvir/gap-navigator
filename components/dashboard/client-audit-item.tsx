@@ -77,7 +77,7 @@ const ClientAuditItem = ({audit}: ClientAuditItemProps) => {
 
                   <DropdownMenuItem
                       className="flex cursor-pointer items-center"
-                      onClick={() => router.push(`/audit/${audit.auditUid}/review`)}
+                      onClick={() => router.push(`/audit/${audit.auditUid}/review/${audit.uid}`)}
                   >
                       <Icons.fileEdit className="mr-2 h-4 w-4"/>
                       Preview

@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Notification } from "@/types/dto";
 import NotificationItem from "@/components/notification/notification-item";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 type FormData = z.infer<typeof auditFilterSchema>
 const NotificationList = () => {
@@ -32,8 +33,8 @@ const NotificationList = () => {
   const [currentSliceNotifications, setCurrentSliceNotifications] = useState<Notification[]>([]);
   const [filterData, setFilterData] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null);
-
   const {user} = useAuth()
+  const router = useRouter()
 
   const form = useForm<FormData>({
     resolver: zodResolver(auditFilterSchema),
@@ -45,7 +46,7 @@ const NotificationList = () => {
   function onSubmit(data: FormData) {
     setFilterData(true)
     if (data.auditName) {
-      let filterData = notifications.filter(notification => notification.auditName.toLowerCase().includes(data?.auditName?.toLowerCase() as string));
+      let filterData = notifications.filter(notification => notification.title.toLowerCase().includes(data?.auditName?.toLowerCase() as string));
       setCurrentNotifications(filterData)
       setCurrentPage(1)
     }
@@ -94,14 +95,15 @@ const NotificationList = () => {
     return <>
       <AuditEditorShell>
         <Link
-          href="/audits"
+          href="#"
+          onClick={() => router.back()}
           className={cn(
             buttonVariants({variant: "ghost"}),
             "absolute left-[-150px] top-4 hidden xl:inline-flex"
           )}
         >
           <Icons.chevronLeft className="mr-2 h-4 w-4"/>
-          See all audits
+          Back
         </Link>
 
         <AuditEditorHeader heading="Notification List" text="Manage notification list."/>
@@ -118,14 +120,15 @@ const NotificationList = () => {
     <>
       <AuditEditorShell>
         <Link
-          href="/audits"
+          href="#"
+          onClick={() => router.back()}
           className={cn(
             buttonVariants({variant: "ghost"}),
             "absolute left-[-150px] top-4 hidden xl:inline-flex"
           )}
         >
           <Icons.chevronLeft className="mr-2 h-4 w-4"/>
-          See all audits
+          Back
         </Link>
 
         <AuditEditorHeader heading="Notification List" text="Manage notification list."/>

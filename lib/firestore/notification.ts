@@ -1,11 +1,13 @@
 import { getDatabase, onValue, ref, set, update, get, remove } from "firebase/database"
 import { Notification } from "@/types/dto";
+import { limitToLast, query, Timestamp } from "firebase/firestore";
 
 const db = getDatabase();
+
 export async function setNotificationData(userId: string, notificationData: Notification) {
   try {
-    const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/` + notificationData.auditId);
-    const userNotificationsAlertRef = ref(db, `root/audit-notifications/${userId}/notificationAlert`);
+    const userNotificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/` + notificationData.uid);
+    const userNotificationsAlertRef = ref(db, `root/gn-notifications/${userId}/alert`);
 
     await set(userNotificationsRef, notificationData);
     // Check the current state of notificationAlert
@@ -14,11 +16,11 @@ export async function setNotificationData(userId: string, notificationData: Noti
       const notificationAlert = snapshot.val().notificationAlert;
       // If notificationAlert is false, then update it to true
       if (!notificationAlert) {
-        await update(userNotificationsAlertRef, { notificationAlert: true });
+        await update(userNotificationsAlertRef, {notificationAlert: true});
       }
     } else {
       // If there's no notificationAlert set, initialize it to true
-      await update(userNotificationsAlertRef, { notificationAlert: true });
+      await update(userNotificationsAlertRef, {notificationAlert: true});
     }
     return true;
   } catch (error) {
@@ -28,10 +30,10 @@ export async function setNotificationData(userId: string, notificationData: Noti
 
 export async function updateNotificationById(userId: string, notification: Notification) {
   try {
-    const notificationRef = ref(db, `root/audit-notifications/${userId}/notifications/${notification.auditId}`);
+    const notificationRef = ref(db, `root/gn-notifications/${userId}/notifications/${notification.uid}`);
 
     // Update the notification with the provided data
-    await update(notificationRef, {isSeen: true});
+    await update(notificationRef, {status: true, updatedAt: Timestamp.now()});
 
     return true;
   } catch (error) {
@@ -41,7 +43,7 @@ export async function updateNotificationById(userId: string, notification: Notif
 
 export async function updateNotificationsAlertById(userId: string) {
   try {
-    const userNotificationsAlert = ref(db, `root/audit-notifications/${userId}/notificationAlert`);
+    const userNotificationsAlert = ref(db, `root/gn-notifications/${userId}/alert`);
 
     // Update notificationAlert to true
     await update(userNotificationsAlert, {notificationAlert: false});
@@ -53,8 +55,7 @@ export async function updateNotificationsAlertById(userId: string) {
 
 export async function getNotificationById(userId: string): Promise<Notification [] | []> {
   try {
-    const userNotificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`)
-
+    const userNotificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/`)
     return new Promise((resolve) => {
       onValue(userNotificationsRef, (snapshot) => {
         const notifications: Notification[] | [] = (snapshot.exists() ? Object.values(snapshot.val()) : []);
@@ -66,10 +67,33 @@ export async function getNotificationById(userId: string): Promise<Notification 
     throw new Error("Error getting notifications")
   }
 }
+export async function getNavNotificationById(userId: string): Promise<Notification [] | []> {
+  try {
+    const userNotificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/`)
+    const notifications = await new Promise<Notification[] | []>((resolve, reject) => {
+      onValue(userNotificationsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          let notifications: Notification[] = Object.values(snapshot.val());
+          notifications.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+          // Return only the last 3 notifications
+          notifications = notifications.slice(0, 3);
+          resolve(notifications);
+        } else {
+          resolve([]);
+        }
+      }, (error) => {
+        reject(new Error("Error accessing notifications: " + error.message));
+      });
+    });
+    return notifications;
+  } catch (err) {
+    throw new Error("Error getting notifications");
+  }
+}
 
 export async function deleteNotificationsAlertById(userId: string, auditId: string): Promise<boolean> {
   try {
-    const notificationsRef = ref(db, `root/audit-notifications/${userId}/notifications/`);
+    const notificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/`);
     const snapshot = await get(notificationsRef);
     if (!snapshot.exists()) {
       throw new Error(`No notifications found for user ${userId}.`);
@@ -86,7 +110,7 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
     }
 
     if (notificationKeyToDelete) {
-      await remove(ref(db, `root/audit-notifications/${userId}/notifications/${notificationKeyToDelete}`));
+      await remove(ref(db, `root/gn-notifications/${userId}/notifications/${notificationKeyToDelete}`));
       return true;
     } else {
       throw new Error(`Notification with auditId ${auditId} not found.`);
@@ -115,3 +139,52 @@ export async function deleteNotificationsAlertById(userId: string, auditId: stri
 //   }
 // }
 
+// Role Change Notification
+export async function setRoleChangeNotification(userId: string, notificationData: Notification) {
+  try {
+    const notificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/` + notificationData.uid);
+    const notificationsAlertRef = ref(db, `root/gn-notifications/${userId}/alert`);
+
+    await set(notificationsRef, notificationData);
+    // Check the current state of notificationAlert
+    const snapshot = await get(notificationsAlertRef);
+    if (snapshot.exists()) {
+      const notificationAlert = snapshot.val().notificationAlert;
+      // If notificationAlert is false, then update it to true
+      if (!notificationAlert) {
+        await update(notificationsAlertRef, {notificationAlert: true});
+      }
+    } else {
+      // If there's no notificationAlert set, initialize it to true
+      await update(notificationsAlertRef, {notificationAlert: true});
+    }
+    return true;
+  } catch (error) {
+    throw new Error("Error notification data");
+  }
+}
+
+// User Account Change Notification
+export async function setUserStatusChangeNotification(userId: string, notificationData: Notification) {
+  try {
+    const notificationsRef = ref(db, `root/gn-notifications/${userId}/notifications/` + notificationData.uid);
+    const notificationsAlertRef = ref(db, `root/gn-notifications/${userId}/alert`);
+
+    await set(notificationsRef, notificationData);
+    // Check the current state of notificationAlert
+    const snapshot = await get(notificationsAlertRef);
+    if (snapshot.exists()) {
+      const notificationAlert = snapshot.val().notificationAlert;
+      // If notificationAlert is false, then update it to true
+      if (!notificationAlert) {
+        await update(notificationsAlertRef, {notificationAlert: true});
+      }
+    } else {
+      // If there's no notificationAlert set, initialize it to true
+      await update(notificationsAlertRef, {notificationAlert: true});
+    }
+    return true;
+  } catch (error) {
+    throw new Error("Error notification data");
+  }
+}

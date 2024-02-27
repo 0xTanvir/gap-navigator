@@ -110,6 +110,7 @@ interface AuditOperationsProps {
   audit: Audit;
   archive?: boolean;
   setAudits?: React.Dispatch<React.SetStateAction<Audits | []>>;
+  countEvaluations: number
 }
 
 interface AuditData {
@@ -125,6 +126,7 @@ export function AuditOperations({
                                   audit,
                                   archive,
                                   setAudits,
+                                  countEvaluations
                                 }: AuditOperationsProps) {
   const {dispatch} = useAudits();
   const {user, updateUser} = useAuth();
@@ -300,13 +302,13 @@ export function AuditOperations({
             };
             const notificationData: Notification = {
               uid: uuidv4(),
-              auditName: audit.name,
-              type: "AUDIT_INVITED",
-              ownerAuditUserId: audit.authorId,
-              inviteUserId: inviteUser.uid,
-              auditId: audit.uid,
-              isSeen: false,
+              title: audit.name,
+              action_type: "AUDIT_INVITED",
+              action_value: `/evaluate/${audit.uid}`,
+              message: `You have been invited to evaluate audit <br><b>${audit.name}</b>.`,
+              status: false,
               createdAt: Timestamp.now(),
+              updatedAt: Timestamp.now(),
             };
             let isSuccess = await setNotificationData(
               inviteUser.uid,
@@ -521,6 +523,19 @@ export function AuditOperations({
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator/>
+            {
+              ((user?.role === "consultant" || user?.role === "admin") && countEvaluations > 0) &&
+                <>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/audit/${audit.uid}/evaluations-list`)}
+                    >
+                        <Icons.list className="mr-2 h-4 w-4"/>
+                        Evaluation List
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                </>
+            }
             {user?.role !== "admin" && (
               <>
                 <DropdownMenuItem
