@@ -181,7 +181,7 @@ export async function fetchPaginatedData(entity_object: any) {
   if (whereFields && whereFields.length > 0) {
     whereFields.forEach((whereObj: any) => {
       if (whereObj.value) {
-        queryRef = query(queryRef, where(whereObj.name, '==', whereObj.value))
+        queryRef = query(queryRef, where(whereObj.name, '>=', whereObj.value), where(whereObj.name, '<=', whereObj.value + '\uf8ff'))
         searchValue = true
       }
     })
@@ -203,7 +203,7 @@ export async function fetchPaginatedData(entity_object: any) {
 
 
   const querySnapshots = await getDocs(queryRef);
-
+  console.log(querySnapshots.docs)
   return querySnapshots.docs.map((doc) => {
     const data = doc.data();
     return {
@@ -249,5 +249,36 @@ export async function getAuditsByType(userId: string, auditType: string): Promis
     return audits.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
   } catch (error) {
     throw new Error(`Error fetching audits by type: ${error}`)
+  }
+}
+
+export async function getAudits(): Promise<Audits> {
+  const auditsCollectionRef = Collections.audits();
+  try {
+    const querySnapshot = await getDocs(auditsCollectionRef);
+    if (querySnapshot.empty) {
+      return [];
+    }
+    const audits: Audit[] = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        name: data.name,
+        type: data.type,
+        condition: data.condition,
+        welcome: data.welcome ? data.welcome : "",
+        thank_you: data.thank_you ? data.thank_you : "",
+        exclusiveList: data.exclusiveList ? data.exclusiveList : [],
+        status: data.status ? data.status : "",
+        authorId: data.authorId,
+        createdAt: data.createdAt,
+      } as Audit;
+    });
+
+    return  audits.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
+  } catch (error) {
+    console.error('Error getting audits:', error);
+    throw error;
   }
 }

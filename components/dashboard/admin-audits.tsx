@@ -1,95 +1,104 @@
-import React, { useEffect, useState } from "react";
-import {
-  fetchAuditsWithCount,
-  fetchPaginatedData,
-} from "@/lib/firestore/audit";
-import { Audits } from "@/types/dto";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { getAudits, } from "@/lib/firestore/audit";
+import { AuditActionType, Audits } from "@/types/dto";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { AuditCreateButton } from "@/components/dashboard/audit-create-button";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
-import AuditPagination from "@/components/admin/audit-pagination";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
+import useAudits from "@/components/dashboard/AuditsContext";
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
 
 interface AdminAuditsProps {
   userId: string;
 }
 
-const AdminAudits = ({ userId }: AdminAuditsProps) => {
+const AdminAudits = ({userId}: AdminAuditsProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [audit, setAudit] = useState<Audits | []>([]);
-  const [pageAction, setPageAction] = useState("NEXT");
-  const [searchName] = useState("");
-  const [page, setPage] = useState(1);
-  const [totalAuditCount, setTotalAuditCount] = useState(0);
-  const [afterThis, setAfterThis] = useState(null);
-  const [beforeThis, setBeforeThis] = useState(null);
-  const PAGE_SIZE: number = 4;
-  const fetchData = async () => {
-    const entityObject = {
-      collection: "",
-      records_limit: PAGE_SIZE,
-      pageAction: pageAction,
-      page: page,
-      fields: {
-        // createdAt:true,
-      },
-      orderByField: "createdAt",
-      orderByOrder: "asc",
-      last_index: afterThis,
-      first_index: beforeThis,
-      whereFields: [
-        {
-          name: "name",
-          value: searchName,
-        },
-      ],
-    };
-    try {
-      const records = await fetchPaginatedData(entityObject);
-      if (records?.length > 0) {
-        const last_index = records.length - 1;
-        const first_index = 0;
-        // @ts-ignore
-        setAfterThis(records[last_index][entityObject.orderByField]);
-        // @ts-ignore
-        setBeforeThis(records[first_index][entityObject.orderByField]);
-        setAudit(records);
-      } else {
-        toast.warning("No data found");
-      }
-    } catch (err) {
-      toast.error("Something went wrong.", {
-        description: "Failed to fetch audits. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const handleNextPage = () => {
-    setPage((prevPage) => prevPage + 1);
-    setPageAction("NEXT");
-  };
-  const handlePrevPage = () => {
-    setPage((prevPage) => prevPage - 1);
-    setPageAction("PREVIOUS");
-  };
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize] = useState<number>(10)
+  const [totalData, setTotalData] = useState<number>(0)
+  const [auditName, setAuditName] = useState<string>("")
+  const [auditType, setAuditType] = useState<string>("all")
+  const {audits, dispatch} = useAudits();
+  const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function auditsCount() {
-    const { totalCount } = await fetchAuditsWithCount(searchName);
-    if (totalCount) {
-      setTotalAuditCount(totalCount);
+
+  const debounce = (call: any, delay: number) => {
+    let timer: any
+    return function (...args: any) {
+      // @ts-ignore
+      const context = this
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        timer = null
+        call.apply(context, args)
+      }, delay)
     }
   }
 
-  useEffect(() => {
-    auditsCount();
-  }, []);
+  const handleChange = (e: any) => {
+    setAuditName(e.target.value)
+    setCurrentPage(1)
+  }
+  const inputDebounce = useCallback(debounce(handleChange, 1000), [])
+
+  const handleReset = () => {
+    setAuditType("all")
+    setCurrentPage(1)
+    setAuditName("")
+    // @ts-ignore
+    inputRef.current.value = '';
+  }
+
+  const indexOfLastAudit = currentPage * pageSize
+  const indexOfFirstAudit = indexOfLastAudit - pageSize
 
   useEffect(() => {
-    setIsLoading(true);
-    fetchData();
-  }, [page]);
+    if (auditName && auditType === "all") {
+      let filterData = audits.filter(audit => audit.name.toLowerCase().includes(auditName.toLowerCase()));
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else if (auditName && auditType !== "all") {
+      let filterData = audits.filter(audit => audit.name.toLowerCase().includes(auditName.toLowerCase()) && audit.type === auditType)
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else if (auditType !== "all") {
+      let filterData = audits.filter(audit => audit.type === auditType)
+      setTotalData(filterData.length)
+      setCurrentSliceAudits(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else {
+      setTotalData(audits.length)
+      setCurrentSliceAudits(audits.slice(indexOfFirstAudit, indexOfLastAudit))
+    }
+  }, [totalData, audits, indexOfLastAudit, indexOfFirstAudit, auditType, auditName]);
+
+  useEffect(() => {
+    async function fetchAudits() {
+      try {
+        const dbAudits = await getAudits();
+        dispatch({
+          type: AuditActionType.ADD_MULTIPLE_AUDITS,
+          payload: dbAudits,
+        });
+        setAudit(dbAudits)
+      } catch (error) {
+        console.log(error);
+        toast.error("Something went wrong.", {
+          description: "Failed to fetch audits. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchAudits();
+  }, []);
 
   if (isLoading) {
     return (
@@ -99,8 +108,8 @@ const AdminAudits = ({ userId }: AdminAuditsProps) => {
           text="Manage audits."
         ></DashboardHeader>
         <div className="divide-border-200 divide-y rounded-md border">
-          {Array.from(Array(PAGE_SIZE)).map((_, index) => (
-            <AuditItem.Skeleton key={index} />
+          {[1, 2, 3, 4, 5].map((_, index) => (
+            <AuditItem.Skeleton key={index}/>
           ))}
         </div>
       </>
@@ -111,37 +120,87 @@ const AdminAudits = ({ userId }: AdminAuditsProps) => {
     <>
       <DashboardHeader heading="Audits" text="Manage audits."></DashboardHeader>
 
+      <div className="px-1.5 flex flex-col sm:flex-row  sm:items-end justify-end gap-3 mr-1">
+        <div className="">
+          <Input
+            placeholder="Audit Name"
+            ref={inputRef}
+            type="text"
+            onChange={(e) => {
+              inputDebounce(e)
+            }}
+          />
+        </div>
+
+        <div className="w-full sm:w-44">
+          <Select
+            defaultValue={auditType}
+            onValueChange={(value) => {
+              setCurrentPage(1)
+              setAuditType(value)
+            }}
+            value={auditType}
+          >
+            <SelectTrigger id="auditType">
+              <SelectValue placeholder="Select"/>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value="exclusive">Exclusive</SelectItem>
+              <SelectItem value="public">Public</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {(auditName || auditType !== "all") &&
+            <Button
+                variant="destructive"
+                type="reset"
+                onClick={handleReset}
+            >
+                <Icons.searchX/>
+            </Button>
+        }
+      </div>
+
       <div>
-        {audit?.length ? (
-          <>
-            <div className="divide-y divide-border rounded-md border">
-              {audit.map((audit) => (
-                <AuditItem
-                  key={audit.uid}
-                  userId={userId}
-                  audit={audit}
-                  setAudits={setAudit}
-                />
-              ))}
-            </div>
-            <AuditPagination
-              totalAuditCount={totalAuditCount}
-              page={page}
-              setPage={setPage}
-              PAGE_SIZE={PAGE_SIZE}
-              handlePrevPage={handlePrevPage}
-              handleNextPage={handleNextPage}
-            />
-          </>
-        ) : (
-          <EmptyPlaceholder>
-            <EmptyPlaceholder.Icon name="audit" />
-            <EmptyPlaceholder.Title>No audits</EmptyPlaceholder.Title>
-            <EmptyPlaceholder.Description>
-              You don&apos;t have any audits yet.
-            </EmptyPlaceholder.Description>
-          </EmptyPlaceholder>
-        )}
+        {
+          audit?.length ? (
+            <>
+              {
+                currentSliceAudits.length ? (
+                    <>
+                      <div className="divide-y divide-border rounded-md border">
+                        {currentSliceAudits.map((audit) => (
+                          <AuditItem
+                            key={audit.uid}
+                            userId={userId}
+                            audit={audit}
+                            setAudits={setAudit}
+                          />
+                        ))}
+                      </div>
+                      <CustomPagination
+                        totalPages={Math.ceil(totalData / pageSize)}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </>
+                  ) :
+                  <div className="divide-y divide-border rounded-md border">
+                    <div className="text-center font-semibold py-10">No Data Found</div>
+                  </div>
+              }
+            </>
+          ) : (
+            <EmptyPlaceholder>
+              <EmptyPlaceholder.Icon name="audit"/>
+              <EmptyPlaceholder.Title>No audits</EmptyPlaceholder.Title>
+              <EmptyPlaceholder.Description>
+                You don&apos;t have any audits yet.
+              </EmptyPlaceholder.Description>
+            </EmptyPlaceholder>
+          )}
       </div>
     </>
   );
