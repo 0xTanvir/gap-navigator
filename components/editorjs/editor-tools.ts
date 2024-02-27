@@ -46,6 +46,8 @@ export const EditorTools = {
   image: {
     class: Image,
     config: {
+      types: 'image/png, image/jpeg, image/jpg',
+      accept: '.png, .jpg, .jpeg',
       uploader: {
         async uploadByFile(file: any) {
           try {
