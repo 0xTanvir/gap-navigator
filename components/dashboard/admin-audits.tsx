@@ -26,6 +26,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
   const [auditType, setAuditType] = useState<string>("all")
   const {audits, dispatch} = useAudits();
   const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
 
