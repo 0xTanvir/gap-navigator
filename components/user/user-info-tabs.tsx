@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from '../icons';
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
 
 interface UserInfoTabsProps {
   userId: string
@@ -215,36 +216,6 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
                     }
                   </CardContent>
                 </Card>
-
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Name<span className="mx-1">:</span></div>*/}
-                {/*      <div*/}
-                {/*        className="capitalize">{userInfo?.participantFirstName + " " + userInfo?.participantLastName}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Email<span className="mx-1">:</span></div>*/}
-                {/*      <div className="">{userInfo?.participantEmail}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  userInfo?.participantPhone &&*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*        <div className="">Email</div>*/}
-                {/*        <div className="">{userInfo?.participantPhone}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Complete Evaluation<span className="mx-1">:</span></div>*/}
-                {/*      <div className="">{evaluations.length}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
               </CardContent>
             </CardHeader>
           </Card>
@@ -285,23 +256,29 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
                     <Skeleton className="h-6 w-full mt-2"/>
                   </div> :
                   currentSliceEvaluations.length > 0 ?
-                    <div className="divide-y divide-border rounded-md border mt-3">
-                      {
-                        currentSliceEvaluations.map((evaluation, index) => (
-                          <div key={index} className="flex items-center justify-between p-4">
-                            <div className="grid gap-1">
-                              <div className="flex gap-2">
-                                <div className="font-semibold">
-                                  <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
-                                    {evaluation.auditName}
-                                  </Link>
+                    <React.Fragment>
+                      <div className="divide-y divide-border rounded-md border !my-5">
+                        {
+                          currentSliceEvaluations.map((evaluation, index) => (
+                            <div key={index} className="flex items-center justify-between p-4">
+                              <div className="grid gap-1">
+                                <div className="flex gap-2">
+                                  <div className="font-semibold">
+                                    <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
+                                      {evaluation.auditName}
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))
-                      }
-                    </div>
+                          ))
+                        }
+                      </div>
+                      <CustomPagination
+                        totalPages={Math.ceil(totalData / pageSize)}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </React.Fragment>
                     :
                     <div className="divide-y divide-border rounded-md border">
                       <div className="text-center font-semibold py-10">No Data Found</div>

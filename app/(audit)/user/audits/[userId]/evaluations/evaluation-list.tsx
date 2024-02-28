@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
 
 interface EvaluationListProps {
   userId: string;
@@ -355,17 +356,36 @@ const EvaluationList = ({userId}: EvaluationListProps) => {
         </div>
 
         <div>
-          {currentSliceEvaluations?.length ? (
-            <div className="divide-y divide-border rounded-md border mt-3">
-              {currentSliceEvaluations.map((evaluation, index) => (
-                <EvaluationItem key={index} evaluation={evaluation}/>
-              ))}
-            </div>
-          ) : (
-            <div className="divide-y divide-border rounded-md border">
-              <div className="text-center font-semibold py-10">No Data Found</div>
-            </div>
-          )}
+          {
+            evaluations.length ?
+              <>
+                {currentSliceEvaluations?.length ? (
+                  <>
+                    <div className="divide-y divide-border rounded-md border mt-3">
+                      {currentSliceEvaluations.map((evaluation, index) => (
+                        <EvaluationItem key={index} evaluation={evaluation}/>
+                      ))}
+                    </div>
+                    <CustomPagination
+                      totalPages={Math.ceil(totalData / pageSize)}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  </>
+                ) : (
+                  <div className="divide-y divide-border rounded-md border">
+                    <div className="text-center font-semibold py-10">No Data Found</div>
+                  </div>
+                )}
+              </>
+              :
+              <EmptyPlaceholder className="mt-3">
+                <EmptyPlaceholder.Icon name="evaluate"/>
+                <EmptyPlaceholder.Title>No evaluations</EmptyPlaceholder.Title>
+                <EmptyPlaceholder.Description>
+                  You don&apos;t have any evaluations yet.
+                </EmptyPlaceholder.Description>
+              </EmptyPlaceholder>
+          }
         </div>
 
         <hr className="mt-12 xl:hidden"/>
