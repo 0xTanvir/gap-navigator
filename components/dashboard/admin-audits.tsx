@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAudits, } from "@/lib/firestore/audit";
-import { AuditActionType, Audits } from "@/types/dto";
+import { Audits } from "@/types/dto";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { AuditItem } from "@/components/dashboard/audit-item";
 import { EmptyPlaceholder } from "@/components/dashboard/empty-placeholder";
@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import useAudits from "@/components/dashboard/AuditsContext";
 import CustomPagination from "@/components/custom-pagination/custom-pagination";
 
 interface AdminAuditsProps {
@@ -18,13 +17,12 @@ interface AdminAuditsProps {
 
 const AdminAudits = ({userId}: AdminAuditsProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [audit, setAudit] = useState<Audits | []>([]);
+  const [audits, setAudits] = useState<Audits | []>([]);
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [pageSize] = useState<number>(10)
   const [totalData, setTotalData] = useState<number>(0)
   const [auditName, setAuditName] = useState<string>("")
   const [auditType, setAuditType] = useState<string>("all")
-  const {audits, dispatch} = useAudits();
   const [currentSliceAudits, setCurrentSliceAudits] = useState<Audits | []>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,11 +81,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
     async function fetchAudits() {
       try {
         const dbAudits = await getAudits();
-        dispatch({
-          type: AuditActionType.ADD_MULTIPLE_AUDITS,
-          payload: dbAudits,
-        });
-        setAudit(dbAudits)
+        setAudits(dbAudits)
       } catch (error) {
         console.log(error);
         toast.error("Something went wrong.", {
@@ -167,7 +161,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
 
       <div>
         {
-          audit?.length ? (
+          audits?.length ? (
             <>
               {
                 currentSliceAudits.length ? (
@@ -178,7 +172,7 @@ const AdminAudits = ({userId}: AdminAuditsProps) => {
                             key={audit.uid}
                             userId={userId}
                             audit={audit}
-                            setAudits={setAudit}
+                            setAudits={setAudits}
                           />
                         ))}
                       </div>
