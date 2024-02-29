@@ -1,18 +1,11 @@
-import Link from "next/link"
-import Image from "next/image"
+import React from 'react';
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
+import UserAuthResetPassword from "@/components/auth/user-auth-reset-password";
 
-import {cn} from "@/lib/utils"
-import {buttonVariants} from "@/components/ui/button"
-import {Icons} from "@/components/icons"
-import {UserAuthLogin} from "@/components/auth/user-auth-login"
-import React from "react";
-
-export const metadata = {
-    title: "Login",
-    description: "Login to your account",
-}
-
-export default function LoginPage() {
+export default function ResetPasswordPage() {
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center">
 
@@ -24,7 +17,7 @@ export default function LoginPage() {
                 >
                     <>
                         <Icons.chevronLeft className="mr-2 h-4 w-4"/>
-                        Home
+                        Login
                     </>
                 </Link>
                 <Link
@@ -46,8 +39,8 @@ export default function LoginPage() {
                 </p>
             </div>
 
-            <UserAuthLogin/>
+            <UserAuthResetPassword/>
 
         </div>
-    )
-}
+    );
+};

@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 import {Icons} from "@/components/icons"
 import {UserAuthComplete} from "@/components/auth/user-auth-complete"
 import React from "react";
@@ -43,7 +41,7 @@ export default function CompleteProfilePage({searchParams}: cpProps) {
                 firstName={name.firstName!}
                 lastName={name.lastName}
                 email={searchParams.email!}
-                callbackUrl="/"
+                callbackUrl="/dashboard"
             />
 
         </div>

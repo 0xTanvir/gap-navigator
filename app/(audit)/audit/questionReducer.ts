@@ -33,6 +33,8 @@ export const questionsReducer = (state: Question[], action: QuestionAction): Que
             )
         case QuestionActionType.DELETE_QUESTION:
             return state.filter(question => question.uid !== action.payload)
+        case QuestionActionType.UPDATE_MULTIPLE_QUESTIONS:
+            return action.payload;
         default:
             return state;
     }

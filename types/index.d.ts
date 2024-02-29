@@ -15,6 +15,7 @@ export type SiteConfig = {
     stitchedName: string
     description: string
     emailFrom: string
+    url:string
     links: {
         twitter: string
         github: string
@@ -28,8 +29,14 @@ export type DashboardConfig = {
     sidebarNav: SidebarNavItem[]
 }
 
+export type SettingsConfig = {
+    mainNav: MainNavItem[]
+    sidebarNav: SidebarNavItem[]
+}
+
 export type SidebarNavItem = {
     title: string
+    id?: string
     disabled?: boolean
     external?: boolean
     icon?: keyof typeof Icons

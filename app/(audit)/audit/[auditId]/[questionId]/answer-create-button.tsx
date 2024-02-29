@@ -1,161 +1,269 @@
-import React from 'react';
-import {Icons} from "@/components/icons";
-import {Button, ButtonProps, buttonVariants} from "@/components/ui/button";
+import React, { useState } from "react";
+import { Icons } from "@/components/icons";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {cn} from "@/lib/utils";
-import {useForm} from "react-hook-form";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {v4 as uuidv4} from 'uuid'
-import {answerSchema} from "@/lib/validations/question";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Timestamp} from "firebase/firestore";
-import {toast} from "@/components/ui/use-toast";
-import {Textarea} from "@/components/ui/textarea";
-import {createQuestionAnswer} from "@/lib/firestore/audit";
+import { v4 as uuidv4 } from "uuid";
+import { answerSchema } from "@/lib/validations/question";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Timestamp } from "firebase/firestore";
+import { toast } from "sonner";
+import { setQuestionAnswer } from "@/lib/firestore/answer";
+import dynamic from "next/dynamic";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import useQuestions from "@/app/(audit)/audit/QuestionContext";
+import { Audit } from "@/types/dto";
+
+const Editor = dynamic(() => import("@/components/editorjs/editor"), {
+  ssr: false,
+});
 
 interface AnswerCreateButtonProps extends ButtonProps {
-    auditId: string
-    questionId: string
-    loading?: boolean
-    singleQuestionFetch: Function
+  auditId: string;
+  questionId: string;
+  loading?: boolean;
+  singleQuestionFetch: Function;
+  audit: Audit | null
 }
 
-type FormData = z.infer<typeof answerSchema>
+type FormData = z.infer<typeof answerSchema>;
 
 const AnswerCreateButton = ({
-                                auditId,
-                                questionId,
-                                singleQuestionFetch,
-                                loading,
-                                className,
-                                variant,
-                                ...props
+                              auditId,
+                              questionId,
+                              singleQuestionFetch,
+                              loading, audit,
+                              className,
+                              variant,
+                              ...props
                             }: AnswerCreateButtonProps) => {
-    const [isLoading, setIsLoading] = React.useState<boolean>(false)
-    const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
-    const form = useForm<FormData>({
-        resolver: zodResolver(answerSchema),
-        defaultValues: {
-            name: '',
-            recommendationDocument: ''
-        },
-    })
+  const {questions} = useQuestions();
 
-    async function onSubmit(data: FormData) {
-        setIsLoading(true)
-        const newAnswer = {
-            uid: uuidv4(),
-            name: data.name,
-            recommendationDocument: data.recommendationDocument,
-            createdAt: Timestamp.now()
-        }
-        try {
-            await createQuestionAnswer(auditId, questionId, newAnswer)
-            form.reset()
-            setIsLoading(false)
-            setShowAddDialog(false)
-            singleQuestionFetch()
-            return toast({
-                title: "Answer created successfully.",
-                description: `Your answer was created with id ${newAnswer.uid}.`,
-            })
-        } catch (error) {
-            setIsLoading(false)
-            console.error('Error adding answer:', error);
-        }
+  let questionIndex = questions.findIndex(
+    (question) => question.uid === questionId
+  );
+
+  let allQuestions: any[] = [];
+
+  if (questionIndex !== -1) {
+    allQuestions = [...questions]; // Create a copy of the original array
+    // Remove elements from index 0 to the found index
+    allQuestions.splice(0, questionIndex + 1);
+  }
+
+  let questionsData = allQuestions
+    ?.filter((question) => question.uid !== questionId)
+    .map((item) => ({
+      name: item.name,
+      uid: item.uid,
+    }));
+
+  const handleEditorSave = (data: any) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      if (!isTyping) {
+        form.trigger("recommendationDocument");
+      }
+    }, 1);
+
+    if (data.length > 0) {
+      form.setValue("recommendationDocument", JSON.stringify(data));
+    } else {
+      form.setValue("recommendationDocument", JSON.stringify(undefined));
     }
+  };
 
-    return (
-        <>
-            <Button
-                disabled={loading}
-                variant={variant}
-                onClick={() => setShowAddDialog(true)}
-            >
-                <Icons.filePlus className="mr-2 h-4 w-4"/>
-                New Answer
-            </Button>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <DialogHeader>
-                                <DialogTitle>Add Answer</DialogTitle>
-                                <DialogDescription>
-                                    Type answer name and recommendation document.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input variant="ny" placeholder="Answer Name" {...field} />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
+  const form = useForm<FormData>({
+    resolver: zodResolver(answerSchema),
+    defaultValues: {
+      name: "",
+      questionId: "",
+      recommendationDocument: "",
+    },
+  });
 
-                            </div>
-                            <div className="grid gap-4 py-4">
-                                <FormField
-                                    control={form.control}
-                                    name="recommendationDocument"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Recommendation Document</FormLabel>
-                                            <FormControl>
-                                                <Textarea variant="ny"
-                                                          placeholder="Recommendation Document" {...field} />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
+  async function onSubmit(data: FormData) {
+    setIsLoading(true);
+    const newAnswer = {
+      uid: uuidv4(),
+      name: data.name,
+      questionId: data.questionId ? data.questionId : "",
+      recommendationDocument: data.recommendationDocument,
+      createdAt: Timestamp.now(),
+    };
+    try {
+      await setQuestionAnswer(auditId, questionId, newAnswer);
+      form.reset();
+      setIsLoading(false);
+      setShowAddDialog(false);
+      singleQuestionFetch();
+      return toast.success("Answer created.", {
+        description: `Your answer was created with id ${newAnswer.uid}.`,
+      });
+    } catch (error) {
+      setIsLoading(false);
+      toast.error("Answer has not been created.");
+      console.error("Answer has not been created.", error);
+    }
+  }
 
-                            </div>
-                            <DialogFooter>
-                                <button
-                                    type="submit"
-                                    className={cn(
-                                        buttonVariants({variant: "default"}),
-                                        {
-                                            "cursor-not-allowed opacity-60": isLoading,
-                                        },
-                                        className
-                                    )}
-                                    disabled={isLoading}
-                                    {...props}
-                                >
-                                    {isLoading ? (
-                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
-                                    ) : (
-                                        <Icons.add className="mr-2 h-4 w-4"/>
-                                    )}
-                                    Add Answer
-                                </button>
-                            </DialogFooter>
-                        </form>
-                    </Form>
-                </DialogContent>
-            </Dialog>
+  return (
+    <>
+      <Button
+        disabled={loading}
+        variant={variant}
+        onClick={() => setShowAddDialog(true)}
+      >
+        <Icons.filePlus className="mr-2 h-4 w-4"/>
+        New Answer
+      </Button>
 
-        </>
-    );
+      <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Add Answer</SheetTitle>
+            <SheetDescription>
+              Type answer name and recommendation document.
+            </SheetDescription>
+          </SheetHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="grid gap-4 py-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          variant="ny"
+                          placeholder="Answer Name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {
+                audit?.condition &&
+                  <div className="grid gap-4 py-4">
+                      <FormField
+                          control={form.control}
+                          name="questionId"
+                          render={({field}) => (
+                            <FormItem>
+                              <FormLabel>Question Name</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select an question Name"/>
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Select a question Name</SelectLabel>
+                                    {questionsData.map((question) => (
+                                      <SelectItem
+                                        key={question.uid}
+                                        value={question.uid}
+                                      >
+                                        {question.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage/>
+                            </FormItem>
+                          )}
+                      />
+                  </div>
+              }
+
+              <div className="grid gap-4 py-4">
+                <FormField
+                  control={form.control}
+                  name="recommendationDocument"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Recommendation Document</FormLabel>
+                      <FormControl>
+                        <Editor
+                          id="recommendationDocument"
+                          onSave={handleEditorSave}
+                          placeHolder="Let`s write recommendation document!"
+                        />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <SheetFooter>
+                <button
+                  type="submit"
+                  className={cn(
+                    buttonVariants({variant: "default"}),
+                    {
+                      "cursor-not-allowed opacity-60": isLoading,
+                    },
+                    className
+                  )}
+                  disabled={isLoading}
+                  {...props}
+                >
+                  {isLoading ? (
+                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin"/>
+                  ) : (
+                    <Icons.filePlus className="mr-2 h-4 w-4"/>
+                  )}
+                  Submit
+                </button>
+              </SheetFooter>
+            </form>
+          </Form>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
 };
 
 export default AnswerCreateButton;

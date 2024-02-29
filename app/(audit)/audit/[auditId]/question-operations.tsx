@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
-    DropdownMenuTrigger
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Icons} from "@/components/icons";
 import {
@@ -12,13 +12,14 @@ import {
     AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription, AlertDialogFooter,
+    AlertDialogDescription,
+    AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {Timestamp} from "firebase/firestore";
 import {Question, QuestionActionType} from "@/types/dto";
-import {toast} from "@/components/ui/use-toast";
+import {toast} from "sonner";
 import useQuestions from "@/app/(audit)/audit/QuestionContext";
 import {
     Dialog,
@@ -26,89 +27,119 @@ import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle
+    DialogTitle,
 } from "@/components/ui/dialog";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {cn} from "@/lib/utils";
 import {buttonVariants} from "@/components/ui/button";
 import {useForm} from "react-hook-form";
-import * as z from 'zod'
+import * as z from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {questionSchema} from "@/lib/validations/question";
-import {deleteSingleQuestionInFirebase, updateSingleQuestionInFirebase} from "@/lib/firestore/audit";
+import {
+    deleteQuestionById,
+    updateQuestionById,
+} from "@/lib/firestore/question";
 
 interface QuestionOperationsProps {
-    auditId: string
-    questionId: string
-    question: Question
+    auditId: string;
+    questionId: string;
+    question: Question;
+    setUnorderQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
-type FormData = z.infer<typeof questionSchema>
+type FormData = z.infer<typeof questionSchema>;
 
-const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsProps) => {
-    const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false)
-    const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false)
-    const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
-    const [showUpdateDialog, setShowUpdateDialog] = React.useState<boolean>(false)
+const QuestionOperations = ({
+                                auditId,
+                                questionId,
+                                question,
+                                setUnorderQuestions,
+                            }: QuestionOperationsProps) => {
+    const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false);
+    const [isUpdateLoading, setIsUpdateLoading] = React.useState<boolean>(false);
+    const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false);
+    const [showUpdateDialog, setShowUpdateDialog] =
+        React.useState<boolean>(false);
 
-    const {dispatch} = useQuestions()
+    const {dispatch} = useQuestions();
 
     const form = useForm<FormData>({
         resolver: zodResolver(questionSchema),
-    })
+    });
 
     async function onUpdateSubmit(data: FormData) {
-        setIsUpdateLoading(true)
+        setIsUpdateLoading(true);
         let formData: Question = {
-            uid: question?.uid || '',
+            id: question.id,
+            uid: question?.uid || "",
             name: data.question_name,
             answers: question?.answers || [],
             createdAt: question?.createdAt || Timestamp.now(),
-        }
+        };
         try {
-            const isSuccess: boolean = await updateSingleQuestionInFirebase(auditId, questionId, formData)
+            const isSuccess: boolean = await updateQuestionById(
+                auditId,
+                questionId,
+                formData
+            );
             if (isSuccess) {
                 // Update your state or dispatch action
-                dispatch({type: QuestionActionType.UPDATE_QUESTION, payload: formData as Question});
-                toast({
-                    title: 'Question updated successfully!',
-                    variant: 'default',
-                    description: `Your Question was updated.`,
+                dispatch({
+                    type: QuestionActionType.UPDATE_QUESTION,
+                    payload: formData as Question,
                 });
-                form.reset()
+                setUnorderQuestions(prevState => {
+                    return prevState.map(prevQuestion => {
+                        if (prevQuestion.id === formData.id) {
+                            // Update the specific question
+                            return formData;
+                        }
+                        // Keep other questions unchanged
+                        return prevQuestion;
+                    });
+                });
+                toast.info("Question updated!");
+                form.reset();
             } else {
                 // Handle failure
-                console.error('Failed to update question in Firebase');
+                console.error("Failed to update question in Firebase");
             }
         } catch (error) {
-            console.error('Error updating document:', error);
+            console.error("Error updating document:", error);
             setIsUpdateLoading(false);
         } finally {
-            setShowUpdateDialog(false)
+            setShowUpdateDialog(false);
             setIsUpdateLoading(false);
         }
     }
 
     async function deleteSingleQuestion(event: React.MouseEvent) {
-        event.preventDefault()
-        setIsDeleteLoading(true)
+        event.preventDefault();
+        setIsDeleteLoading(true);
         try {
-            await deleteSingleQuestionInFirebase(auditId, questionId)
-            dispatch({type: QuestionActionType.DELETE_QUESTION, payload: questionId})
-            toast({
-                title: 'Question deleted successfully!',
-                variant: 'default'
-            })
-            setIsDeleteLoading(false)
-            setShowDeleteAlert(false)
+            await deleteQuestionById(auditId, questionId);
+            dispatch({
+                type: QuestionActionType.DELETE_QUESTION,
+                payload: questionId,
+            });
+            setUnorderQuestions(prevQuestion => prevQuestion.filter(question => question.uid !== questionId))
+            toast.info("Question deleted.");
+            setIsDeleteLoading(false);
+            setShowDeleteAlert(false);
         } catch (error) {
-            setIsDeleteLoading(false)
-            toast({
-                title: "Something went wrong.",
-                description: "Your question was not deleted. Please try again.",
-                variant: "destructive",
-            })
+            setIsDeleteLoading(false);
+            toast.error("Something went wrong.", {
+                description: "Failed to delete question. Please try again.",
+            });
         }
     }
 
@@ -134,7 +165,7 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                         onSelect={() => setShowUpdateDialog(true)}
                     >
                         <Icons.fileEdit className="mr-2 h-4 w-4"/>
-                        Edit
+                        Rename
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
                     <DropdownMenuItem
@@ -157,7 +188,9 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleteLoading}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isDeleteLoading}>
+                            Cancel
+                        </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(event) => deleteSingleQuestion(event)}
                             className="bg-red-600 focus:ring-red-600"
@@ -181,7 +214,8 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                             <DialogHeader>
                                 <DialogTitle>Update Question</DialogTitle>
                                 <DialogDescription>
-                                    Make changes to your question here. Click save when you're done.
+                                    Make changes to your question here. Click save when you're
+                                    done.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
@@ -194,7 +228,8 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                                             <FormControl>
                                                 <Input
                                                     variant="ny"
-                                                    placeholder="Answer Name" {...field}
+                                                    placeholder="Answer Name"
+                                                    {...field}
                                                 />
                                             </FormControl>
                                             <FormMessage/>
@@ -205,12 +240,9 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                             <DialogFooter>
                                 <button
                                     type="submit"
-                                    className={cn(
-                                        buttonVariants({variant: "default"}),
-                                        {
-                                            "cursor-not-allowed opacity-60": isUpdateLoading,
-                                        }
-                                    )}
+                                    className={cn(buttonVariants({variant: "default"}), {
+                                        "cursor-not-allowed opacity-60": isUpdateLoading,
+                                    })}
                                     disabled={isUpdateLoading}
                                 >
                                     {isUpdateLoading ? (
@@ -218,14 +250,13 @@ const QuestionOperations = ({auditId, questionId, question}: QuestionOperationsP
                                     ) : (
                                         <Icons.add className="mr-2 h-4 w-4"/>
                                     )}
-                                    Save changes
+                                    Update Question
                                 </button>
                             </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>
             </Dialog>
-
         </>
     );
 };

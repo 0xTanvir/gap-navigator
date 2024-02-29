@@ -5,6 +5,7 @@ import { useAuth } from "@/components/auth/auth-provider"
 import ClientDashboard from "@/components/dashboard/client-dashboard"
 import ConsultantDashboard from "@/components/dashboard/consultant-dashboard"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import AdminDashboard from "@/components/dashboard/admin-dashboard";
 
 export default function DashboardsPage() {
     const { user, isAuthenticated, loading } = useAuth()
@@ -19,7 +20,11 @@ export default function DashboardsPage() {
         )
     } else if (isAuthenticated && user && user.role === "consultant") {
         return (
-            <ConsultantDashboard />
+            <ConsultantDashboard userAuditsId={user?.audits} />
+        )
+    }else if (isAuthenticated && user && user.role === "admin") {
+        return (
+            <AdminDashboard />
         )
     } else {
         return notFound()

@@ -28,7 +28,7 @@ export function ProfileNav() {
                 /></div>}
             {!loading && !user && <div className="flex gap-4">
                 <Link
-                    href="/login"
+                    href="/"
                     className={cn(
                         buttonVariants({ variant: "outline", size: "sm" }),
                         "px-4"
@@ -44,10 +44,10 @@ export function ProfileNav() {
 function AvatarSkeleton() {
     return (
         <div className="flex items-center space-x-4">
-            <div className="space-y-2">
-                <Skeleton className="h-3 w-[50px]" />
-                <Skeleton className="h-3 w-[25px]" />
-            </div>
+            {/*<div className="space-y-2">*/}
+            {/*    <Skeleton className="h-3 w-[50px]" />*/}
+            {/*    <Skeleton className="h-3 w-[25px]" />*/}
+            {/*</div>*/}
             <Skeleton className="h-6 w-6 rounded-full" />
         </div>
     )

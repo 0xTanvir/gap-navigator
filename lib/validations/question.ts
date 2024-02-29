@@ -1,5 +1,9 @@
 import * as z from 'zod'
 
+const phoneRegex = new RegExp(
+    /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
+)
+
 export const questionSchema = z.object({
     question_name: z.string()
         .refine(value => value.trim().length > 0, {
@@ -13,6 +17,9 @@ export const answerSchema = z.object({
     name: z
         .string()
         .min(1, {message: "Please type an answer name."}),
+    questionId: z.string({
+        required_error: "Please select an question name.",
+    }).optional(),
     recommendationDocument: z
         .string()
         .min(1, {message: "Please type an recommendation document."})
@@ -30,7 +37,29 @@ export const evaluationQuestionListSchema = z.object({
     answerId: z.string({
         required_error: "You need to select a answer.",
     }),
-    additionalNote: z.string().max(160).optional(),
-    recommendedNote: z.string().max(160).optional(),
-    internalNote: z.string().max(160).optional(),
+    additionalNote: z.string().optional(),
+    recommendedNote: z.string().optional(),
+    internalNote: z.string().optional(),
+})
+
+export const evaluateParticipant = z.object({
+    participantFirstName: z.string({required_error: 'First name is required!'})
+        .min(3, {
+            message: 'First Name must be at least 3 characters',
+        }),
+    participantLastName: z.string({required_error: 'Last name is required!'})
+        .min(3, {
+            message: 'Last Name must be at least 3 characters',
+        }),
+    participantEmail: z.string({required_error: 'Email is required!'}).email('Please enter a valid email'),
+    participantPhone: z.string({required_error: 'Please enter a valid phone number!'})
+        // .min(9, {message: 'Please enter a valid phone number!'})
+        // .regex(phoneRegex, 'Please enter a valid phone number!')
+        .optional(),
+})
+
+export const evaluateParticipantUpdate = z.object({
+    participantPhone: z.string({required_error: 'Please enter a valid phone number!'})
+        .min(9, {message: 'Please enter a valid phone number!'})
+        .regex(phoneRegex, 'Please enter a valid phone number!'),
 })

@@ -1,0 +1,33 @@
+.editorjs pre {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    margin: 1em 0;
+}
+
+.editorjs code {
+    white-space: pre-wrap !important;
+    width: 100%;
+    min-height: 30px;
+    box-sizing: border-box;
+    text-align: left;
+    margin: 15px 0 8px;
+    padding: 10px;
+    border-radius: 2px 2px 2px 0;
+    font-size: 14px;
+    line-height: 22px;
+    display: block;
+    overflow-x: auto;
+}
+
+.editorjs ol {
+    list-style-type: decimal;
+}
+
+.editorjs ul {
+    list-style-type: disc;
+}
+
+.editorjs a {
+    text-decoration: underline;
+}
