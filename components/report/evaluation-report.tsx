@@ -67,7 +67,6 @@ const EvaluationReport = ({auditId}: EvaluationReportProps) => {
         const result = countAnswerSelections(allChoices);
         // const result = countAnswerSelections(evaluations[0].choices, evaluations[1].choices);
         setAnswerSelectCount(result)
-        console.log(result);
       } catch (e) {
         console.log(e)
       } finally {
