@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from '../icons';
 import CustomPagination from "@/components/custom-pagination/custom-pagination";
+import { useRouter } from "next/navigation";
 
 interface UserInfoTabsProps {
   userId: string
@@ -38,6 +39,7 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
   const [totalData, setTotalData] = useState<number>(0)
 
   const inputUserNameRef = useRef<HTMLInputElement>(null);
+  const router = useRouter()
 
 
   const debounce = (call: any, delay: number) => {
@@ -264,7 +266,8 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
                               <div className="grid gap-1">
                                 <div className="flex gap-2">
                                   <div className="font-semibold">
-                                    <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
+                                    <Link href={`/audit/${evaluation.auditId}/review/${evaluation.uid}`}
+                                          className="hover:underline">
                                       {evaluation.auditName}
                                     </Link>
                                   </div>
