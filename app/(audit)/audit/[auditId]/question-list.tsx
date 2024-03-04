@@ -188,12 +188,14 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                                     <QuestionCreateButton
                                         auditId={auditId as string}
                                         setUnorderQuestions={setUnorderQuestions}
+                                        audit={audit}
                                     />
                                 </div>
                                 :
                                 <QuestionCreateButton
                                     auditId={auditId as string}
                                     setUnorderQuestions={setUnorderQuestions}
+                                    audit={audit}
                                 />
                         }
                     </>
@@ -247,6 +249,7 @@ export default function QuestionList({userId, auditId}: AuditEditorProps) {
                         noQuestion={true}
                         auditId={auditId as string}
                         setUnorderQuestions={setUnorderQuestions}
+                        audit={audit}
                     />
                 </EmptyPlaceholder>
             )}

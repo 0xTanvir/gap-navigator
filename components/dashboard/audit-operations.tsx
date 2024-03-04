@@ -302,13 +302,13 @@ export function AuditOperations({
             };
             const notificationData: Notification = {
               uid: uuidv4(),
-              auditName: audit.name,
-              type: "AUDIT_INVITED",
-              ownerAuditUserId: audit.authorId,
-              inviteUserId: inviteUser.uid,
-              auditId: audit.uid,
-              isSeen: false,
+              title: audit.name,
+              action_type: "AUDIT_INVITED",
+              action_value: `/evaluate/${audit.uid}`,
+              message: `You have been invited to evaluate audit <br><b>${audit.name}</b>.`,
+              status: false,
               createdAt: Timestamp.now(),
+              updatedAt: Timestamp.now(),
             };
             let isSuccess = await setNotificationData(
               inviteUser.uid,
@@ -524,7 +524,7 @@ export function AuditOperations({
             </DropdownMenuItem>
             <DropdownMenuSeparator/>
             {
-              (user?.role === "consultant" && countEvaluations > 0) &&
+              ((user?.role === "consultant" || user?.role === "admin") && countEvaluations > 0) &&
                 <>
                     <DropdownMenuItem
                         className="flex cursor-pointer items-center"
@@ -532,6 +532,14 @@ export function AuditOperations({
                     >
                         <Icons.list className="mr-2 h-4 w-4"/>
                         Evaluation List
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/audit/${audit.uid}/report`)}
+                    >
+                        <Icons.flag className="mr-2 h-4 w-4"/>
+                        Reports
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
                 </>

@@ -19,6 +19,8 @@ import edjsParser from "editorjs-parser";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { generatePdfDefinition } from "@/app/(evaluate)/evaluate/[auditId]/completed/pdf-download";
 import { usePathname } from 'next/navigation'
+import { AuditEditorHeader } from "@/app/(audit)/audit/[auditId]/audit-editor-header";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Editor = dynamic(() => import("@/components/editorjs/editor"), {
   ssr: false,
@@ -290,11 +292,36 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
   }, [evaluationId]);
 
   if (isLoading) {
-    return <Icons.spinner/>
+    return <>
+      <Skeleton className="w-full h-10"/>
+      <div className="flex justify-end items-center gap-2 my-5">
+        <Skeleton className="w-24 h-10"/>
+        <Skeleton className="w-32 h-10"/>
+      </div>
+      <div className="">
+        <Skeleton className="w-full h-40"/>
+      </div>
+      {
+        [1, 2, 3, 4].map(data => (
+          <React.Fragment key={data}>
+            <div className="flex gap-2 items-center justify-between mt-8">
+              <Skeleton className="w-10 h-12"/>
+              <Skeleton className="w-full h-12"/>
+            </div>
+            <hr className="my-4"/>
+            <Skeleton className="w-full h-11 mb-4"/>
+            <Skeleton className="w-full h-11 mb-4"/>
+            <Skeleton className="w-full h-11 mb-4"/>
+            <Skeleton className="w-full h-11"/>
+          </React.Fragment>
+        ))
+      }
+    </>
   }
 
   return (
     <div>
+      <AuditEditorHeader heading={audit?.auditName as string}/>
       <div className="flex justify-end items-center gap-2">
         <Button
           variant="secondary"
@@ -357,7 +384,7 @@ const ReviewComponent = ({auditId}: ReviewComponent) => {
                               className="resize-none mb-3"
                               value={choice.additionalNote}
                           />
-                        {user?.role === "consultant" && (
+                        {(user?.role === "consultant" || user?.role === "admin") && (
                           <>
                             <Editor
                               onSave={() => {
