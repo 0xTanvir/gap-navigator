@@ -1,14 +1,18 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfileInfo from "@/components/user/profile-info";
 import { getEvaluationWithUseInfoAndEvaluations } from "@/lib/firestore/evaluation";
-import { AuditItem } from "@/components/dashboard/audit-item";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Evaluate } from "@/types/dto";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Icons } from '../icons';
+import CustomPagination from "@/components/custom-pagination/custom-pagination";
+import { useRouter } from "next/navigation";
 
 interface UserInfoTabsProps {
   userId: string
@@ -28,19 +32,70 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
   const [userInfo, setUserInfo] = useState<useInfo | null>(null)
   const [evaluations, setEvaluations] = useState<Evaluate[]>([])
 
-  async function fetchClientsEvaluationData() {
-    try {
-      if (user?.audits) {
-        const {userInfo, evaluations} = await getEvaluationWithUseInfoAndEvaluations(user.audits, userId)
-        setUserInfo(userInfo)
-        setEvaluations(evaluations)
-        setIsLoading(false)
-      }
-    } catch (err) {
+  const [auditName, setAuditName] = useState<string>("")
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [currentSliceEvaluations, setCurrentSliceEvaluations] = useState<Evaluate[] | []>([]);
+  const [pageSize] = useState<number>(10)
+  const [totalData, setTotalData] = useState<number>(0)
+
+  const inputUserNameRef = useRef<HTMLInputElement>(null);
+  const router = useRouter()
+
+
+  const debounce = (call: any, delay: number) => {
+    let timer: any
+    return function (...args: any) {
+      // @ts-ignore
+      const context = this
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        timer = null
+        call.apply(context, args)
+      }, delay)
     }
   }
 
+  const handleChange = (e: any) => {
+    setAuditName(e.target.value)
+    setCurrentPage(1)
+  }
+  const inputDebounce = useCallback(debounce(handleChange, 1000), [])
+
+  const handleReset = () => {
+    setCurrentPage(1)
+    setAuditName("")
+    // @ts-ignore
+    inputUserNameRef.current.value = '';
+  }
+
+  const indexOfLastAudit = currentPage * pageSize
+  const indexOfFirstAudit = indexOfLastAudit - pageSize
+
   useEffect(() => {
+    if (auditName) {
+      let filterData = evaluations.filter(evaluation => evaluation?.auditName?.toLowerCase().includes(auditName.toLowerCase()));
+      setTotalData(filterData.length)
+      setCurrentSliceEvaluations(filterData.slice(indexOfFirstAudit, indexOfLastAudit))
+    } else {
+      setTotalData(evaluations.length)
+      setCurrentSliceEvaluations(evaluations.slice(indexOfFirstAudit, indexOfLastAudit))
+    }
+  }, [totalData, auditName, indexOfLastAudit, indexOfFirstAudit, evaluations]);
+
+
+  useEffect(() => {
+    async function fetchClientsEvaluationData() {
+      try {
+        if (user?.audits) {
+          const {userInfo, evaluations} = await getEvaluationWithUseInfoAndEvaluations(user.audits, userId)
+          setUserInfo(userInfo)
+          setEvaluations(evaluations)
+          setIsLoading(false)
+        }
+      } catch (err) {
+      }
+    }
+
     fetchClientsEvaluationData()
   }, [loading, isLoading]);
 
@@ -163,36 +218,6 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
                     }
                   </CardContent>
                 </Card>
-
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Name<span className="mx-1">:</span></div>*/}
-                {/*      <div*/}
-                {/*        className="capitalize">{userInfo?.participantFirstName + " " + userInfo?.participantLastName}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Email<span className="mx-1">:</span></div>*/}
-                {/*      <div className="">{userInfo?.participantEmail}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  userInfo?.participantPhone &&*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*        <div className="">Email</div>*/}
-                {/*        <div className="">{userInfo?.participantPhone}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
-                {/*{*/}
-                {/*  isLoading ? <Skeleton className="h-6 w-full mt-2"/> :*/}
-                {/*    <div className="flex items-center font-semibold">*/}
-                {/*      <div className="">Complete Evaluation<span className="mx-1">:</span></div>*/}
-                {/*      <div className="">{evaluations.length}</div>*/}
-                {/*    </div>*/}
-                {/*}*/}
               </CardContent>
             </CardHeader>
           </Card>
@@ -202,6 +227,29 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
               <CardTitle>All Evaluations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
+
+              <div className="px-1.5 flex flex-col sm:flex-row  sm:items-end justify-end gap-3 mr-1 mb-5">
+                <div className="">
+                  <Input
+                    placeholder="Aduit Name"
+                    ref={inputUserNameRef}
+                    type="text"
+                    onChange={(e) => {
+                      inputDebounce(e)
+                    }}
+                  />
+                </div>
+                {auditName &&
+                    <Button
+                        variant="destructive"
+                        type="reset"
+                        onClick={handleReset}
+                    >
+                        <Icons.searchX/>
+                    </Button>
+                }
+              </div>
+
               {
                 isLoading ?
                   <div className="divide-y divide-border rounded-md border mt-3 p-4">
@@ -209,24 +257,31 @@ const UserInfoTabs = ({userId}: UserInfoTabsProps) => {
                     <Skeleton className="h-6 w-full mt-2"/>
                     <Skeleton className="h-6 w-full mt-2"/>
                   </div> :
-                  evaluations.length > 0 ?
-                    <div className="divide-y divide-border rounded-md border mt-3">
-                      {
-                        evaluations.map((evaluation, index) => (
-                          <div key={index} className="flex items-center justify-between p-4">
-                            <div className="grid gap-1">
-                              <div className="flex gap-2">
-                                <div className="font-semibold">
-                                  <Link href={`/evaluate/${evaluation.auditId}`} className="hover:underline">
-                                    {evaluation.auditName}
-                                  </Link>
+                  currentSliceEvaluations.length > 0 ?
+                    <React.Fragment>
+                      <div className="divide-y divide-border rounded-md border !my-5">
+                        {
+                          currentSliceEvaluations.map((evaluation, index) => (
+                            <div key={index} className="flex items-center justify-between p-4">
+                              <div className="grid gap-1">
+                                <div className="flex gap-2">
+                                  <div className="font-semibold">
+                                    <Link href={`/audit/${evaluation.auditId}/review/${evaluation.uid}`}
+                                          className="hover:underline">
+                                      {evaluation.auditName}
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))
-                      }
-                    </div>
+                          ))
+                        }
+                      </div>
+                      <CustomPagination
+                        totalPages={Math.ceil(totalData / pageSize)}
+                        setCurrentPage={setCurrentPage}
+                      />
+                    </React.Fragment>
                     :
                     <div className="divide-y divide-border rounded-md border">
                       <div className="text-center font-semibold py-10">No Data Found</div>
