@@ -38,33 +38,9 @@ export const EvaluationEmail = ({
             <Text className="text-sm">
               Hello {receiverEmail},
             </Text>
-            <Text className="text-sm">
-              <strong>{receiverEmail}</strong> (
-              <Link
-                href={`mailto:${receiverEmail}`}
-                className="text-blue-600 no-underline"
-              >
-                {receiverEmail}
-              </Link>
-              ) has invited you to join <strong>{siteConfig.name}</strong> to evaluate a audit.
-            </Text>
             <Section className="text-center my-8">
 
             </Section>
-            <Text className="text-sm">
-              or copy and paste this URL into your browser:{' '}
-              {auditName}
-            </Text>
-            <Hr className="border border-solid border-[#eaeaea] my-6 mx-0 w-full"/>
-            <Text className="opacity-50 text-xs">
-              This invitation was intended for{' '}
-              {/*<span className="">{receiverFirstName} </span>.This invite was sent from{' '}*/}
-              <span className="">{inviteFromIp}</span> located in{' '}
-              <span className="">{inviteFromLocation}</span>. If you were not
-              expecting this invitation, you can ignore this email. If you are
-              concerned about your account's safety, please reply to this email to
-              get in touch with us.
-            </Text>
           </Container>
         </Body>
       </Tailwind>
