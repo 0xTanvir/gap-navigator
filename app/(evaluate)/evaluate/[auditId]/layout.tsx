@@ -33,11 +33,14 @@ export default function DocsLayout({children}: DocsLayoutProps) {
   const {evaluation, dispatch} = useEvaluation();
   const [evaluateLoading, setEvaluateLoading] = useState<boolean>(true);
   const router = useRouter();
+  const [auditData, setAuditData] = useState<Audit | null>(null)
+  const [loader, setLoader] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchEvaluation = async (auditId: string) => {
       try {
         const audit = await getAudit(auditId);
+        setAuditData(audit)
         const evaluations = await getAllEvaluations(auditId);
         const questions = await getQuestionsById(auditId);
         const sideBarNav = getSidebarNav(audit, questions);
@@ -96,6 +99,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
               toast.success(
                 `you are unauthenticated but audit is public so you can do it.`
               );
+              return;
             } else {
               toast.error(`You must be logged in to view this evaluation.`);
               router.push("/");
@@ -120,6 +124,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
         toast.error(`Error fetching evaluation: ${error}.`);
       } finally {
         setEvaluateLoading(false);
+        setLoader(false)
       }
     };
 
@@ -154,8 +159,10 @@ export default function DocsLayout({children}: DocsLayoutProps) {
   }
 
   useEffect(() => {
-    if (loading) {
+    if (loading || loader) {
       return
+    } else if (auditData?.type === "public") {
+      return;
     } else if (!isAuthenticated || !user) {
       router.push("/")
     }
@@ -192,7 +199,7 @@ export default function DocsLayout({children}: DocsLayoutProps) {
 function getSidebarNav(audit: Audit, questions: Questions): SidebarNavItem[] {
   const items = questions.map((question) => ({
     title: question.name,
-    id:question.id,
+    id: question.id,
     href: `/evaluate/${audit.uid}/${question.uid}`,
   }));
 
