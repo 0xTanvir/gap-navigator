@@ -28,7 +28,7 @@ interface DocsLayoutProps {
 }
 
 export default function DocsLayout({children}: DocsLayoutProps) {
-  const {loading, user, isAuthenticated} = useAuth();
+  const {loading, user, isAuthenticated, loggedOut, setLoggedOut} = useAuth();
   const {auditId} = useParams();
   const {evaluation, dispatch} = useEvaluation();
   const [evaluateLoading, setEvaluateLoading] = useState<boolean>(true);
@@ -167,6 +167,13 @@ export default function DocsLayout({children}: DocsLayoutProps) {
       router.push("/")
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (loggedOut) {
+      setLoggedOut(false)
+      router.push("/")
+    }
+  }, [loggedOut]);
 
   return (
     <div className="flex min-h-screen flex-col">
