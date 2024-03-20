@@ -319,20 +319,33 @@ export interface DataItem {
   data: { [key: string]: any };
 }
 
+export function extractYouTubeVideoID(url: string) {
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}
+
+export const VideoThumbnailUrl = (videoId: string) => {
+  console.log(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`)
+  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+};
+
 export async function generatePdfDefinition(data: DataItem[]) {
   const content: Content[] = [];
 
   for (const item of data) {
     switch (item.type) {
       case 'embed':
-        let data: any = {
-          text: item.data.caption || "Link",
-          link: item.data.source,
-          color: "blue",
-          decoration: 'underline',
-          margin: [0, 3],
+        let youTubeVideoID = extractYouTubeVideoID(item.data.source)
+        if (youTubeVideoID) {
+          const imageBase64 = await imageToBase64(VideoThumbnailUrl(youTubeVideoID));
+          content.push({
+            image: "data:image/jpeg;base64," + imageBase64,
+            width: 500,
+            margin: [0, 10],
+            link: item.data.source
+          });
         }
-        content.push(data)
         break;
       case 'image':
         try {

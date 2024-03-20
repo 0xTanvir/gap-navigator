@@ -11,7 +11,8 @@ const DashboardRecentEvaluation = ({evaluation}: DashboardRecentEvaluationProps)
   return (
     <div className="flex items-center">
       <div className="space-y-1">
-        <Link href={`evaluate/${evaluation.auditId}`} className="hover:underline text-sm font-medium leading-none">
+        <Link href={`audit/${evaluation.auditId}/review/${evaluation.uid}`}
+              className="hover:underline text-sm font-medium leading-none">
           {evaluation.auditName}
         </Link>
         <p className="text-sm text-muted-foreground">

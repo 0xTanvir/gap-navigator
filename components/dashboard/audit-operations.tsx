@@ -534,6 +534,14 @@ export function AuditOperations({
                         Evaluation List
                     </DropdownMenuItem>
                     <DropdownMenuSeparator/>
+                    <DropdownMenuItem
+                        className="flex cursor-pointer items-center"
+                        onClick={() => router.push(`/audit/${audit.uid}/report`)}
+                    >
+                        <Icons.flag className="mr-2 h-4 w-4"/>
+                        Reports
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator/>
                 </>
             }
             {user?.role !== "admin" && (

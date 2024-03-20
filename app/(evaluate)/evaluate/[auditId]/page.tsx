@@ -50,6 +50,7 @@ export default function EvaluatePage({
 }) {
   const [audit, setAudit] = useState<Audit | null>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(true)
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const {evaluation, dispatch} = useEvaluation();
   const {user, isAuthenticated, loading} = useAuth()
@@ -180,8 +181,10 @@ export default function EvaluatePage({
     try {
       let dbAudit = await getAudit(auditId)
       setAudit(dbAudit)
+      setLoader(false)
     } catch (error) {
       console.log(error);
+      setLoader(false)
       toast.error("Something went wrong.", {
         description: "Failed to fetch audits. Please try again.",
       });
@@ -193,7 +196,9 @@ export default function EvaluatePage({
   }, []);
 
   useEffect(() => {
-    if (loading) {
+    if (loading || loader) {
+      return;
+    } else if (audit?.type === "public") {
       return;
     } else if (!isAuthenticated || !user) {
       router.push("/")
