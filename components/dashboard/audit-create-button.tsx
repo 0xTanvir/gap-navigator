@@ -162,7 +162,7 @@ export function AuditCreateButton({
           setAuditFormData((prev) => ({...prev as AuditData, ...data}));
           next()
         } else {
-          formStep1.setError('custom_url_string', {type: "custom", message: "required"})
+          formStep1.setError('custom_url_string', {type: "custom", message: "Custom URL is required"})
         }
       } else {
         setAuditFormData((prev) => ({...prev as AuditData, ...data}));
