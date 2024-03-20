@@ -64,7 +64,9 @@ interface AuditCreateButtonProps extends ButtonProps {
 interface AuditData {
   auditName: string;
   auditType: string;
+  custom_url_string: string;
   condition: boolean;
+  custom_url: boolean;
   welcome: string;
   thank_you: string;
 }
@@ -75,7 +77,7 @@ export function AuditCreateButton({
                                     variant,
                                     ...props
                                   }: AuditCreateButtonProps) {
-  const {dispatch} = useAudits();
+  const {audits, dispatch} = useAudits();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAddDialog, setShowAddDialog] = React.useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -90,7 +92,9 @@ export function AuditCreateButton({
     defaultValues: {
       auditName: auditFormData?.auditName || "",
       auditType: auditFormData?.auditType || "",
+      custom_url_string: auditFormData?.custom_url_string || "",
       condition: auditFormData?.condition || false,
+      custom_url: auditFormData?.custom_url || false,
     },
   });
   const formStep2 = useForm<FormDataStep2>({
@@ -144,8 +148,27 @@ export function AuditCreateButton({
   };
 
   const onFinishStep1 = (data: FormDataStep1) => {
-    setAuditFormData((prev) => ({...prev as AuditData, ...data}));
-    next()
+    // Check if audit UID already exists
+    const auditExists = audits.some(audit => audit.uid === data.custom_url_string)
+    if (auditExists) {
+      toast.error("An audit with this UID already exists. Please use a different UID or let the system generate one automatically.", {
+        description: "Please choose a different custom URL or deselect the custom URL option.",
+      });
+      return;
+    } else {
+      if (data.custom_url) {
+        if (data.custom_url_string) {
+          formStep1.clearErrors('custom_url_string')
+          setAuditFormData((prev) => ({...prev as AuditData, ...data}));
+          next()
+        } else {
+          formStep1.setError('custom_url_string', {type: "custom", message: "required"})
+        }
+      } else {
+        setAuditFormData((prev) => ({...prev as AuditData, ...data}));
+        next()
+      }
+    }
   };
   const onFinishStep2 = (data: FormDataStep2) => {
     setAuditFormData((prev) => ({...prev as AuditData, ...data}));
@@ -161,7 +184,7 @@ export function AuditCreateButton({
         condition: auditFormData?.condition as boolean,
         welcome: auditFormData?.welcome === undefined ? "" : auditFormData?.welcome as string,
         thank_you: data?.thank_you === undefined ? "" : data?.thank_you as string,
-        uid: uuidv4(),
+        uid: auditFormData?.custom_url ? auditFormData.custom_url_string : uuidv4(),
         authorId: userId,
         createdAt: Timestamp.now(),
       };
@@ -198,7 +221,16 @@ export function AuditCreateButton({
         New audit
       </Button>
 
-      <Sheet open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <Sheet
+        open={showAddDialog}
+        onOpenChange={() => {
+          setShowAddDialog(false);
+          formStep1.reset();
+          formStep2.reset();
+          formStep3.reset();
+          setAuditFormData(null)
+        }}
+      >
         <SheetContent className="sm:max-w-[80vw] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>Add audit</SheetTitle>
@@ -229,6 +261,62 @@ export function AuditCreateButton({
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={formStep1.control}
+                        name="custom_url"
+                        render={({field}) => (
+                          <FormItem
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => { // Explicitly specify the type here
+                              if (event.target.checked === false) {
+                                formStep1.setValue("custom_url_string", "")
+                              }
+                            }}
+                          >
+                            <div className="relative flex items-start">
+                              <div className="flex h-6 items-center">
+                                <input
+                                  id="custom_url"
+                                  type="checkbox"
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                  {...formStep1.register("custom_url")}
+                                />
+                              </div>
+                              <div className="ml-3 text-sm leading-6">
+                                <label htmlFor="custom_url" className="font-medium">
+                                  Mark it as a custom url audit.
+                                </label>
+                              </div>
+                            </div>
+                            <FormDescription>
+                              Conditional audit can have different sequence of question based on answer choice,
+                              where non conditional audit is linear sequence.
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
+
+                      {
+                        formStep1.getValues("custom_url") &&
+                          <FormField
+                              control={formStep1.control}
+                              name="custom_url_string"
+                              render={({field}) => (
+                                <FormItem>
+                                  <FormLabel>Custom URL</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      variant="ny"
+                                      placeholder="Custom URL"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage/>
+                                </FormItem>
+                              )}
+                          />
+                      }
+
                       <FormField
                         control={formStep1.control}
                         name="auditType"

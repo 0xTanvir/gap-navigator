@@ -28,7 +28,9 @@ export const auditSchemaStep1 = z.object({
     .string({
       required_error: "Please select an audit type.",
     }).min(1),
-  condition: z.boolean().optional()
+  condition: z.boolean().optional(),
+  custom_url: z.boolean().optional(),
+  custom_url_string: z.string().optional()
 })
 export const auditSchemaStep2 = z.object({
   welcome: z
