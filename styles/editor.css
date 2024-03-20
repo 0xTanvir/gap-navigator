@@ -121,6 +121,10 @@ h6.ce-header {
     display: none;
 }
 
+.cdx-input.embed-tool__caption {
+    display: none;
+}
+
 @media (max-width: 639.98px) {
     /*#additionalNote .ce-block__content, #recommendedNote .ce-block__content, #internalNote .ce-block__content, #recommendationDocument .ce-block__content, #description .ce-block__content {*/
     .editorjs .ce-block__content {
