@@ -50,7 +50,7 @@ import {
   ArrowLeft,
   RefreshCcw,
   SearchX,
-  ArrowLeftFromLine, AlignJustify,
+  ArrowLeftFromLine, AlignJustify, Flag,
 } from "lucide-react"
 
 export const Icons = {
@@ -106,6 +106,7 @@ export const Icons = {
   searchX: SearchX,
   back: ArrowLeftFromLine,
   list: AlignJustify,
+  flag: Flag,
   x: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 13" {...props}>
       <path

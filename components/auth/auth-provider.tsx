@@ -18,8 +18,10 @@ interface AuthContextValue {
   setUser: (user: User | null) => Promise<void>;
   isAuthenticated: boolean;
   loading: boolean;
+  loggedOut: boolean;
   updateUser: (user: User | null) => void;
   logOut: () => Promise<void>;
+  setLoggedOut: (value: boolean) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -27,8 +29,10 @@ export const AuthContext = createContext<AuthContextValue>({
   setUser: async () => {},
   isAuthenticated: false,
   loading: true,
+  loggedOut: false,
   updateUser: (user: User | null) => {},
   logOut: async () => {},
+  setLoggedOut: (value: boolean) => {},
 });
 
 export const AuthContextProvider: FC<{ children: ReactNode }> = ({
@@ -37,6 +41,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loggedOut, setLoggedOut] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -49,7 +54,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
       await signOut(firebaseAuth);
       setUser(null);
       setIsAuthenticated(false);
-      // router.push("/")
+      setLoggedOut(true)
     } catch (e: any) {
       toast.error("Something went wrong.", {
         description: `Failed to fetch audits. Please try again. ${e.message}`,
@@ -114,6 +119,8 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({
         loading,
         updateUser,
         logOut,
+        loggedOut,
+        setLoggedOut,
       }}
     >
       {children}
